@@ -1,45 +1,72 @@
-**Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
+# Dwarf Dash
 
-When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
-
-*We recommend that you open this README in another tab as you perform the tasks below. You can [watch our video](https://youtu.be/0ocf7u76WSo) for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.*
+This game aims to be fun and fast paced, while at the same time fullfilling the requirements of CG SS20.
 
 ---
 
-## Edit a file
+## Getting Started
 
-You’ll start by editing this README file to learn how to edit a file in Bitbucket.
+Get yourself a copy of Visual Studio 2017 (Enterprise) to run it right from the project folder in debug mode.
 
-1. Click **Source** on the left side.
-2. Click the README.md link from the list of files.
-3. Click the **Edit** button.
-4. Delete the following text: *Delete this line to make a change to the README from Bitbucket.*
-5. After making your change, click **Commit** and then **Commit** again in the dialog. The commit page will open and you’ll see the change you just made.
-6. Go back to the **Source** page.
+### Prerequisites
 
----
+To be able to run this game you will need:
+```
+OpenGL 4.3 and up
+discrete GPUs from 2009 and later(Intel HD 4200 and up , NVIDIA Geforce 400 and up , AMD Radeon 5000 and up)
+Windows 10
+```
 
-## Create a file
+### Installing
 
-Next, you’ll add a new file to this repository.
+Clone this repository.
 
-1. Click the **New file** button at the top of the **Source** page.
-2. Give the file a filename of **contributors.txt**.
-3. Enter your name in the empty file space.
-4. Click **Commit** and then **Commit** again in the dialog.
-5. Go back to the **Source** page.
+```
+Clone link[clone link]
+```
 
-Before you move on, go ahead and explore the repository. You've already seen the **Source** page, but check out the **Commits**, **Branches**, and **Settings** pages.
+Import into Visual Studio.
 
----
+```
+Instruction link[link]
+```
 
-## Clone a repository
+By pressing the green run button, the game will compile in debug mode. Congratulations, you got yourself Dwarf Dash up and running!
 
-Use these steps to clone from SourceTree, our client for using the repository command-line free. Cloning allows you to work on your files locally. If you don't yet have SourceTree, [download and install first](https://www.sourcetreeapp.com/). If you prefer to clone from the command line, see [Clone a repository](https://confluence.atlassian.com/x/4whODQ).
+## Deployment
 
-1. You’ll see the clone button under the **Source** heading. Click that button.
-2. Now click **Check out in SourceTree**. You may need to create a SourceTree account or log in.
-3. When you see the **Clone New** dialog in SourceTree, update the destination path and name if you’d like to and then click **Clone**.
-4. Open the directory you just created to see your repository’s files.
+You can also simply run the compiled .exe file, as soon as you've compiled once in debug mode. You can find this file under: DwarfDash\bin\Release
 
-Now that you're more familiar with your Bitbucket repository, go ahead and add a new file locally. You can [push your change back to Bitbucket with SourceTree](https://confluence.atlassian.com/x/iqyBMg), or you can [add, commit,](https://confluence.atlassian.com/x/8QhODQ) and [push from the command line](https://confluence.atlassian.com/x/NQ0zDQ).
+## Built With
+
+Still more to come...
+
+~~* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used~~
+~~* [Maven](https://maven.apache.org/) - Dependency Management~~
+~~* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds~~
+
+## Contributing
+
+As of now it isn't possible to contribute to this project yet. Stay tuned!
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+
+## Authors
+
+* **Miran Jank** - *Initial work* - [SoulFast](https://bitbucket.org/Soulfast)
+
+## License
+
+TODO:
+~~This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details~~
+
+## Acknowledgments
+
+* Hat tip to anyone whose code was used
+
+* Inspiration
+```
+[Redungeon](https://play.google.com/store/apps/details?id=com.nitrome.redungeon)
+```
