@@ -176,7 +176,8 @@ int main(int argc, char** argv)
 			// Render
 			cube.draw();
 			cylinder.draw();
-			sphere.draw();
+			//Test for git branch
+			//sphere.draw();
 
 			// Compute frame time
 			dt = t;
