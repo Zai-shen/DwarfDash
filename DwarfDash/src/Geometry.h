@@ -1,8 +1,3 @@
-/*
-* Copyright 2018 Vienna University of Technology.
-* Institute of Computer Graphics and Algorithms.
-* This file is part of the ECG Lab Framework and must not be redistributed.
-*/
 #pragma once
 
 
