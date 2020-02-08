@@ -1,6 +1,6 @@
 # Dwarf Dash
 
-This game aims to be fun and fast paced, while at the same time fullfilling the requirements of CG SS20.
+This game aims to be *fun and fast paced*, while at the same time _fullfilling the requirements_ of CG SS20.
 
 ---
 
@@ -19,17 +19,14 @@ Windows 10
 
 ### Installing
 
-Clone this repository.
+Clone this repository and open manually.
+[Clone link](https://Soulfast@bitbucket.org/Soulfast/dwarfdash.git)
 
-```
-Clone link[clone link]
-```
+OR
 
-Import into Visual Studio.
+Import into Visual Studio via VCS directly.
+[Instructions](https://docs.microsoft.com/en-us/visualstudio/get-started/tutorial-open-project-from-repo?view=vs-2019)
 
-```
-Instruction link[link]
-```
 
 By pressing the green run button, the game will compile in debug mode. Congratulations, you got yourself Dwarf Dash up and running!
 
@@ -67,6 +64,4 @@ TODO:
 * Hat tip to anyone whose code was used
 
 * Inspiration
-```
 [Redungeon](https://play.google.com/store/apps/details?id=com.nitrome.redungeon)
-```
