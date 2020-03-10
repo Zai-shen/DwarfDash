@@ -10,7 +10,7 @@ build/
 # User-specific files
 *.rsuser
 *.suo
-*.user
+### *.user
 *.userosscache
 *.sln.docstates
 
