@@ -7,6 +7,13 @@
 #include "Light.h"
 #include "Texture.h"
 
+//PhysX
+#include "physxInclude/PxPhysicsAPI.h"
+//#include "physxInclude/PxPhysicsVersion.h" hm, komisch, findet er net
+#include "physxInclude/pvd/PxPvd.h"
+#include "physxInclude/pvd/PxPvdSceneClient.h"
+#include "physxInclude/pvd/PxPvdTransport.h"
+using namespace physx;
 
 /* --------------------------------------------- */
 // Prototypes
@@ -29,6 +36,11 @@ static bool _culling = true;
 static bool _dragging = false;
 static bool _strafing = false;
 static float _zoom = 6.0f;
+
+//PhysX
+static PxDefaultErrorCallback gDefaultErrorCallback;
+static PxDefaultAllocator gDefaultAllocatorCallback;
+static PxFoundation* gFoundation = NULL;
 
 
 /* --------------------------------------------- */
@@ -125,6 +137,66 @@ int main(int argc, char** argv)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
+	//PhysX
+	//Creating foundation for PhysX
+	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
+		gDefaultErrorCallback);
+	if (!gFoundation)
+	{
+		std::cerr << "Error creating PhysX3 foundation, Exiting..." << std::endl;
+		exit(1);
+	}
+
+	bool recordMemoryAllocations = true;
+
+	/*
+	PxPvd* pvd = PxCreatePvd(*gFoundation);
+	const char* pvd_host_ip = "127.0.0.1"; // IP of local PC machine PVD
+	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(pvd_host_ip, 5425, 10);
+	pvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
+	*/
+
+	//Creating instance of PhysX SDK
+	///PxPhysics* gPhysicsSDK = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, pvd);
+	PxPhysics* gPhysicsSDK = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale());
+	if (gPhysicsSDK == NULL)
+	{
+		std::cerr << "Error creating PhysX3 device, Exiting..." << std::endl;
+		exit(1);
+	}
+
+	PxScene* gScene = NULL;
+	//Creating scene
+	PxSceneDesc sceneDesc(gPhysicsSDK->getTolerancesScale());
+	sceneDesc.gravity = PxVec3(0.0f, -9.8f, 0.0f);
+	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
+	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	gScene = gPhysicsSDK->createScene(sceneDesc);
+
+	//Creating material
+	PxMaterial* mMaterial =
+		//static friction, dynamic friction, restitution
+		gPhysicsSDK->createMaterial(0.5, 0.5, 0.5);
+
+	//1-Creating static plane
+	PxTransform planePos = PxTransform(PxVec3(0.0f, 0,
+		0.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
+	PxRigidStatic* plane = gPhysicsSDK->createRigidStatic(planePos);
+	PxShape* shape = gPhysicsSDK->createShape(PxPlaneGeometry(), *mMaterial);
+	plane->attachShape(*shape);
+	gScene->addActor(*plane);
+
+	PxRigidDynamic*gBox;
+	//2) Create cube
+	PxTransform boxPos(PxVec3(0.0f, 10.0f, 0.0f));
+	PxBoxGeometry boxGeometry(PxVec3(0.5f, 0.5f, 0.5f));
+	gBox = PxCreateDynamic(*gPhysicsSDK, boxPos, boxGeometry, *mMaterial,
+		1.0f);
+	gScene->addActor(*gBox);
+
+	//Stepping PhysX
+	PxReal myTimestep = 1.0f / 60.0f;
+
 
 	/* --------------------------------------------- */
 	// Initialize scene and render loop
@@ -179,6 +251,17 @@ int main(int argc, char** argv)
 			//Test for git branch
 			//sphere.draw();
 
+			//PhysX
+			if (gScene) {
+				gScene->simulate(myTimestep);
+				gScene->fetchResults(true);
+			}
+			//Get current position of actor (box) and print it
+			PxVec3 boxPos = gBox->getGlobalPose().p;
+			std::cout << "Box current Position (" << boxPos.x << " " << boxPos.y << " " << boxPos.z<<")\n";
+
+
+
 			// Compute frame time
 			dt = t;
 			t = float(glfwGetTime());
@@ -196,6 +279,14 @@ int main(int argc, char** argv)
 	/* --------------------------------------------- */
 
 	destroyFramework();
+
+	//PhysX
+	gScene->release();
+	gPhysicsSDK->release();
+	gFoundation->release();
+	//pvd->release();
+	//transport->release();
+
 
 
 	/* --------------------------------------------- */
