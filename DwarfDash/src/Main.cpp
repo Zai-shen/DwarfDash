@@ -149,16 +149,16 @@ int main(int argc, char** argv)
 
 	bool recordMemoryAllocations = true;
 
-	/*
+	
 	PxPvd* pvd = PxCreatePvd(*gFoundation);
 	const char* pvd_host_ip = "127.0.0.1"; // IP of local PC machine PVD
 	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(pvd_host_ip, 5425, 10);
 	pvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
-	*/
+	
 
 	//Creating instance of PhysX SDK
-	///PxPhysics* gPhysicsSDK = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, pvd);
-	PxPhysics* gPhysicsSDK = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale());
+	PxPhysics* gPhysicsSDK = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, pvd);
+	///PxPhysics* gPhysicsSDK = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale());
 	if (gPhysicsSDK == NULL)
 	{
 		std::cerr << "Error creating PhysX3 device, Exiting..." << std::endl;
@@ -286,8 +286,6 @@ int main(int argc, char** argv)
 	gFoundation->release();
 	//pvd->release();
 	//transport->release();
-
-
 
 	/* --------------------------------------------- */
 	// Destroy context and exit
