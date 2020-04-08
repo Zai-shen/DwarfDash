@@ -229,6 +229,7 @@ int main(int argc, char** argv)
 		float t = float(glfwGetTime());
 		float dt = 0.0f;
 		float t_sum = 0.0f;
+		int frames = 0;
 		double mouse_x, mouse_y;
 
 		while (!glfwWindowShouldClose(window)) {
@@ -258,8 +259,7 @@ int main(int argc, char** argv)
 			}
 			//Get current position of actor (box) and print it
 			PxVec3 boxPos = gBox->getGlobalPose().p;
-			std::cout << "Box current Position (" << boxPos.x << " " << boxPos.y << " " << boxPos.z<<")\n";
-
+			///std::cout << "Box current Position (" << boxPos.x << " " << boxPos.y << " " << boxPos.z<<")\n";
 
 
 			// Compute frame time
@@ -267,6 +267,15 @@ int main(int argc, char** argv)
 			t = float(glfwGetTime());
 			dt = t - dt;
 			t_sum += dt;
+			frames++;
+
+			//Every second print frametime and frames per second to console
+			if (t_sum >= 1.0f) {
+				std::cout << std::to_string(1000.0f / double(frames)) + "ms/frame; " + std::to_string(frames) + " FPS" << std::endl;
+				t_sum -= 1.0f;
+				frames = 0;
+			}
+
 
 			// Swap buffers
 			glfwSwapBuffers(window);
