@@ -15,6 +15,9 @@
 #include "physxInclude/pvd/PxPvdTransport.h"
 using namespace physx;
 
+//Configs
+#include "Configuration.h"
+
 /* --------------------------------------------- */
 // Prototypes
 /* --------------------------------------------- */
@@ -25,6 +28,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
+void setWindowFPS(GLFWwindow *window,float& t_sum);
 
 
 /* --------------------------------------------- */
@@ -36,6 +40,10 @@ static bool _culling = true;
 static bool _dragging = false;
 static bool _strafing = false;
 static float _zoom = 6.0f;
+int frames = 0;
+///Game game;
+///Configuration config;
+
 
 //PhysX
 static PxDefaultErrorCallback gDefaultErrorCallback;
@@ -43,10 +51,11 @@ static PxDefaultAllocator gDefaultAllocatorCallback;
 static PxFoundation* gFoundation = NULL;
 
 
+
+
 /* --------------------------------------------- */
 // Main
 /* --------------------------------------------- */
-
 int main(int argc, char** argv)
 {
 	/* --------------------------------------------- */
@@ -229,7 +238,6 @@ int main(int argc, char** argv)
 		float t = float(glfwGetTime());
 		float dt = 0.0f;
 		float t_sum = 0.0f;
-		int frames = 0;
 		double mouse_x, mouse_y;
 
 		while (!glfwWindowShouldClose(window)) {
@@ -261,7 +269,6 @@ int main(int argc, char** argv)
 			PxVec3 boxPos = gBox->getGlobalPose().p;
 			///std::cout << "Box current Position (" << boxPos.x << " " << boxPos.y << " " << boxPos.z<<")\n";
 
-
 			// Compute frame time
 			dt = t;
 			t = float(glfwGetTime());
@@ -269,13 +276,7 @@ int main(int argc, char** argv)
 			t_sum += dt;
 			frames++;
 
-			//Every second print frametime and frames per second to console
-			if (t_sum >= 1.0f) {
-				std::cout << std::to_string(1000.0f / double(frames)) + "ms/frame; " + std::to_string(frames) + " FPS" << std::endl;
-				t_sum -= 1.0f;
-				frames = 0;
-			}
-
+			setWindowFPS(window,t_sum);
 
 			// Swap buffers
 			glfwSwapBuffers(window);
@@ -305,6 +306,18 @@ int main(int argc, char** argv)
 	return EXIT_SUCCESS;
 }
 
+void setWindowFPS(GLFWwindow *window, float& t_sum)
+{
+	//Every second print frametime and frames per second to console
+	if (t_sum >= 1.0f) {
+		//std::stringstream title;
+		//title << config.title << " [" << (int)(frameCount / delta) << " FPS]";
+		//glfwSetWindowTitle(window, title.str().c_str());
+		std::cout << std::to_string(1000.0f / double(frames)) + "ms/frame; " + std::to_string(frames) + " FPS" << std::endl;
+		t_sum -= 1.0f;
+		frames = 0;
+	}
+}
 
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL)
 {
