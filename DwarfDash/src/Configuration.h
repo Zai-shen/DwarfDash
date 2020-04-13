@@ -15,9 +15,9 @@ public:
 		this->antialiasing = (int)reader.GetInteger("window", "antialiasing", 4);
 		this->brightness = (float)reader.GetReal("window", "brightness", 1.f);
 		this->fullscreen = reader.GetBoolean("window", "fullscreen", false);
-		this->cameraFov = (float)reader.GetReal("camera", "fov", 60.f);
-		this->cameraNear = (float)reader.GetReal("camera", "near", 0.1f);
-		this->cameraFar = (float)reader.GetReal("camera", "far", 100.f);
+		this->fov = (float)reader.GetReal("camera", "fov", 60.f);
+		this->nearZ = (float)reader.GetReal("camera", "near", 0.1f);
+		this->farZ = (float)reader.GetReal("camera", "far", 100.f);
 		this->title = reader.Get("window", "title", "Dwarf Dash");
 	}
 
@@ -28,14 +28,17 @@ public:
 	int refresh_rate;
 	int antialiasing;
 	float brightness;
-	float cameraFov;
-	float cameraNear;
-	float cameraFar;
+	float fov;
+	float nearZ;
+	float farZ;
 	std::string title;
 	bool fullscreen = false;
-	bool wireframes = false;
-	bool culling = false;
-	bool boundingBoxes = false;
+	bool wireframe = false;
+	bool culling = true;
+	bool dragging = false;
+	bool strafing = false;
+	float zoom = 6.0f;
 };
 
-extern Configuration config = Configuration("assets/settings.ini");
+//Declare global and initialize
+//extern Configuration config = Configuration("assets/settings.ini");

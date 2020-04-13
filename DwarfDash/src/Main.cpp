@@ -14,8 +14,9 @@
 #include "physxInclude/pvd/PxPvdSceneClient.h"
 #include "physxInclude/pvd/PxPvdTransport.h"
 using namespace physx;
+using namespace std;
 
-//Configs
+//Config
 #include "Configuration.h"
 
 /* --------------------------------------------- */
@@ -35,15 +36,14 @@ void setWindowFPS(GLFWwindow *window,float& t_sum);
 // Global variables
 /* --------------------------------------------- */
 
-static bool _wireframe = false;
-static bool _culling = true;
+// Load settings.ini
+Configuration config = Configuration("assets/settings.ini");
+
 static bool _dragging = false;
 static bool _strafing = false;
 static float _zoom = 6.0f;
 int frames = 0;
 ///Game game;
-///Configuration config;
-
 
 //PhysX
 static PxDefaultErrorCallback gDefaultErrorCallback;
@@ -59,21 +59,6 @@ static PxFoundation* gFoundation = NULL;
 int main(int argc, char** argv)
 {
 	/* --------------------------------------------- */
-	// Load settings.ini
-	/* --------------------------------------------- */
-
-	INIReader reader("assets/settings.ini");
-
-	int window_width = reader.GetInteger("window", "width", 800);
-	int window_height = reader.GetInteger("window", "height", 800);
-	int refresh_rate = reader.GetInteger("window", "refresh_rate", 60);
-	bool fullscreen = reader.GetBoolean("window", "fullscreen", false);
-	std::string window_title = reader.Get("window", "title", "ECG");
-	float fov = float(reader.GetReal("camera", "fov", 60.0f));
-	float nearZ = float(reader.GetReal("camera", "near", 0.1f));
-	float farZ = float(reader.GetReal("camera", "far", 100.0f));
-
-	/* --------------------------------------------- */
 	// Create context
 	/* --------------------------------------------- */
 
@@ -85,7 +70,7 @@ int main(int argc, char** argv)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Request core profile
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);  // Create an OpenGL debug context 
-	glfwWindowHint(GLFW_REFRESH_RATE, refresh_rate); // Set refresh rate
+	glfwWindowHint(GLFW_REFRESH_RATE, config.refresh_rate); // Set refresh rate
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	// Enable antialiasing (4xMSAA)
@@ -94,10 +79,10 @@ int main(int argc, char** argv)
 	// Open window
 	GLFWmonitor* monitor = nullptr;
 
-	if (fullscreen)
+	if (config.fullscreen)
 		monitor = glfwGetPrimaryMonitor();
 
-	GLFWwindow* window = glfwCreateWindow(window_width, window_height, window_title.c_str(), monitor, nullptr);
+	GLFWwindow* window = glfwCreateWindow(config.width, config.height, config.title.c_str(), monitor, nullptr);
 
 	if (!window) {
 		glfwTerminate();
@@ -152,7 +137,7 @@ int main(int argc, char** argv)
 		gDefaultErrorCallback);
 	if (!gFoundation)
 	{
-		std::cerr << "Error creating PhysX3 foundation, Exiting..." << std::endl;
+		cerr << "Error creating PhysX3 foundation, Exiting..." << endl;
 		exit(1);
 	}
 
@@ -170,7 +155,7 @@ int main(int argc, char** argv)
 	///PxPhysics* gPhysicsSDK = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale());
 	if (gPhysicsSDK == NULL)
 	{
-		std::cerr << "Error creating PhysX3 device, Exiting..." << std::endl;
+		cerr << "Error creating PhysX3 device, Exiting..." << endl;
 		exit(1);
 	}
 
@@ -212,15 +197,15 @@ int main(int argc, char** argv)
 	/* --------------------------------------------- */
 	{
 		// Load shader(s)
-		std::shared_ptr<Shader> textureShader = std::make_shared<Shader>("texture.vert", "texture.frag");
+		shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
 
 		// Create textures
-		std::shared_ptr<Texture> woodTexture = std::make_shared<Texture>("wood_texture.dds");
-		std::shared_ptr<Texture> brickTexture = std::make_shared<Texture>("bricks_diffuse.dds");
+		shared_ptr<Texture> woodTexture = make_shared<Texture>("wood_texture.dds");
+		shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
 
 		// Create materials
-		std::shared_ptr<Material> woodTextureMaterial = std::make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.1f), 2.0f, woodTexture);
-		std::shared_ptr<Material> brickTextureMaterial = std::make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
+		shared_ptr<Material> woodTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.1f), 2.0f, woodTexture);
+		shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
 
 		// Create geometry
 		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), woodTextureMaterial);
@@ -228,7 +213,7 @@ int main(int argc, char** argv)
 		Geometry sphere = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, -1.0f, 0.0f)), Geometry::createSphereGeometry(64, 32, 1.0f), brickTextureMaterial);
 
 		// Initialize camera
-		Camera camera(fov, float(window_width) / float(window_height), nearZ, farZ);
+		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
 		// Initialize lights
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f));
@@ -267,7 +252,7 @@ int main(int argc, char** argv)
 			}
 			//Get current position of actor (box) and print it
 			PxVec3 boxPos = gBox->getGlobalPose().p;
-			///std::cout << "Box current Position (" << boxPos.x << " " << boxPos.y << " " << boxPos.z<<")\n";
+			///cout << "Box current Position (" << boxPos.x << " " << boxPos.y << " " << boxPos.z<<")\n";
 
 			// Compute frame time
 			dt = t;
@@ -308,12 +293,11 @@ int main(int argc, char** argv)
 
 void setWindowFPS(GLFWwindow *window, float& t_sum)
 {
-	//Every second print frametime and frames per second to console
+	//Every second print frametime and frames per second window title
 	if (t_sum >= 1.0f) {
-		//std::stringstream title;
-		//title << config.title << " [" << (int)(frameCount / delta) << " FPS]";
-		//glfwSetWindowTitle(window, title.str().c_str());
-		std::cout << std::to_string(1000.0f / double(frames)) + "ms/frame; " + std::to_string(frames) + " FPS" << std::endl;
+		stringstream title;
+		title << config.title << " [" << to_string(1000.0f / double(frames)) + "ms/frame | " + to_string(frames) + " FPS]";
+		glfwSetWindowTitle(window, title.str().c_str());
 		t_sum -= 1.0f;
 		frames = 0;
 	}
@@ -365,12 +349,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			glfwSetWindowShouldClose(window, true);
 			break;
 		case GLFW_KEY_F1:
-			_wireframe = !_wireframe;
-			glPolygonMode(GL_FRONT_AND_BACK, _wireframe ? GL_LINE : GL_FILL);
+			config.wireframe = !config.wireframe;
+			glPolygonMode(GL_FRONT_AND_BACK, config.wireframe ? GL_LINE : GL_FILL);
 			break;
 		case GLFW_KEY_F2:
-			_culling = !_culling;
-			if (_culling) glEnable(GL_CULL_FACE);
+			config.culling = !config.culling;
+			if (config.culling) glEnable(GL_CULL_FACE);
 			else glDisable(GL_CULL_FACE);
 			break;
 	}
@@ -378,15 +362,15 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 static void APIENTRY DebugCallbackDefault(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
 	if (id == 131185 || id == 131218) return; // ignore performance warnings from nvidia
-	std::string error = FormatDebugOutput(source, type, id, severity, message);
-	std::cout << error << std::endl;
+	string error = FormatDebugOutput(source, type, id, severity, message);
+	cout << error << endl;
 }
 
-static std::string FormatDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, const char* msg) {
-	std::stringstream stringStream;
-	std::string sourceString;
-	std::string typeString;
-	std::string severityString;
+static string FormatDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, const char* msg) {
+	stringstream stringStream;
+	string sourceString;
+	string typeString;
+	string severityString;
 
 	// The AMD variant of this extension provides a less detailed classification of the error,
 	// which is why some arguments might be "Unknown".
