@@ -89,8 +89,12 @@ int main(int argc, char** argv)
 		EXIT_WITH_ERROR("Failed to create window")
 	}
 
+	//Set gamma for monitor =/= window
+	glfwSetGamma(glfwGetPrimaryMonitor(), config.brightness);
+
 	// This function makes the context of the specified window current on the calling thread. 
 	glfwMakeContextCurrent(window);
+
 
 	// Initialize GLEW
 	glewExperimental = true;

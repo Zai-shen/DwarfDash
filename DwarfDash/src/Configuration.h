@@ -8,7 +8,7 @@ class Configuration
 public:
 
 	Configuration(string path) {
-		INIReader reader("assets/settings.ini"); ///simply path??
+		INIReader reader(path);
 		width = reader.GetInteger("window", "width", 800);
 		height = reader.GetInteger("window", "height", 800);
 		refresh_rate = reader.GetInteger("window", "refresh_rate", 60);
@@ -35,10 +35,4 @@ public:
 	bool fullscreen = false;
 	bool wireframe = false;
 	bool culling = true;
-	bool dragging = false;
-	bool strafing = false;
-	float zoom = 6.0f;
 };
-
-//Declare global and initialize
-//extern Configuration config = Configuration("assets/settings.ini");
