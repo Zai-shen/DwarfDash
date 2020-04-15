@@ -19,6 +19,9 @@ using namespace std;
 //Config
 #include "Configuration.h"
 
+// Model loading
+#include "Model.h"
+
 /* --------------------------------------------- */
 // Prototypes
 /* --------------------------------------------- */
