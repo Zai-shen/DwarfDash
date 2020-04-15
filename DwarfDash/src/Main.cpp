@@ -30,26 +30,34 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 void setWindowFPS(GLFWwindow *window,float& t_sum);
+void initPhysX();
+void releasePhysX();
+void examplePhysX();
 
 
 /* --------------------------------------------- */
 // Global variables
 /* --------------------------------------------- */
 
-// Load settings.ini
+// settings.ini
 Configuration config = Configuration("assets/settings.ini");
 
+// camera
 static bool _dragging = false;
 static bool _strafing = false;
 static float _zoom = 6.0f;
+
+//Game
 int frames = 0;
 ///Game game;
 
 //PhysX
 static PxDefaultErrorCallback gDefaultErrorCallback;
 static PxDefaultAllocator gDefaultAllocatorCallback;
-static PxFoundation* gFoundation = NULL;
-
+static PxFoundation* gFoundation = nullptr;
+static PxPhysics* gPhysics = nullptr;
+static PxScene* gScene = nullptr;
+static PxPvd* gPvd = nullptr;
 
 
 
@@ -131,66 +139,15 @@ int main(int argc, char** argv)
 	glfwSetScrollCallback(window, scroll_callback);
 
 	// set GL defaults
-	glClearColor(1, 1, 1, 1);
+	glClearColor(0, 0, 0, 1);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-	//PhysX
-	//Creating foundation for PhysX
-	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
-		gDefaultErrorCallback);
-	if (!gFoundation)
-	{
-		cerr << "Error creating PhysX3 foundation, Exiting..." << endl;
-		exit(1);
-	}
+	// Init PhysX
+	initPhysX();
 
-	bool recordMemoryAllocations = true;
-
-	
-	PxPvd* pvd = PxCreatePvd(*gFoundation);
-	const char* pvd_host_ip = "127.0.0.1"; // IP of local PC machine PVD
-	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(pvd_host_ip, 5425, 10);
-	pvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
-	
-
-	//Creating instance of PhysX SDK
-	PxPhysics* gPhysicsSDK = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, pvd);
-	///PxPhysics* gPhysicsSDK = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale());
-	if (gPhysicsSDK == NULL)
-	{
-		cerr << "Error creating PhysX3 device, Exiting..." << endl;
-		exit(1);
-	}
-
-	PxScene* gScene = NULL;
-	//Creating scene
-	PxSceneDesc sceneDesc(gPhysicsSDK->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(0.0f, -9.8f, 0.0f);
-	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
-	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
-	gScene = gPhysicsSDK->createScene(sceneDesc);
-
-	//Creating material
-	PxMaterial* mMaterial =
-		//static friction, dynamic friction, restitution
-		gPhysicsSDK->createMaterial(0.5, 0.5, 0.5);
-
-	//1-Creating static plane
-	PxTransform planePos = PxTransform(PxVec3(0.0f, 0,
-		0.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
-	PxRigidStatic* plane = gPhysicsSDK->createRigidStatic(planePos);
-	PxShape* shape = gPhysicsSDK->createShape(PxPlaneGeometry(), *mMaterial);
-	plane->attachShape(*shape);
-	gScene->addActor(*plane);
-
-	PxRigidDynamic*gBox;
-	//2) Create cube
-	PxTransform boxPos(PxVec3(0.0f, 10.0f, 0.0f));
-	PxBoxGeometry boxGeometry(PxVec3(0.5f, 0.5f, 0.5f));
-	gBox = PxCreateDynamic(*gPhysicsSDK, boxPos, boxGeometry, *mMaterial,
-		1.0f);
-	gScene->addActor(*gBox);
+	// Example PhysX code
+	examplePhysX();
 
 	//Stepping PhysX
 	PxReal myTimestep = 1.0f / 60.0f;
@@ -246,8 +203,7 @@ int main(int argc, char** argv)
 			// Render
 			cube.draw();
 			cylinder.draw();
-			//Test for git branch
-			//sphere.draw();
+			sphere.draw();
 
 			//PhysX
 			if (gScene) {
@@ -255,7 +211,7 @@ int main(int argc, char** argv)
 				gScene->fetchResults(true);
 			}
 			//Get current position of actor (box) and print it
-			PxVec3 boxPos = gBox->getGlobalPose().p;
+			///PxVec3 boxPos = gBox->getGlobalPose().p;
 			///cout << "Box current Position (" << boxPos.x << " " << boxPos.y << " " << boxPos.z<<")\n";
 
 			// Compute frame time
@@ -279,12 +235,11 @@ int main(int argc, char** argv)
 
 	destroyFramework();
 
-	//PhysX
-	gScene->release();
-	gPhysicsSDK->release();
-	gFoundation->release();
-	//pvd->release();
-	//transport->release();
+	/* --------------------------------------------- */
+	// Destroy PhysX
+	/* --------------------------------------------- */
+
+	releasePhysX();
 
 	/* --------------------------------------------- */
 	// Destroy context and exit
@@ -293,6 +248,72 @@ int main(int argc, char** argv)
 	glfwTerminate();
 
 	return EXIT_SUCCESS;
+}
+
+void examplePhysX() {
+	//Creating material
+	PxMaterial* mMaterial =
+		//static friction, dynamic friction, restitution
+		gPhysics->createMaterial(0.5, 0.5, 0.5);
+
+	//1-Creating static plane
+	PxTransform planePos = PxTransform(PxVec3(0.0f, 0,
+		0.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
+	PxRigidStatic* plane = gPhysics->createRigidStatic(planePos);
+	PxShape* shape = gPhysics->createShape(PxPlaneGeometry(), *mMaterial);
+	plane->attachShape(*shape);
+	gScene->addActor(*plane);
+
+	PxRigidDynamic*gBox;
+	//2) Create cube
+	PxTransform boxPos(PxVec3(0.0f, 10.0f, 0.0f));
+	PxBoxGeometry boxGeometry(PxVec3(0.5f, 0.5f, 0.5f));
+	gBox = PxCreateDynamic(*gPhysics, boxPos, boxGeometry, *mMaterial,
+		1.0f);
+	gScene->addActor(*gBox);
+}
+
+void initPhysX() {
+	//Creating foundation for PhysX
+	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback, gDefaultErrorCallback);
+	if (!gFoundation)
+	{
+		cerr << "Error creating PhysX3 foundation, Exiting..." << endl;
+		exit(1);
+	}
+
+	bool recordMemoryAllocations = true;
+
+	gPvd = PxCreatePvd(*gFoundation);
+	const char* gPvdHostIP = "127.0.0.1"; // IP of local PC machine PVD
+	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(gPvdHostIP, 5425, 10);
+	gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
+
+	//Creating instance of PhysX SDK
+	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
+	if (gPhysics == NULL)
+	{
+		cerr << "Error creating PhysX3 device, Exiting..." << endl;
+		exit(1);
+	}
+
+	//Creating scene
+	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
+	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
+	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	gScene = gPhysics->createScene(sceneDesc);
+}
+
+// Cleans up all PhysX objects
+void releasePhysX()
+{
+	gScene->release();
+	gPhysics->release();
+	PxPvdTransport* transport = gPvd->getTransport();
+	gPvd->release();
+	transport->release();
+	gFoundation->release();
 }
 
 void setWindowFPS(GLFWwindow *window, float& t_sum)
