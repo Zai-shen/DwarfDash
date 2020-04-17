@@ -29,10 +29,11 @@ void Game::draw() {
 }
 
 void Game::reset() {
-
+	geometryObjects.clear();
+	createInitialGeometry();
 }
 
-void Game::createGeometry() {
+void Game::createInitialGeometry() {
 	//// Create geometry
 	//Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), woodTextureMaterial);
 	//TIL: Pointer to objects last longer in memory than simple objects do!
@@ -43,4 +44,8 @@ void Game::createGeometry() {
 	geometryObjects.push_back(cube);
 	geometryObjects.push_back(cylinder);
 	geometryObjects.push_back(sphere);
+}
+
+void Game::addGeometry(Geometry* geometry) {
+	geometryObjects.push_back(geometry);
 }

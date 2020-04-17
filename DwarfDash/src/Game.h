@@ -12,6 +12,8 @@ class Game {
 public:
 
 	shared_ptr<Shader> primaryShader;
+	shared_ptr<Material> woodTextureMaterial;
+	shared_ptr<Material> brickTextureMaterial;
 
 	Game();
 	~Game();
@@ -24,7 +26,9 @@ public:
 
 	void reset();
 
-	void createGeometry();
+	void createInitialGeometry();
+
+	void addGeometry(Geometry* geometry);
 
 private:
 	//std::vector<Gameobject*> objects;
@@ -38,8 +42,6 @@ private:
 
 	shared_ptr<Texture> woodTexture;
 	shared_ptr<Texture> brickTexture;
-	shared_ptr<Material> woodTextureMaterial;
-	shared_ptr<Material> brickTextureMaterial;
 
 	vector<Geometry*> geometryObjects;
 };

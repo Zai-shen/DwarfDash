@@ -161,7 +161,9 @@ int main(int argc, char** argv)
 	{
 		// Init game
 		game->init();
-		game->createGeometry();
+		game->createInitialGeometry();
+		game->addGeometry(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 3.f, -1.5f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), game->woodTextureMaterial));
+		//game->reset();
 
 		// Initialize camera
 		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
