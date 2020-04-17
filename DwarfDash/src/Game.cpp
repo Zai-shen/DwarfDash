@@ -1,33 +1,46 @@
-class Game {
+#include "Game.h"
 
-public:
-	Game() {};
-	~Game() {};
+using namespace std;
 
-	void init() {
-		
+Game::Game() {};
+Game::~Game() {};
+
+void Game::init() {
+	// Load shader(s)
+	primaryShader = make_shared<Shader>("texture.vert", "texture.frag");
+
+	// Create textures
+	woodTexture = make_shared<Texture>("wood_texture.dds");
+	brickTexture = make_shared<Texture>("bricks_diffuse.dds");
+
+	// Create materials
+	woodTextureMaterial = make_shared<TextureMaterial>(primaryShader, glm::vec3(0.1f, 0.7f, 0.1f), 2.0f, woodTexture);
+	brickTextureMaterial = make_shared<TextureMaterial>(primaryShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
+}
+
+void Game::update() {
+}
+
+void Game::draw() {
+	// Using a for loop with index
+	for (std::size_t i = 0; i < geometryObjects.size(); ++i) {
+		geometryObjects[i]->draw();
 	}
+}
 
-	void update() {
+void Game::reset() {
 
-	}
+}
 
-	void draw() {
+void Game::createGeometry() {
+	//// Create geometry
+	//Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), woodTextureMaterial);
+	//TIL: Pointer to objects last longer in memory than simple objects do!
+	Geometry* cube = new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), woodTextureMaterial);
+	Geometry* cylinder = new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, -1.0f, 0.0f)), Geometry::createCylinderGeometry(32, 1.3f, 1.0f), brickTextureMaterial);
+	Geometry* sphere = new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, -1.0f, 0.0f)), Geometry::createSphereGeometry(64, 32, 1.0f), brickTextureMaterial);
 
-	}
-
-	void reset() {
-
-	}
-
-private:
-	//std::vector<Gameobject*> objects;
-
-	int const GAME_STATE_IDLE = 0;
-	int const GAME_STATE_ACTIVE = 1;
-	int const GAME_STATE_PAUSED = 2;
-	int const GAME_STATE_FINISHED = 3;
-
-	int activeGameState = GAME_STATE_IDLE;
-
-};
+	geometryObjects.push_back(cube);
+	geometryObjects.push_back(cylinder);
+	geometryObjects.push_back(sphere);
+}
