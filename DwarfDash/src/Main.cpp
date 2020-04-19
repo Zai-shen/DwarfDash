@@ -21,6 +21,10 @@ using namespace std;
 
 // Model loading
 #include "Model.h"
+//#include "Shader_.h"
+//#include "Mesh.h"
+
+
 
 /* --------------------------------------------- */
 // Prototypes
@@ -160,17 +164,24 @@ int main(int argc, char** argv)
 	// Initialize scene and render loop
 	/* --------------------------------------------- */
 	{
+		// Model loading
+		//shared_ptr<Shader> modelShader = make_shared<Shader>("modeloading.vert", "modeloading.frag");
+		//Model testModel("assets\models\nanosuit\naosuit.obj");
+
+
 		// Load shader(s)
 		shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
+
+
 
 		// Create textures
 		shared_ptr<Texture> woodTexture = make_shared<Texture>("wood_texture.dds");
 		shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
-
+		
 		// Create materials
 		shared_ptr<Material> woodTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.1f), 2.0f, woodTexture);
 		shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
-
+		
 		// Create geometry
 		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), woodTextureMaterial);
 		Geometry cylinder = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, -1.0f, 0.0f)), Geometry::createCylinderGeometry(32, 1.3f, 1.0f), brickTextureMaterial);

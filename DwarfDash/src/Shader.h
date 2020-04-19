@@ -58,6 +58,8 @@ protected:
 	 */
 	GLint getUniformLocation(std::string uniform);
 
+
+
 public:
 
 	/*!
@@ -74,6 +76,10 @@ public:
 	Shader(std::string vs, std::string fs);
 	
 	~Shader();
+
+	GLint getHandle() {
+		return _handle;
+	}
 
 	/*!
 	 * Uses the shader with glUseProgram
