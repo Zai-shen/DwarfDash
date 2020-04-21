@@ -1,12 +1,11 @@
 /*
 Code based on: https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/model.h
 */
+#pragma once
 
 #ifndef MODEL_H
 #define MODEL_H
 
-
-#pragma once
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -52,7 +51,7 @@ public:
 	}
 
 	// draws the model, and thus all its meshes
-	void Draw(Shader shader)
+	void Draw(Shader &shader)
 	{
 		for (unsigned int i = 0; i < meshes.size(); i++)
 			meshes[i].Draw(shader);
@@ -65,7 +64,7 @@ private:
 	{
 		// read file via ASSIMP
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs );
 		// check for errors
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 		{

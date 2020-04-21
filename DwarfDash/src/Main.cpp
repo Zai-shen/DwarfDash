@@ -21,9 +21,6 @@ using namespace std;
 
 // Model loading
 #include "Model.h"
-//#include "Shader_.h"
-//#include "Mesh.h"
-
 
 
 /* --------------------------------------------- */
@@ -165,14 +162,14 @@ int main(int argc, char** argv)
 	/* --------------------------------------------- */
 	{
 		// Model loading
-		//shared_ptr<Shader> modelShader = make_shared<Shader>("modeloading.vert", "modeloading.frag");
-		//Model testModel("assets\models\nanosuit\naosuit.obj");
-
+		//shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
+		Shader modelShader("modelloading.vert", "modelloading.frag");
+		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
+		//Model nanosuit("assets/models/lego.obj");
+		modelShader.use();
 
 		// Load shader(s)
 		shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
-
-
 
 		// Create textures
 		shared_ptr<Texture> woodTexture = make_shared<Texture>("wood_texture.dds");
@@ -218,6 +215,8 @@ int main(int argc, char** argv)
 			cube.draw();
 			cylinder.draw();
 			sphere.draw();
+			//nanosuit.Draw(modelShader);
+
 
 			//PhysX
 			if (gScene) {
