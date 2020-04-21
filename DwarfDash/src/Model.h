@@ -64,7 +64,7 @@ private:
 	{
 		// read file via ASSIMP
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs );
+		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 		// check for errors
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 		{
@@ -131,6 +131,18 @@ private:
 			}
 			else
 				vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+			// tangent
+			vector.x = mesh->mTangents[i].x;
+			vector.y = mesh->mTangents[i].y;
+			vector.z = mesh->mTangents[i].z;
+			vertex.Tangent = vector;
+
+			// bitangent
+			vector.x = mesh->mBitangents[i].x;
+			vector.y = mesh->mBitangents[i].y;
+			vector.z = mesh->mBitangents[i].z;
+			vertex.Bitangent = vector;
+			vertices.push_back(vertex);
 		}
 		// now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
 		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
@@ -149,42 +161,25 @@ private:
 		// specular: texture_specularN
 		// normal: texture_normalN
 
-		// 
-		//Material materialColors = loadMaterial(material);
-
 		// 1. diffuse maps
 		vector<MeshTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+
 		// 2. specular maps
 		vector<MeshTexture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
 		// 3. normal maps
 		std::vector<MeshTexture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
 		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
+		// 4. height maps
+		std::vector<MeshTexture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+		textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+
 		// return a mesh object created from the extracted mesh data
 		return Mesh(vertices, indices, textures);
 	}
-
-	//Material loadMaterial(aiMaterial* mat) {
-	//	Material material;
-	//	aiColor3D color(0.f, 0.f, 0.f);
-	//	float shininess;
-	//
-	//	mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-	//	material.Diffuse = glm::vec3(color.r, color.g, color.b);
-	//
-	//	mat->Get(AI_MATKEY_COLOR_AMBIENT, color);
-	//	material.Ambient = glm::vec3(color.r, color.g, color.b);
-	//
-	//	mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
-	//	material.Specular = glm::vec3(color.r, color.g, color.b);
-	//
-	//	mat->Get(AI_MATKEY_SHININESS, shininess);
-	//	material.Shininess = shininess;
-	//
-	//	return material;
-	//}
 
 	// checks all material textures of a given type and loads the textures if they're not loaded yet.
 	// the required info is returned as a Texture struct.
@@ -213,7 +208,6 @@ private:
 				texture.type = typeName;
 				texture.path = str.C_Str();
 				textures.push_back(texture);
-
 				textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
 			}
 		}
@@ -261,5 +255,5 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
 
 	return textureID;
 }
-#endif
 
+#endif

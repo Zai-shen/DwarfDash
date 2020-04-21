@@ -165,7 +165,7 @@ int main(int argc, char** argv)
 		//shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
 		Shader modelShader("modelloading.vert", "modelloading.frag");
 		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
-		//Model nanosuit("assets/models/lego.obj");
+		Model nanosuit("assets/models/lego.obj");
 		modelShader.use();
 
 		// Load shader(s)
@@ -209,13 +209,13 @@ int main(int argc, char** argv)
 			camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
+			//setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
 
 			// Render
-			cube.draw();
-			cylinder.draw();
-			sphere.draw();
-			//nanosuit.Draw(modelShader);
+			//cube.draw();
+			//cylinder.draw();
+			//sphere.draw();
+			nanosuit.Draw(modelShader);
 
 
 			//PhysX
