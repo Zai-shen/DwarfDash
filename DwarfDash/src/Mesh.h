@@ -43,32 +43,34 @@ struct MeshMaterial {
 
 class Mesh {
 public:
-	/*  Mesh Data  */
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
 	vector<MeshTexture> textures;
-	unsigned int VAO;
+	MeshMaterial material;
+	//unsigned int VAO;
 
-	/*  Functions  */
-	// constructor
-	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<MeshTexture> textures)
-	{
+
+	//Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<MeshTexture> textures){
+	Mesh(vector<Vertex> &vertices, vector<unsigned int> &indices, vector<MeshTexture> &textures, MeshMaterial material){
+
 		this->vertices = vertices;
 		this->indices = indices;
 		this->textures = textures;
+		this->material = material;
 
 		// now that we have all the required data, set the vertex buffers and its attribute pointers.
 		setupMesh();
 	}
 
 	// render the mesh
-	void Draw(Shader shader)
+	void Draw(Shader &shader)
 	{
 		// bind appropriate textures
 		unsigned int diffuseNr = 1;
 		unsigned int specularNr = 1;
 		unsigned int normalNr = 1;
 		unsigned int heightNr = 1;
+
 		for (unsigned int i = 0; i < textures.size(); i++)
 		{
 			glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
@@ -102,13 +104,12 @@ public:
 
 private:
 	/*  Render data  */
-	unsigned int VBO, EBO;
+	unsigned int VAO, VBO, EBO;
 
 	/*  Functions    */
 	// initializes all the buffer objects/arrays
-	void setupMesh()
-	{
-		// create buffers/arrays
+	void setupMesh()	{
+
 		glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &VBO);
 		glGenBuffers(1, &EBO);
@@ -145,7 +146,10 @@ private:
 		glEnableVertexAttribArray(4);
 		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
 
+		// unbind
 		glBindVertexArray(0);
+
+		// TODO: set texture parameters (mag_filter, min_filter ...)
 	}
 };
 #endif

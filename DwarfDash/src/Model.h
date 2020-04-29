@@ -37,14 +37,11 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
 class Model
 {
 public:
-	/*  Model Data */
 	vector<MeshTexture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 	vector<Mesh> meshes;
 	string directory;
 	bool gammaCorrection;
 
-	/*  Functions   */
-	// constructor, expects a filepath to a 3D model.
 	Model(string const& path, bool gamma = false) : gammaCorrection(gamma)
 	{
 		loadModel(path);
@@ -58,11 +55,8 @@ public:
 	}
 
 private:
-	/*  Functions   */
-	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 	void loadModel(string const& path)
 	{
-		// read file via ASSIMP
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 		// check for errors
@@ -99,7 +93,6 @@ private:
 
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene)
 	{
-		// data to fill
 		vector<Vertex> vertices;
 		vector<unsigned int> indices;
 		vector<MeshTexture> textures;
@@ -108,17 +101,22 @@ private:
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
 			Vertex vertex;
-			glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
+			// we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to
+			//glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.			
+			glm::vec3 vector; 
+
 			// positions
 			vector.x = mesh->mVertices[i].x;
 			vector.y = mesh->mVertices[i].y;
 			vector.z = mesh->mVertices[i].z;
 			vertex.Position = vector;
+
 			// normals
 			vector.x = mesh->mNormals[i].x;
 			vector.y = mesh->mNormals[i].y;
 			vector.z = mesh->mNormals[i].z;
 			vertex.Normal = vector;
+
 			// texture coordinates
 			if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
 			{
@@ -131,6 +129,7 @@ private:
 			}
 			else
 				vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+
 			// tangent
 			vector.x = mesh->mTangents[i].x;
 			vector.y = mesh->mTangents[i].y;
@@ -144,7 +143,8 @@ private:
 			vertex.Bitangent = vector;
 			vertices.push_back(vertex);
 		}
-		// now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
+
+		// now walk through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
 		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 		{
 			aiFace face = mesh->mFaces[i];
@@ -152,8 +152,15 @@ private:
 			for (unsigned int j = 0; j < face.mNumIndices; j++)
 				indices.push_back(face.mIndices[j]);
 		}
+
+
+
 		// process materials
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+		// load material properties
+		MeshMaterial materialColors = loadMaterial(material);
+
 		// we assume a convention for sampler names in the shaders. Each diffuse texture should be named
 		// as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
 		// Same applies to other texture as the following list summarizes:
@@ -178,7 +185,27 @@ private:
 		textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
 		// return a mesh object created from the extracted mesh data
-		return Mesh(vertices, indices, textures);
+		return Mesh(vertices, indices, textures, materialColors);
+	}
+
+	MeshMaterial loadMaterial(aiMaterial* mat) {
+		MeshMaterial material;
+		aiColor3D color(0.f, 0.f, 0.f);
+		float shininess;
+
+		mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+		material.Diffuse = glm::vec3(color.r, color.b, color.g);
+
+		mat->Get(AI_MATKEY_COLOR_AMBIENT, color);
+		material.Ambient = glm::vec3(color.r, color.b, color.g);
+
+		mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
+		material.Specular = glm::vec3(color.r, color.b, color.g);
+
+		mat->Get(AI_MATKEY_SHININESS, shininess);
+		material.Shininess = shininess;
+
+		return material;
 	}
 
 	// checks all material textures of a given type and loads the textures if they're not loaded yet.

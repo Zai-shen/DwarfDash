@@ -77,8 +77,8 @@ public:
 	
 	~Shader();
 
-	GLint getHandle() {
-		return _handle;
+	GLuint getHandle() {
+		return this->_handle;
 	}
 
 	/*!

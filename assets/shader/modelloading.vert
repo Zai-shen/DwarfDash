@@ -15,3 +15,4 @@ void main() {
 	TexCoords = uv;
 	gl_Position = viewProjMatrix * modelMatrix * vec4(position, 1);
 }
+
