@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClInclude Include="src\FPSCamera.h" />
+    <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Shader_.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Configuration.h" />
@@ -12,6 +14,7 @@
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <ItemGroup Label="ProjectConfigurations">

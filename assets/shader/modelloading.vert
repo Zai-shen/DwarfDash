@@ -13,6 +13,6 @@ uniform mat3 normalMatrix;
 
 void main() {
 	TexCoords = uv;
-	gl_Position = viewProjMatrix * modelMatrix * vec4(position, 1);
+	gl_Position = viewProjMatrix * modelMatrix * vec4(position, 1.0);
 }
 

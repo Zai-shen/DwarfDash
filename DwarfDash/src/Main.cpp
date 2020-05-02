@@ -22,6 +22,8 @@ using namespace std;
 // Model loading
 #include "Model.h"
 
+#include "FPSCamera.h"
+
 
 /* --------------------------------------------- */
 // Prototypes
@@ -37,7 +39,7 @@ void setWindowFPS(GLFWwindow *window,float& t_sum);
 void initPhysX();
 void releasePhysX();
 void examplePhysX();
-
+void processInput(GLFWwindow* window);
 
 /* --------------------------------------------- */
 // Global variables
@@ -163,47 +165,33 @@ int main(int argc, char** argv)
 	{
 		// Model loading
 
-		// this "kinda" works
+		// these next two lines works
 		Shader modelShader("modelloading.vert", "modelloading.frag");
-		Model plattform("assets/models/plattform/plattform.obj");
-		//Model plattform("assets/models/nanosuit2/nanosuit.obj");
-		//Model plattform("assets/models/dwarf/Dwarf.obj");
 		modelShader.use();
 
-		// this doesn't work
+		// how do shader pointers work?
 		//shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
-		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
-		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
-		//modelShader.get()->use();
 
-		// this also doesn't work (model doesn't show)
-		//Shader modelShader("modelloading.vert", "modelloading.frag");
-		//Model nanosuit("assets/models/plattform/plattform.obj");
-		//modelShader.use();
+
+		Model plattform("assets/models/plattform/plattform.obj");
+		Model nanosuit("assets/models/nanosuit/nanosuit.obj");
 
 
 		// Load shader(s)
 		shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
-
 		// Create textures
-		shared_ptr<Texture> woodTexture = make_shared<Texture>("wood_texture.dds");
-		//shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
-		
+		shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
 		// Create materials
-		shared_ptr<Material> woodTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.1f), 2.0f, woodTexture);
-		//shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
-		
+		shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
 		// Create geometry
-		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), woodTextureMaterial);
-		//Geometry cylinder = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, -1.0f, 0.0f)), Geometry::createCylinderGeometry(32, 1.3f, 1.0f), brickTextureMaterial);
-		//Geometry sphere = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, -1.0f, 0.0f)), Geometry::createSphereGeometry(64, 32, 1.0f), brickTextureMaterial);
+		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), brickTextureMaterial);
 
 		// Initialize camera
 		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
 		// Initialize lights
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f));
-		PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f));
+		PointLight pointL(    glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f));
 
 		// Render loop
 		float t = float(glfwGetTime());
@@ -226,12 +214,24 @@ int main(int argc, char** argv)
 			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
 			//setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
 
-			//glm::mat4 model = glm::mat4(1.0f);
-			//model = glm::translate(model, glm::vec3(10.0f, -10.75f, 0.0f)); // translate it down so it's at the center of the scene
-			//model = glm::scale(model, glm::vec3(10.2f, 2.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-			//modelShader.setUniform("model", model);
+			//Shader* shader = modelShader->getHandle();
+			//shader->use();
+			//shader->setUniform("viewingPosition", camera.getPosition());
 
-			plattform.Draw(modelShader);
+
+
+			glm::mat4 model = glm::mat3(1.0f);
+			model = glm::translate(model, glm::vec3(10.0f, -10.75f, 0.0f)); // translate it down so it's at the center of the scene
+			model = glm::scale    (model, glm::vec3(10.2f, 2.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+	
+			// WHY DOES THIS ALWAYS USE THE WRONG setUniform? 
+			//modelShader.setUniform("modelMatrix", model);
+			//modelShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+
+			//plattform.Draw(modelShader);
+			nanosuit.Draw(modelShader);
+
+
 
 			// Render
 			cube.draw();
@@ -387,6 +387,16 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		_strafing = false;
 	}
 }
+
+// FPS Camera 
+void processInput(GLFWwindow* window)
+{
+
+
+
+}
+
+
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
