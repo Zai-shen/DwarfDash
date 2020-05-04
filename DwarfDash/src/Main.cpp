@@ -18,7 +18,7 @@ using namespace std;
 
 //Config
 #include "Configuration.h"
-
+//
 // Model loading
 #include "Model.h"
 
@@ -31,10 +31,12 @@ using namespace std;
 
 static void APIENTRY DebugCallbackDefault(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam);
 static std::string FormatDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, const char* msg);
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
+
 void setWindowFPS(GLFWwindow *window,float& t_sum);
 void initPhysX();
 void releasePhysX();
@@ -187,7 +189,8 @@ int main(int argc, char** argv)
 		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), brickTextureMaterial);
 
 		// Initialize camera
-		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
+		//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
+		FPSCamera camera
 
 		// Initialize lights
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f));
@@ -374,6 +377,9 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 	shader->setUniform("pointL.attenuation", pointL.attenuation);
 }
 
+void mouse_callback(GLFWwindow* windows, double xpos, double ypos) {
+
+}
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
