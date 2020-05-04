@@ -32,7 +32,6 @@ public:
 	void addGeometry(Geometry* geometry);
 
 private:
-	//std::vector<Gameobject*> objects;
 
 	Level* level1 = new Level();
 	Level* level2 = new Level();
@@ -49,5 +48,4 @@ private:
 	shared_ptr<Texture> woodTexture;
 	shared_ptr<Texture> brickTexture;
 
-	vector<Geometry*> geometryObjects;
 };
