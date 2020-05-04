@@ -50,13 +50,13 @@ Configuration config = Configuration("assets/settings.ini");
 // camera
 static bool _dragging = false;
 static bool _strafing = false;
-static float _zoom = 6.0f;
+static float _zoom = 10.0f;
 
-//Game
+// Game
 int frames = 0;
 Game* game = new Game();
 
-//PhysX
+// PhysX
 static PxDefaultErrorCallback gDefaultErrorCallback;
 static PxDefaultAllocator gDefaultAllocatorCallback;
 static PxFoundation* gFoundation = nullptr;
@@ -162,7 +162,7 @@ int main(int argc, char** argv)
 		// Init game
 		game->init();
 		game->createInitialGeometry();
-		game->addGeometry(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 3.f, -1.5f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), game->woodTextureMaterial));
+		game->addGeometry(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 3.f, -1.5f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), game->brickTextureMaterial));
 		//game->reset();
 
 		// Initialize camera
@@ -198,10 +198,6 @@ int main(int argc, char** argv)
 			//PhysX
 			//stepPhysics(interactive);
 			renderCallback();
-
-			//Get current position of actor (box) and print it
-			///PxVec3 boxPos = gBox->getGlobalPose().p;
-			///cout << "Box current Position (" << boxPos.x << " " << boxPos.y << " " << boxPos.z<<")\n";
 
 			// Compute frame time
 			dt = t;
