@@ -26,6 +26,7 @@ void Game::draw() {
 	for (std::size_t i = 0; i < geometryObjects.size(); ++i) {
 		geometryObjects[i]->draw();
 	}
+	currentLevel->draw();
 }
 
 void Game::reset() {

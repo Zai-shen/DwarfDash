@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "Material.h"
 #include "Geometry.h"
+#include "Level.h"
 
 using namespace std;
 
@@ -32,6 +33,11 @@ public:
 
 private:
 	//std::vector<Gameobject*> objects;
+
+	Level* level1 = new Level();
+	Level* level2 = new Level();
+
+	Level* currentLevel = level1;
 
 	int const GAME_STATE_IDLE = 0;
 	int const GAME_STATE_ACTIVE = 1;
