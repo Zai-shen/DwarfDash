@@ -166,15 +166,16 @@ int main(int argc, char** argv)
 		// Model loading
 
 		// these next two lines works
-		Shader modelShader("modelloading.vert", "modelloading.frag");
-		modelShader.use();
-
-		// how do shader pointers work?
-		//shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
+		//Shader modelShader("modelloading.vert", "modelloading.frag");
+		// how do shared pointers work?
+		shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
 
 
 		Model plattform("assets/models/plattform/plattform.obj");
 		Model nanosuit("assets/models/nanosuit/nanosuit.obj");
+
+		stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
+		Model backpack("assets/models/backpack/backpack.obj");
 
 
 		// Load shader(s)
@@ -212,29 +213,28 @@ int main(int argc, char** argv)
 
 			// Set per-frame uniforms
 			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
-			//setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
-
-			//Shader* shader = modelShader->getHandle();
-			//shader->use();
-			//shader->setUniform("viewingPosition", camera.getPosition());
-
+			setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
 
 
 			glm::mat4 model = glm::mat3(1.0f);
-			model = glm::translate(model, glm::vec3(10.0f, -10.75f, 0.0f)); // translate it down so it's at the center of the scene
-			model = glm::scale    (model, glm::vec3(10.2f, 2.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-	
-			// WHY DOES THIS ALWAYS USE THE WRONG setUniform? 
-			//modelShader.setUniform("modelMatrix", model);
-			//modelShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+			model = glm::translate(model, glm::vec3(-2.0f, -2.0f, -2.0f)); // translate it down so it's at the center of the scene
+			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));		   // it's a bit too big for our scene, so scale it down
 
-			//plattform.Draw(modelShader);
-			nanosuit.Draw(modelShader);
+			// this works with a shared pointer
+			modelShader->use();
+			modelShader->setUniform("modelMatrix", model);
+			modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+			backpack.Draw(*modelShader);
 
 
+			model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));   // translate it down so it's at the center of the scene
+			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));		  //	// it's a bit too big for our scene, so scale it down
+			modelShader->setUniform("modelMatrix", model);
+			modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+			nanosuit.Draw(*modelShader);
 
 			// Render
-			cube.draw();
+			//cube.draw();
 			//cylinder.draw();
 			//sphere.draw();
 

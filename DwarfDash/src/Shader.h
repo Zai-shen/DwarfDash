@@ -203,4 +203,5 @@ public:
 	 * @param f: the value to be set
 	 */
 	void setUniformArr(std::string arr, unsigned int i, std::string prop, const float f);
+
 };
