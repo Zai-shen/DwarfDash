@@ -4,6 +4,7 @@ bin/
 build/
 .vs/
 *.zip
+*.blend
 
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
@@ -74,7 +75,7 @@ StyleCopReport.xml
 *_h.h
 *.ilk
 *.meta
-*.obj
+# *.obj
 *.iobj
 *.pch
 *.pdb
