@@ -82,6 +82,8 @@ public:
 	Geometry(glm::mat4 modelMatrix, GeometryData& data, std::shared_ptr<Material> material);
 	~Geometry();
 
+	Geometry();
+
 	/*!
 	 * Draws the object
 	 * Uses the shader, sets the uniform and issues a draw call

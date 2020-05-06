@@ -9,7 +9,6 @@
 
 //PhysX
 #include "physxInclude/PxPhysicsAPI.h"
-//#include "physxInclude/PxPhysicsVersion.h" hm, komisch, findet er net
 #include "physxInclude/pvd/PxPvd.h"
 #include "physxInclude/pvd/PxPvdSceneClient.h"
 #include "physxInclude/pvd/PxPvdTransport.h"
@@ -24,6 +23,9 @@ using namespace std;
 
 #include "FPSCamera.h"
 
+//Game
+#include "Game.h"
+
 
 /* --------------------------------------------- */
 // Prototypes
@@ -36,10 +38,17 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 void setWindowFPS(GLFWwindow *window,float& t_sum);
-void initPhysX();
-void releasePhysX();
-void examplePhysX();
+
 void processInput(GLFWwindow* window);
+
+void initPhysX(bool interactive);
+void releasePhysX(bool interactive);
+void examplePhysX(bool interactive);
+void stepPhysics(bool interactive);
+void renderCallback();
+void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, const PxVec3 & color);
+
+
 
 /* --------------------------------------------- */
 // Global variables
@@ -51,13 +60,13 @@ Configuration config = Configuration("assets/settings.ini");
 // camera
 static bool _dragging = false;
 static bool _strafing = false;
-static float _zoom = 6.0f;
+static float _zoom = 10.0f;
 
-//Game
+// Game
 int frames = 0;
-///Game game;
+Game* game = new Game();
 
-//PhysX
+// PhysX
 static PxDefaultErrorCallback gDefaultErrorCallback;
 static PxDefaultAllocator gDefaultAllocatorCallback;
 static PxFoundation* gFoundation = nullptr;
@@ -150,19 +159,17 @@ int main(int argc, char** argv)
 	glEnable(GL_CULL_FACE);
 
 	// Init PhysX
-	initPhysX();
+	bool interactive = false;
+	initPhysX(interactive);
 
 	// Example PhysX code
-	examplePhysX();
-
-	//Stepping PhysX
-	PxReal myTimestep = 1.0f / 60.0f;
-
+	examplePhysX(interactive);
 
 	/* --------------------------------------------- */
 	// Initialize scene and render loop
 	/* --------------------------------------------- */
 	{
+
 		// Model loading
 
 		// these next two lines works
@@ -186,6 +193,11 @@ int main(int argc, char** argv)
 		shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
 		// Create geometry
 		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), brickTextureMaterial);
+
+		// Init game
+		game->init();
+		game->createInitialGeometry();
+
 
 		// Initialize camera
 		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
@@ -215,7 +227,7 @@ int main(int argc, char** argv)
 			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
 			setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
 
-
+			// Models
 			glm::mat4 model = glm::mat3(1.0f);
 			model = glm::translate(model, glm::vec3(-2.0f, -2.0f, -2.0f)); // translate it down so it's at the center of the scene
 			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));		   // it's a bit too big for our scene, so scale it down
@@ -243,9 +255,17 @@ int main(int argc, char** argv)
 				gScene->simulate(myTimestep);
 				gScene->fetchResults(true);
 			}
-			//Get current position of actor (box) and print it
-			//PxVec3 boxPos = gBox->getGlobalPose().p;
-			//cout << "Box current Position (" << boxPos.x << " " << boxPos.y << " " << boxPos.z<<")\n";
+
+
+			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
+
+			// Render
+			game->update();
+			game->draw();
+
+			//PhysX
+			//stepPhysics(interactive);
+			renderCallback();
 
 			// Compute frame time
 			dt = t;
@@ -272,7 +292,7 @@ int main(int argc, char** argv)
 	// Destroy PhysX
 	/* --------------------------------------------- */
 
-	releasePhysX();
+	releasePhysX(interactive);
 
 	/* --------------------------------------------- */
 	// Destroy context and exit
@@ -283,7 +303,15 @@ int main(int argc, char** argv)
 	return EXIT_SUCCESS;
 }
 
-void examplePhysX() {
+void stepPhysics(bool interactive)
+{
+	PX_UNUSED(interactive);
+	float timeStep = 1.0f / 60.0f;
+	gScene->simulate(timeStep);
+	gScene->fetchResults(true);
+}
+
+void examplePhysX(bool interactive) {
 	//Creating material
 	PxMaterial* mMaterial =
 		//static friction, dynamic friction, restitution
@@ -297,16 +325,18 @@ void examplePhysX() {
 	plane->attachShape(*shape);
 	gScene->addActor(*plane);
 
-	PxRigidDynamic*gBox;
-	//2) Create cube
-	PxTransform boxPos(PxVec3(0.0f, 10.0f, 0.0f));
-	PxBoxGeometry boxGeometry(PxVec3(0.5f, 0.5f, 0.5f));
-	gBox = PxCreateDynamic(*gPhysics, boxPos, boxGeometry, *mMaterial,
-		1.0f);
-	gScene->addActor(*gBox);
+	if (!interactive) {
+		PxRigidDynamic*gBox;
+		//2) Create cube
+		PxTransform boxPos(PxVec3(0.0f, 10.0f, 0.0f));
+		PxBoxGeometry boxGeometry(PxVec3(0.5f, 0.5f, 0.5f));
+		gBox = PxCreateDynamic(*gPhysics, boxPos, boxGeometry, *mMaterial,
+			1.0f);
+		gScene->addActor(*gBox);
+	}
 }
 
-void initPhysX() {
+void initPhysX(bool interactive) {
 	//Creating foundation for PhysX
 	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback, gDefaultErrorCallback);
 	if (!gFoundation)
@@ -336,17 +366,94 @@ void initPhysX() {
 	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
+
+	//Pvd Client
+	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
+	if (pvdClient)
+	{
+		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
+		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
+		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
+	}
 }
 
-// Cleans up all PhysX objects
-void releasePhysX()
+void releasePhysX(bool interactive)
 {
+	PX_UNUSED(interactive);
 	gScene->release();
 	gPhysics->release();
 	PxPvdTransport* transport = gPvd->getTransport();
 	gPvd->release();
 	transport->release();
 	gFoundation->release();
+}
+
+void renderCallback()
+{
+	stepPhysics(true);
+
+	PxScene* scene;
+	PxGetPhysics().getScenes(&scene, 1);
+	PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
+	if (nbActors)
+	{
+		std::vector<PxRigidActor*> actors(nbActors);
+		scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
+		renderActors(&actors[0], static_cast<PxU32>(actors.size()), false, PxVec3(1.0f, 1.0f, 1.0f));
+	}
+
+}
+
+void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, const PxVec3 & color)
+{
+	PxShape* shapes[128];
+	for (PxU32 i = 0; i < numActors; i++)
+	{
+		const PxU32 nbShapes = actors[i]->getNbShapes();
+		PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
+		actors[i]->getShapes(shapes, nbShapes);
+		bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false;
+
+		for (PxU32 j = 0; j < nbShapes; j++)
+		{
+			const PxMat44 shapePose(PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
+			PxGeometryHolder h = shapes[j]->getGeometry();
+
+
+
+			//if (shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE)
+			//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); set to work with "Lines"
+
+			// render object
+			//glPushMatrix(); push current matrix on the stack
+			//glMultMatrixf(reinterpret_cast<const float*>(&shapePose)); multiply current matrix with &shapePose
+			//if (sleeping)
+			//{
+			//	PxVec3 darkColor = color * 0.25f;
+			//	glColor4f(darkColor.x, darkColor.y, darkColor.z, 1.0f);
+			//}
+			//else
+			//	glColor4f(color.x, color.y, color.z, 1.0f);
+			//renderGeometry(h); ka?
+			//glPopMatrix(); pop current matrix from stack
+
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+			/*if (shadows) if shadows are wanted, draw them
+			{
+				const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
+				const PxReal shadowMat[] = { 1,0,0,0, -shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
+				glPushMatrix();
+				glMultMatrixf(shadowMat);
+				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
+				glDisable(GL_LIGHTING);
+				glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
+				renderGeometry(h);
+				glEnable(GL_LIGHTING);
+				glPopMatrix();
+			}*/
+		}
+	}
 }
 
 void setWindowFPS(GLFWwindow *window, float& t_sum)

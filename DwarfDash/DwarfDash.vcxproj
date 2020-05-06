@@ -6,10 +6,13 @@
     <ClInclude Include="src\Shader_.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Configuration.h" />
+    <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Geometry.h" />
     <ClInclude Include="src\INIReader.h" />
+    <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\Light.h" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\Level.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
