@@ -185,15 +185,6 @@ int main(int argc, char** argv)
 		Model backpack("assets/models/backpack/backpack.obj");
 
 
-		// Load shader(s)
-		shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
-		// Create textures
-		shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
-		// Create materials
-		shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
-		// Create geometry
-		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), brickTextureMaterial);
-
 		// Init game
 		game->init();
 		game->createInitialGeometry();
@@ -204,7 +195,7 @@ int main(int argc, char** argv)
 
 		// Initialize lights
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f));
-		PointLight pointL(    glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f));
+		PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f));
 
 		// Render loop
 		float t = float(glfwGetTime());
@@ -224,40 +215,19 @@ int main(int argc, char** argv)
 			camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
+			//setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
+			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
+
 			setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
 
 			// Models
-			glm::mat4 model = glm::mat3(1.0f);
-			model = glm::translate(model, glm::vec3(-2.0f, -2.0f, -2.0f)); // translate it down so it's at the center of the scene
-			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));		   // it's a bit too big for our scene, so scale it down
-
-			// this works with a shared pointer
 			modelShader->use();
-			modelShader->setUniform("modelMatrix", model);
+			modelShader->setUniform("modelMatrix", glm::translate(glm::mat4(1.f), glm::vec3(0.f,2.f,-10.f)));
 			modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-			backpack.Draw(*modelShader);
-
-
-			model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));   // translate it down so it's at the center of the scene
-			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));		  //	// it's a bit too big for our scene, so scale it down
-			modelShader->setUniform("modelMatrix", model);
-			modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-			nanosuit.Draw(*modelShader);
-
-			// Render
-			//cube.draw();
-			//cylinder.draw();
-			//sphere.draw();
-
-			//PhysX
-			if (gScene) {
-				gScene->simulate(myTimestep);
-				gScene->fetchResults(true);
-			}
-
-
-			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
+			backpack.draw(*modelShader);
+			//modelShader->setUniform("modelMatrix", model);
+			//modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+			//nanosuit.draw(*modelShader);
 
 			// Render
 			game->update();
