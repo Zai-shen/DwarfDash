@@ -12,14 +12,22 @@
 #include "physxInclude/pvd/PxPvd.h"
 #include "physxInclude/pvd/PxPvdSceneClient.h"
 #include "physxInclude/pvd/PxPvdTransport.h"
-using namespace physx;
-using namespace std;
 
 //Config
 #include "Configuration.h"
 
+// Model loading
+#include "Model.h"
+
+// Camera
+#include "FPSCamera.h"
+
 //Game
 #include "Game.h"
+
+//Namespaces
+using namespace physx;
+using namespace std;
 
 /* --------------------------------------------- */
 // Prototypes
@@ -32,12 +40,14 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 void setWindowFPS(GLFWwindow *window,float& t_sum);
+void processInput(GLFWwindow* window);
 void initPhysX(bool interactive);
 void releasePhysX(bool interactive);
 void examplePhysX(bool interactive);
 void stepPhysics(bool interactive);
 void renderCallback();
 void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, const PxVec3 & color);
+
 
 
 /* --------------------------------------------- */
@@ -63,6 +73,7 @@ static PxFoundation* gFoundation = nullptr;
 static PxPhysics* gPhysics = nullptr;
 static PxScene* gScene = nullptr;
 static PxPvd* gPvd = nullptr;
+bool interactive = false;
 
 
 
@@ -144,25 +155,32 @@ int main(int argc, char** argv)
 	glfwSetScrollCallback(window, scroll_callback);
 
 	// set GL defaults
-	glClearColor(0, 0, 0, 1);
+	glClearColor(0.5, 0.5, 0.5, 1);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-
-	// Init PhysX
-	bool interactive = false;
-	initPhysX(interactive);
-
-	// Example PhysX code
-	examplePhysX(interactive);
 
 	/* --------------------------------------------- */
 	// Initialize scene and render loop
 	/* --------------------------------------------- */
 	{
+		// Init PhysX
+		initPhysX(interactive);
+
+		// Example PhysX code
+		examplePhysX(interactive);
+
+
+		// Model loading
+		Model plattform("assets/models/plattform/plattform.obj");
+		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
+		stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
+		Model backpack("assets/models/backpack/backpack.obj");
+
 
 		// Init game
 		game->init();
 		game->createInitialGeometry();
+
 
 		// Initialize camera
 		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
@@ -190,8 +208,15 @@ int main(int argc, char** argv)
 
 			// Set per-frame uniforms
 			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
+			setPerFrameUniforms(game->modelShader.get(), camera, dirL, pointL);
+
+			// Models
+			game->modelShader->use();
+			game->modelShader->setUniform("modelMatrix", glm::translate(glm::mat4(1.f), glm::vec3(0.f,2.f,-10.f)));
+			game->modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 
 			// Render
+			backpack.draw(*(game->modelShader)); //wont work correctly after game->draw()
 			game->update();
 			game->draw();
 
@@ -426,6 +451,16 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		_strafing = false;
 	}
 }
+
+// FPS Camera 
+void processInput(GLFWwindow* window)
+{
+
+
+
+}
+
+
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {

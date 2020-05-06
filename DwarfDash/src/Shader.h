@@ -58,6 +58,8 @@ protected:
 	 */
 	GLint getUniformLocation(std::string uniform);
 
+
+
 public:
 
 	/*!
@@ -74,6 +76,10 @@ public:
 	Shader(std::string vs, std::string fs);
 	
 	~Shader();
+
+	GLuint getHandle() {
+		return this->_handle;
+	}
 
 	/*!
 	 * Uses the shader with glUseProgram
@@ -197,4 +203,5 @@ public:
 	 * @param f: the value to be set
 	 */
 	void setUniformArr(std::string arr, unsigned int i, std::string prop, const float f);
+
 };
