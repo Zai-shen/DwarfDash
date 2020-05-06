@@ -7,8 +7,9 @@ Game::Game() {}
 Game::~Game() {}
 
 void Game::init() {
-	// Load shader(s)
+	// Load shaders
 	primaryShader = make_shared<Shader>("texture.vert", "texture.frag");
+	modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
 
 	// Create textures
 	woodTexture = make_shared<Texture>("wood_texture.dds");

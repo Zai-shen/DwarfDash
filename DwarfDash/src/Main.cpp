@@ -12,8 +12,6 @@
 #include "physxInclude/pvd/PxPvd.h"
 #include "physxInclude/pvd/PxPvdSceneClient.h"
 #include "physxInclude/pvd/PxPvdTransport.h"
-using namespace physx;
-using namespace std;
 
 //Config
 #include "Configuration.h"
@@ -21,11 +19,15 @@ using namespace std;
 // Model loading
 #include "Model.h"
 
+// Camera
 #include "FPSCamera.h"
 
 //Game
 #include "Game.h"
 
+//Namespaces
+using namespace physx;
+using namespace std;
 
 /* --------------------------------------------- */
 // Prototypes
@@ -38,9 +40,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 void setWindowFPS(GLFWwindow *window,float& t_sum);
-
 void processInput(GLFWwindow* window);
-
 void initPhysX(bool interactive);
 void releasePhysX(bool interactive);
 void examplePhysX(bool interactive);
@@ -73,6 +73,7 @@ static PxFoundation* gFoundation = nullptr;
 static PxPhysics* gPhysics = nullptr;
 static PxScene* gScene = nullptr;
 static PxPvd* gPvd = nullptr;
+bool interactive = false;
 
 
 
@@ -158,29 +159,20 @@ int main(int argc, char** argv)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-	// Init PhysX
-	bool interactive = false;
-	initPhysX(interactive);
-
-	// Example PhysX code
-	examplePhysX(interactive);
-
 	/* --------------------------------------------- */
 	// Initialize scene and render loop
 	/* --------------------------------------------- */
 	{
+		// Init PhysX
+		initPhysX(interactive);
+
+		// Example PhysX code
+		examplePhysX(interactive);
+
 
 		// Model loading
-
-		// these next two lines works
-		//Shader modelShader("modelloading.vert", "modelloading.frag");
-		// how do shared pointers work?
-		shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
-
-
 		Model plattform("assets/models/plattform/plattform.obj");
-		Model nanosuit("assets/models/nanosuit/nanosuit.obj");
-
+		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
 		stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
 		Model backpack("assets/models/backpack/backpack.obj");
 
@@ -215,21 +207,16 @@ int main(int argc, char** argv)
 			camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			//setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
 			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
-
-			setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
+			setPerFrameUniforms(game->modelShader.get(), camera, dirL, pointL);
 
 			// Models
-			modelShader->use();
-			modelShader->setUniform("modelMatrix", glm::translate(glm::mat4(1.f), glm::vec3(0.f,2.f,-10.f)));
-			modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-			backpack.draw(*modelShader);
-			//modelShader->setUniform("modelMatrix", model);
-			//modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-			//nanosuit.draw(*modelShader);
+			game->modelShader->use();
+			game->modelShader->setUniform("modelMatrix", glm::translate(glm::mat4(1.f), glm::vec3(0.f,2.f,-10.f)));
+			game->modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 
 			// Render
+			backpack.draw(*(game->modelShader)); //wont work correctly after game->draw()
 			game->update();
 			game->draw();
 
