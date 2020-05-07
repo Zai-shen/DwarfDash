@@ -11,9 +11,6 @@ This code is based on: https://learnopengl.com/code_viewer_gh.php?code=includes/
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
-//#include "GLFW/glfw3.h"
-//#include "GL/glew.h"
-
 enum Camera_Movement {
     FORWARD,
     BACKWARD,
@@ -29,7 +26,6 @@ const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
 
 
-// An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 class FPSCamera
 {
 public:
@@ -39,6 +35,11 @@ public:
     glm::vec3 Up;
     glm::vec3 Right;
     glm::vec3 WorldUp;
+
+	// my declarations
+	glm::mat4 perspective;
+	glm::mat4 view;
+
 
     // Euler Angles
     float Yaw;
@@ -53,10 +54,11 @@ public:
     FPSCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH)
         : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
     {
-        Position = position;
+        Position = position; // a vector in world space that points to the camera's position
         WorldUp = up;
         Yaw = yaw;
         Pitch = pitch;
+
         updateCameraVectors();
     }
 
@@ -68,12 +70,12 @@ public:
         WorldUp = glm::vec3(upX, upY, upZ);
         Yaw = yaw;
         Pitch = pitch;
+
         updateCameraVectors();
     }
 
-    // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
-    glm::mat4 GetViewMatrix()
-    {
+	// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
+    glm::mat4 GetViewMatrix()    {
         return glm::lookAt(Position, Position + Front, Up);
     }
 
@@ -97,24 +99,28 @@ public:
 		return this->WorldUp;
 	}
 
-
-
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
         float velocity = MovementSpeed * deltaTime;
+
+
         if (direction == FORWARD)
             Position += Front * velocity;
+
         if (direction == BACKWARD)
             Position -= Front * velocity;
+
         if (direction == LEFT)
             Position -= Right * velocity;
+
         if (direction == RIGHT)
             Position += Right * velocity;
+
     }
 
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-    void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true)
+    void ProcessMouseMovement(float xoffset, float yoffset)
     {
         xoffset *= MouseSensitivity;
         yoffset *= MouseSensitivity;
@@ -123,13 +129,13 @@ public:
         Pitch += yoffset;
 
         // Make sure that when pitch is out of bounds, screen doesn't get flipped
-        if (constrainPitch)
-        {
-            if (Pitch > 89.0f)
-                Pitch = 89.0f;
-            if (Pitch < -89.0f)
-                Pitch = -89.0f;
-        }
+		if (Pitch > 89.0f) {
+            Pitch = 89.0f;
+		}
+		if (Pitch < -89.0f) {
+            Pitch = -89.0f;
+		}
+
 
         // Update Front, Right and Up Vectors using the updated Euler angles
         updateCameraVectors();
@@ -162,6 +168,10 @@ private:
         Right = glm::normalize(glm::cross(Front, WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         Up = glm::normalize(glm::cross(Right, Front));
     }
+
+	void updateViewMatrix() {
+		view = glm::lookAt(Position, Position + Front, Up);
+	}
 
 
 };

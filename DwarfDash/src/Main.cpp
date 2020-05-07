@@ -35,7 +35,8 @@ static void APIENTRY DebugCallbackDefault(GLenum source, GLenum type, GLuint id,
 static std::string FormatDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, const char* msg);
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
+//void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 
 // FPS Camera
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -43,7 +44,9 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
 
-
+// for printing out vec3 values
+#include "glm/ext.hpp";
+#include "glm/gtx/string_cast.hpp";
 
 
 
@@ -52,7 +55,6 @@ void setWindowFPS(GLFWwindow *window,float& t_sum);
 void initPhysX();
 void releasePhysX();
 void examplePhysX();
-void processInput(GLFWwindow* window);
 
 /* --------------------------------------------- */
 // Global variables
@@ -188,9 +190,7 @@ int main(int argc, char** argv)
 	/* --------------------------------------------- */
 	{
 
-
-
-		//FPSCamera camera(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, float(config.width) / float(config.height), config.nearZ, config.farZ);
+		//FPSCamera camera2(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
 		// FPS Camera
 		// per-frame time logic
@@ -199,14 +199,11 @@ int main(int argc, char** argv)
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		// input
-		// -----
-		processInput(window);
 
 		// Model loading
 		shared_ptr<Shader> ourShader = make_shared<Shader>("camera.vert", "camera.frag");
-
 		shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
+
 		shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
 		shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
 		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), brickTextureMaterial);
@@ -227,6 +224,10 @@ int main(int argc, char** argv)
 		double mouse_x, mouse_y;
 
 		while (!glfwWindowShouldClose(window)) {
+			// input
+			// -----
+			processInput(window);
+
 			// Clear backbuffer
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -238,21 +239,19 @@ int main(int argc, char** argv)
 			//camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			//setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
+			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
 			//setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
-
-
-
 			//setPerFrameUniforms(ourShader.get(), camera, dirL, pointL);
 
-			ourShader->use();
-			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-			ourShader->setUniform("projection", projection);
 
-			glm::mat4 view = camera.GetViewMatrix();
-			ourShader->setUniform("view", view);
+			//ourShader->use();
+			//glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+			//ourShader->setUniform("projection", camera.getPosition());
+			//glm::mat4 view = camera.GetViewMatrix();
+			//ourShader->setUniform("view", camera.GetViewMatrix);
 
 
+			textureShader->use();
 			// Render
 			cube.draw();
 			//cylinder.draw();
@@ -263,9 +262,7 @@ int main(int argc, char** argv)
 				gScene->simulate(myTimestep);
 				gScene->fetchResults(true);
 			}
-			//Get current position of actor (box) and print it
-			//PxVec3 boxPos = gBox->getGlobalPose().p;
-			//cout << "Box current Position (" << boxPos.x << " " << boxPos.y << " " << boxPos.z<<")\n";
+
 
 			// Compute frame time
 			dt = t;
@@ -384,8 +381,12 @@ void setWindowFPS(GLFWwindow *window, float& t_sum)
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL)
 {
 	shader->use();
+	// these two lines belong to the old ecg camera class
 	//shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 	//shader->setUniform("camera_world", camera.getPosition());
+
+	shader->setUniform("view", camera.GetViewMatrix());
+	shader->setUniform("camera_world", camera.getPosition());
 
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
@@ -400,21 +401,36 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	glm::vec3 pos = camera.getPosition();
+
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		std::cout << "Pressed ESC" << std::endl;
 		glfwSetWindowShouldClose(window, true);
+	}
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		//std::cout << "Pressed W" << std::endl;
+		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.ProcessKeyboard(FORWARD, deltaTime);
+	}
 
-
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		//std::cout << "Pressed S" << std::endl;
+		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.ProcessKeyboard(BACKWARD, deltaTime);
+	}
 
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		//std::cout << "Pressed A" << std::endl;
+		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.ProcessKeyboard(LEFT, deltaTime);
+	}
 
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		//std::cout << "Pressed D" << std::endl;
+		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+	}
 }
 
 // glfw: whenever the mouse moves, this callback is called
