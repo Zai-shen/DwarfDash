@@ -86,12 +86,16 @@ static PxPvd* gPvd = nullptr;
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 FPSCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
+//float lastX = SCR_WIDTH / 2.0f;
+//float lastY = SCR_HEIGHT / 2.0f;
+float lastX = config.width / 2.0f;
+float lastY = config.height / 2.0f;
 bool firstMouse = true;
+
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
+
 
 /* --------------------------------------------- */
 // Main
@@ -169,6 +173,11 @@ int main(int argc, char** argv)
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
+	glfwSetCursorPosCallback(window, mouse_callback);
+
+	// tell GLFW to capture our mouse
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	// set GL defaults
 	glClearColor(0.5, 0.5, 0.5, 1);
 	glEnable(GL_DEPTH_TEST);
@@ -204,14 +213,12 @@ int main(int argc, char** argv)
 		shared_ptr<Shader> ourShader = make_shared<Shader>("camera.vert", "camera.frag");
 		shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
 
+		shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
+		Model backpack("assets/models/backpack/backpack.obj");
+
 		shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
 		shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
-		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), brickTextureMaterial);
-
-		// Initialize camera
-		//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
-
-		
+		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), brickTextureMaterial);	
 
 		// Initialize lights
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f));
@@ -239,19 +246,27 @@ int main(int argc, char** argv)
 			//camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
-			//setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
-			//setPerFrameUniforms(ourShader.get(), camera, dirL, pointL);
+			//setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
 
 
-			//ourShader->use();
-			//glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-			//ourShader->setUniform("projection", camera.getPosition());
-			//glm::mat4 view = camera.GetViewMatrix();
-			//ourShader->setUniform("view", camera.GetViewMatrix);
 
+			// this works with a shared pointer
+			modelShader->use();
+			
+			// view/projection transformations
+			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)config.width / (float)config.height, 0.1f, 100.0f);
+			glm::mat4 view = camera.GetViewMatrix();
+			modelShader->setUniform("projection", projection);
+			modelShader->setUniform("view", view);
 
-			textureShader->use();
+			// render the loaded model
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+			modelShader->setUniform("model", model);
+			backpack.Draw(*modelShader);
+
+			//textureShader->use();
 			// Render
 			cube.draw();
 			//cylinder.draw();
@@ -431,6 +446,14 @@ void processInput(GLFWwindow* window)
 		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.ProcessKeyboard(RIGHT, deltaTime);
 	}
+
+	// reset camera to 0
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+		//std::cout << "Pressed X" << std::endl;
+		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
+		camera.resetPosition();
+	}
+
 }
 
 // glfw: whenever the mouse moves, this callback is called
