@@ -35,8 +35,6 @@ static void APIENTRY DebugCallbackDefault(GLenum source, GLenum type, GLuint id,
 static std::string FormatDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, const char* msg);
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-//void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 
 // FPS Camera
@@ -44,19 +42,10 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
-// settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
 
-// camera
-FPSCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
-bool firstMouse = true;
 
-// timing
-float deltaTime = 0.0f;	// time between current frame and last frame
-float lastFrame = 0.0f;
+
+
 
 // Physx
 void setWindowFPS(GLFWwindow *window,float& t_sum);
@@ -90,6 +79,17 @@ static PxScene* gScene = nullptr;
 static PxPvd* gPvd = nullptr;
 
 
+// fps camera
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+FPSCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
+bool firstMouse = true;
+// timing
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
 
 /* --------------------------------------------- */
 // Main
@@ -165,7 +165,6 @@ int main(int argc, char** argv)
 
 	// set callbacks
 	glfwSetKeyCallback(window, key_callback);
-	//glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
 	// set GL defaults
@@ -183,10 +182,16 @@ int main(int argc, char** argv)
 	PxReal myTimestep = 1.0f / 60.0f;
 
 
+
 	/* --------------------------------------------- */
 	// Initialize scene and render loop
 	/* --------------------------------------------- */
 	{
+
+
+
+		//FPSCamera camera(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, float(config.width) / float(config.height), config.nearZ, config.farZ);
+
 		// FPS Camera
 		// per-frame time logic
 		// --------------------
@@ -201,30 +206,14 @@ int main(int argc, char** argv)
 		// Model loading
 		shared_ptr<Shader> ourShader = make_shared<Shader>("camera.vert", "camera.frag");
 
-		// these next two lines work
-		shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
-		//modelShader.use();
-
-		// how do shader pointers work?
-		//shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
-
-
-		Model plattform("assets/models/plattform/plattform.obj");
-		Model nanosuit("assets/models/nanosuit/nanosuit.obj");
-		Model backpack("assets/models/backpack/backpack.obj");
-
-
-		// Load shader(s)
 		shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
-		// Create textures
 		shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
-		// Create materials
 		shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
-		// Create geometry
 		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), brickTextureMaterial);
 
 		// Initialize camera
 		//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
+
 		
 
 		// Initialize lights
@@ -253,6 +242,9 @@ int main(int argc, char** argv)
 			//setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
 
 
+
+			//setPerFrameUniforms(ourShader.get(), camera, dirL, pointL);
+
 			ourShader->use();
 			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 			ourShader->setUniform("projection", projection);
@@ -261,26 +253,11 @@ int main(int argc, char** argv)
 			ourShader->setUniform("view", view);
 
 
-			glm::mat4 model = glm::mat3(1.0f);
-			model = glm::translate(model, glm::vec3(10.0f, -10.75f, 0.0f)); // translate it down so it's at the center of the scene
-			model = glm::scale    (model, glm::vec3(10.2f, 2.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-	
-			// WHY DOES THIS ALWAYS USE THE WRONG setUniform? 
-			modelShader->use();
-			modelShader->setUniform("modelMatrix", model);
-			modelShader->setUniform("viewProjMatrix", camera.GetViewMatrix());
-			backpack.Draw(*modelShader);
-
-			//plattform.Draw(modelShader);
-			//nanosuit.Draw(modelShader);
-
-
-
 			// Render
 			cube.draw();
 			//cylinder.draw();
 			//sphere.draw();
-
+			
 			//PhysX
 			if (gScene) {
 				gScene->simulate(myTimestep);
@@ -404,11 +381,11 @@ void setWindowFPS(GLFWwindow *window, float& t_sum)
 	}
 }
 
-void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL)
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL)
 {
 	shader->use();
-	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-	shader->setUniform("camera_world", camera.getPosition());
+	//shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+	//shader->setUniform("camera_world", camera.getPosition());
 
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
@@ -416,19 +393,6 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 	shader->setUniform("pointL.color", pointL.color);
 	shader->setUniform("pointL.position", pointL.position);
 	shader->setUniform("pointL.attenuation", pointL.attenuation);
-}
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		_dragging = true;
-	} else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-		_dragging = false;
-	} else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-		_strafing = true;
-	} else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
-		_strafing = false;
-	}
 }
 
 // FPS Camera 
@@ -441,14 +405,17 @@ void processInput(GLFWwindow* window)
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		camera.ProcessKeyboard(FORWARD, deltaTime);
+
+
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		camera.ProcessKeyboard(BACKWARD, deltaTime);
+
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		camera.ProcessKeyboard(LEFT, deltaTime);
+
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
-
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------

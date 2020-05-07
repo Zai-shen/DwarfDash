@@ -59,6 +59,7 @@ public:
         Pitch = pitch;
         updateCameraVectors();
     }
+
     // Constructor with scalar values
     FPSCamera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch)
         : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
@@ -75,6 +76,28 @@ public:
     {
         return glm::lookAt(Position, Position + Front, Up);
     }
+
+	glm::vec3 getPosition() {
+		return this->Position;
+	}
+
+	glm::vec3 getFront() {
+		return this->Front;
+	}
+
+	glm::vec3 getUp(){
+		return this->Up;
+	}
+
+	glm::vec3 getRight() {
+		return this->Right;
+	}
+
+	glm::vec3 getWorldUp() {
+		return this->WorldUp;
+	}
+
+
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
@@ -124,9 +147,10 @@ public:
     }
 
 private:
+
     // Calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors()
-    {
+	{
         // Calculate the new Front vector
         glm::vec3 front;
         front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
@@ -138,5 +162,7 @@ private:
         Right = glm::normalize(glm::cross(Front, WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         Up = glm::normalize(glm::cross(Right, Front));
     }
+
+
 };
 #endif
