@@ -182,12 +182,12 @@ int main(int argc, char** argv)
 
 		// Init game
 		game->init();
-		game->createInitialGeometry();
 
 		//physx test
 		//Geometry* cuboi = game->currentLevel->levelObjects[4];
 		Geometry* cuboi = new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 5.f, -1.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), game->brickTextureMaterial);
 		game->addGeometry(cuboi);
+		//PxActor* cBox;
 		PxRigidDynamic* cBox;
 		PxMaterial* cMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
 		PxTransform cPos(PxVec3(0.0f, 5.0f, -1.0f)); //this->position

@@ -24,3 +24,7 @@ void Level::draw() {
 void Level::reset() {
 	this->levelObjects.clear();
 }
+
+void Level::addGeometry(Geometry* geometry) {
+	this->levelObjects.push_back(geometry);
+}

@@ -22,6 +22,8 @@ public:
 
 	void reset();
 	
+	void addGeometry(Geometry* geometry);
+
 private:
 
 	int in = 2;

@@ -28,8 +28,6 @@ public:
 
 	void reset();
 
-	void createInitialGeometry();
-
 	void addGeometry(Geometry* geometry);
 
 	Level* getCurrentLevel();
@@ -38,7 +36,6 @@ private:
 
 	Level* level1 = new Level();
 	Level* level2 = new Level();
-
 	Level* currentLevel = level1;
 
 	int const GAME_STATE_IDLE = 0;
@@ -50,5 +47,12 @@ private:
 
 	shared_ptr<Texture> woodTexture;
 	shared_ptr<Texture> brickTexture;
+
+	void initShaders();
+	void initTextures();
+	void initMaterials();
+	void initGeometry();
+	void initLevel1();
+	void initLevel2();
 
 };
