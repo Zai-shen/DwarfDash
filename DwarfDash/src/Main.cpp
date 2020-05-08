@@ -85,8 +85,6 @@ static PxPvd* gPvd = nullptr;
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 FPSCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-//float lastX = SCR_WIDTH / 2.0f;
-//float lastY = SCR_HEIGHT / 2.0f;
 float lastX = config.width / 2.0f;
 float lastY = config.height / 2.0f;
 bool firstMouse = true;
@@ -173,7 +171,7 @@ int main(int argc, char** argv)
 	glfwSetCursorPosCallback(window, mouse_callback);
 
 	// tell GLFW to capture our mouse
-	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// set GL defaults
 	glClearColor(0.5, 0.5, 0.5, 1);
@@ -195,8 +193,6 @@ int main(int argc, char** argv)
 	// Initialize scene and render loop
 	/* --------------------------------------------- */
 	{
-
-		//FPSCamera camera2(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
 		// FPS Camera
 		// per-frame time logic
@@ -254,7 +250,9 @@ int main(int argc, char** argv)
 			
 			// view/projection transformations
 			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)config.width / (float)config.height, 0.1f, 100.0f);
+
 			glm::mat4 view = camera.GetViewMatrix();
+
 			modelShader->setUniform("projection", projection);
 			modelShader->setUniform("view", view);
 

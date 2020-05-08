@@ -64,7 +64,7 @@ public:
 
     // Constructor with scalar values
     FPSCamera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch)
-        : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+        : Front(glm::vec3(0.0f, 0.0f, 100.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
     {
         Position = glm::vec3(posX, posY, posZ);
         WorldUp = glm::vec3(upX, upY, upZ);
@@ -73,6 +73,8 @@ public:
 
         updateCameraVectors();
     }
+
+
 
 	// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix()    {
@@ -100,7 +102,7 @@ public:
 	}
 
 	glm::vec3 resetPosition() {
-		return Position = glm::vec3(0.0f, 0.0f, 0.0f);
+		return Position = glm::vec3(0.0f, 0.0f, -1.0f);
 	}
 
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
@@ -134,7 +136,8 @@ public:
         xoffset *= MouseSensitivity;
         yoffset *= MouseSensitivity;
 
-        Yaw += xoffset;
+        //Yaw += xoffset;
+        Yaw = glm::mod(Yaw + (float)xoffset, 360.0f);
         Pitch += yoffset;
 
         // Make sure that when pitch is out of bounds, screen doesn't get flipped
