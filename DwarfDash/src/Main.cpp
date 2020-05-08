@@ -40,7 +40,6 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 
 // FPS Camera
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
 
@@ -171,8 +170,6 @@ int main(int argc, char** argv)
 
 	// set callbacks
 	glfwSetKeyCallback(window, key_callback);
-	glfwSetScrollCallback(window, scroll_callback);
-
 	glfwSetCursorPosCallback(window, mouse_callback);
 
 	// tell GLFW to capture our mouse
@@ -214,11 +211,13 @@ int main(int argc, char** argv)
 		shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
 
 		shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
+
+		stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
 		Model backpack("assets/models/backpack/backpack.obj");
 
-		shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
-		shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
-		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), brickTextureMaterial);	
+		//shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
+		//shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
+		//Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), brickTextureMaterial);	
 
 		// Initialize lights
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f));
@@ -268,7 +267,7 @@ int main(int argc, char** argv)
 
 			//textureShader->use();
 			// Render
-			cube.draw();
+			//cube.draw();
 			//cylinder.draw();
 			//sphere.draw();
 			
@@ -474,13 +473,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	lastY = ypos;
 
 	camera.ProcessMouseMovement(xoffset, yoffset);
-}
-
-// glfw: whenever the mouse scroll wheel scrolls, this callback is called
-// ----------------------------------------------------------------------
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-	camera.ProcessMouseScroll(yoffset);
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
