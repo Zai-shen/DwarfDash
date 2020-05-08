@@ -57,3 +57,7 @@ void Game::createInitialGeometry() {
 void Game::addGeometry(Geometry* geometry) {
 	this->currentLevel->levelObjects.push_back(geometry);
 }
+
+Level* Game::getCurrentLevel() {
+	return this->currentLevel;
+}

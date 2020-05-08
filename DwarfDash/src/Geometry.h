@@ -96,6 +96,10 @@ public:
 	 */
 	void transform(glm::mat4 transformation);
 
+	void setModelMatrix(glm::mat4 model) {
+		this->_modelMatrix = model;
+	}
+
 	/*!
 	 * Resets the model matrix to the identity matrix
 	 */

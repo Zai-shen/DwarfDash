@@ -29,6 +29,9 @@
 using namespace physx;
 using namespace std;
 
+//Temp
+#include <glm/gtx/string_cast.hpp>
+
 /* --------------------------------------------- */
 // Prototypes
 /* --------------------------------------------- */
@@ -174,13 +177,36 @@ int main(int argc, char** argv)
 		Model plattform("assets/models/plattform/plattform.obj");
 		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
 		stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
-		Model backpack("assets/models/backpack/backpack.obj");
+		//Model backpack("assets/models/backpack/backpack.obj");
 
 
 		// Init game
 		game->init();
 		game->createInitialGeometry();
 
+		//physx test
+		//Geometry* cuboi = game->currentLevel->levelObjects[4];
+		Geometry* cuboi = new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 5.f, -1.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), game->brickTextureMaterial);
+		game->addGeometry(cuboi);
+		PxRigidDynamic* cBox;
+		PxMaterial* cMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
+		PxTransform cPos(PxVec3(0.0f, 5.0f, -1.0f)); //this->position
+		PxBoxGeometry cGeometry(PxVec3(0.5f, 0.5f, 0.5f)); //this->model
+		cBox = PxCreateDynamic(*gPhysics, cPos, cGeometry, *cMaterial, 1.0f);
+		gScene->addActor(*cBox);
+
+		//enemy1Actor->mMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
+		/*enemy1Actor->pos = PxTransform(PxVec3(10.0f, 0, 0.0f));
+		PxShape* enemy1shape = gPhysics->createShape(PxSphereGeometry(2.0f), enemy1Actor->mMaterial, true, PxShapeFlags(PxShapeFlag::eSIMULATION_SHAPE  PxShapeFlag::eVISUALIZATION  PxShapeFlag::eSCENE_QUERY_SHAPE));
+		enemy1shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
+		enemy1shape->setFlag(PxShapeFlag::eVISUALIZATION, true);
+		enemy1shape->setName("enemy");
+		enemy1Actor->dynamicActor = gPhysics->createRigidDynamic(enemy1Actor->pos);
+		enemy1Actor->dynamicActor->attachShape(enemy1shape);
+		enemy1Actor->dynamicActor->setName("enemy");
+		enemy1shape->release();
+		enemy1Actor->geometry = enemy;
+		gScene->addActor(*enemy1Actor->dynamicActor);*/
 
 		// Initialize camera
 		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
@@ -216,13 +242,28 @@ int main(int argc, char** argv)
 			game->modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 
 			// Render
-			backpack.draw(*(game->modelShader)); //wont work correctly after game->draw()
+			//backpack.draw(*(game->modelShader)); //wont work correctly after game->draw()
 			game->update();
 			game->draw();
 
 			//PhysX
 			//stepPhysics(interactive);
 			renderCallback();
+			//game->getCurrentLevel()->levelObjects[6]->transform(glm::rotate(glm::mat4(1.0f), glm::radians(.5f), glm::vec3(0.f, 1.f, 0.f)));
+			PxMat44 transform = cBox->getGlobalPose();
+			PxVec4 c1 = transform.column0;
+			PxVec4 c2 = transform.column1;
+			PxVec4 c3 = transform.column2;
+			PxVec4 c4 = transform.column3;
+
+			glm::vec4 v1 = glm::vec4(c1.x, c1.y, c1.z, c1.w);
+			glm::vec4 v2 = glm::vec4(c2.x, c2.y, c2.z, c2.w);
+			glm::vec4 v3 = glm::vec4(c3.x, c3.y, c3.z, c3.w);
+			glm::vec4 v4 = glm::vec4(c4.x, c4.y, c4.z, c4.w);
+
+			glm::mat4 geomTransform = glm::mat4(v1, v2, v3, v4);
+			//std::cout << glm::to_string(geomTransform) << std::endl;
+			game->getCurrentLevel()->levelObjects[6]->setModelMatrix(geomTransform);
 
 			// Compute frame time
 			dt = t;
@@ -332,6 +373,25 @@ void initPhysX(bool interactive) {
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
 	}
+}
+
+PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
+	PxFilterObjectAttributes attributes1, PxFilterData filterData1,
+	PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
+{
+	PX_UNUSED(attributes0);
+	PX_UNUSED(attributes1);
+	PX_UNUSED(filterData0);
+	PX_UNUSED(filterData1);
+	PX_UNUSED(constantBlockSize);
+	PX_UNUSED(constantBlock);
+
+	// all initial and persisting reports for everything, with per-point data
+	pairFlags = PxPairFlag::eSOLVE_CONTACT | PxPairFlag::eDETECT_DISCRETE_CONTACT
+		| PxPairFlag::eNOTIFY_TOUCH_FOUND
+		| PxPairFlag::eNOTIFY_TOUCH_PERSISTS
+		| PxPairFlag::eNOTIFY_CONTACT_POINTS | PxPairFlag::eTRIGGER_DEFAULT;
+	return  PxFilterFlag::eDEFAULT;
 }
 
 void releasePhysX(bool interactive)

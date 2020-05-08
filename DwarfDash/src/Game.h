@@ -32,6 +32,8 @@ public:
 
 	void addGeometry(Geometry* geometry);
 
+	Level* getCurrentLevel();
+
 private:
 
 	Level* level1 = new Level();
