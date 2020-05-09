@@ -18,6 +18,9 @@ public:
 	shared_ptr<Material> woodTextureMaterial;
 	shared_ptr<Material> brickTextureMaterial;
 
+	PxPhysics* gPhysics;
+	PxScene* gScene;
+
 	Game();
 	~Game();
 
@@ -29,13 +32,9 @@ public:
 
 	void reset();
 
-	void addGeometry(Geometry* geometry);
-
 	void addGameobject(Gameobject* gameObject);
 
 	Level* getCurrentLevel();
-
-	void getPhysXHandles(PxPhysics* gPhysics, PxScene* gScene);
 
 private:
 
@@ -53,13 +52,10 @@ private:
 	shared_ptr<Texture> woodTexture;
 	shared_ptr<Texture> brickTexture;
 
-	PxPhysics* gPhysics;
-	PxScene* gScene;
-
 	void initShaders();
 	void initTextures();
 	void initMaterials();
-	void initGeometry();
+	void initLevels();
 	void initLevel1();
 	void initLevel2();
 

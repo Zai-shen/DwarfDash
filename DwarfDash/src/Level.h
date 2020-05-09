@@ -10,8 +10,6 @@ class Level {
 
 public:
 
-	vector<Geometry*> levelObjects;
-
 	Level();
 	~Level();
 
@@ -22,8 +20,6 @@ public:
 	void draw();
 
 	void reset();
-	
-	void addGeometry(Geometry* geometry);
 
 	void addGameobject(Gameobject* gameObject);
 

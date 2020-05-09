@@ -44,14 +44,9 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 void setWindowFPS(GLFWwindow *window,float& t_sum);
 void processInput(GLFWwindow* window);
-void initPhysX(bool interactive);
-void releasePhysX(bool interactive);
-void examplePhysX(bool interactive);
-void stepPhysics(bool interactive);
-void renderCallback();
-void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, const PxVec3 & color);
-
-
+void initPhysX();
+void releasePhysX();
+void stepPhysics();
 
 /* --------------------------------------------- */
 // Global variables
@@ -65,10 +60,6 @@ static bool _dragging = false;
 static bool _strafing = false;
 static float _zoom = 10.0f;
 
-// Game
-int frames = 0;
-Game* game = new Game();
-
 // PhysX
 static PxDefaultErrorCallback gDefaultErrorCallback;
 static PxDefaultAllocator gDefaultAllocatorCallback;
@@ -76,9 +67,10 @@ static PxFoundation* gFoundation = nullptr;
 static PxPhysics* gPhysics = nullptr;
 static PxScene* gScene = nullptr;
 static PxPvd* gPvd = nullptr;
-bool interactive = false;
 
-
+// Game
+int frames = 0;
+Game* game = new Game();
 
 /* --------------------------------------------- */
 // Main
@@ -167,10 +159,7 @@ int main(int argc, char** argv)
 	/* --------------------------------------------- */
 	{
 		// Init PhysX
-		initPhysX(interactive);
-
-		// Example PhysX code
-		examplePhysX(interactive);
+		initPhysX();
 
 
 		// Model loading
@@ -181,19 +170,10 @@ int main(int argc, char** argv)
 
 
 		// Init game
-		game->getPhysXHandles(gPhysics, gScene);
+		game->gPhysics = gPhysics;
+		game->gScene = gScene;
 		game->init();
 
-		//physx test
-		////Geometry* cuboi = new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 5.f, -1.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), game->brickTextureMaterial);
-		////game->addGeometry(cuboi);
-		//////PxActor* cBox;
-		////PxRigidDynamic* cBox;
-		////PxMaterial* cMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-		////PxTransform cPos(PxVec3(0.0f, 5.0f, -1.0f)); //this->position
-		////PxBoxGeometry cGeometry(PxVec3(0.5f, 0.5f, 0.5f)); //this->model
-		////cBox = PxCreateDynamic(*gPhysics, cPos, cGeometry, *cMaterial, 1.0f);
-		////gScene->addActor(*cBox);
 
 		// Initialize camera
 		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
@@ -234,23 +214,8 @@ int main(int argc, char** argv)
 			game->draw();
 
 			//PhysX
-			//stepPhysics(interactive);
-			renderCallback();
-			//game->getCurrentLevel()->levelObjects[6]->transform(glm::rotate(glm::mat4(1.0f), glm::radians(.5f), glm::vec3(0.f, 1.f, 0.f)));
-			//PxMat44 transform = cBox->getGlobalPose();
-			//PxVec4 c1 = transform.column0;
-			//PxVec4 c2 = transform.column1;
-			//PxVec4 c3 = transform.column2;
-			//PxVec4 c4 = transform.column3;
-
-			//glm::vec4 v1 = glm::vec4(c1.x, c1.y, c1.z, c1.w);
-			//glm::vec4 v2 = glm::vec4(c2.x, c2.y, c2.z, c2.w);
-			//glm::vec4 v3 = glm::vec4(c3.x, c3.y, c3.z, c3.w);
-			//glm::vec4 v4 = glm::vec4(c4.x, c4.y, c4.z, c4.w);
-
-			//glm::mat4 geomTransform = glm::mat4(v1, v2, v3, v4);
-			////std::cout << glm::to_string(geomTransform) << std::endl;
-			//game->getCurrentLevel()->levelObjects[6]->setModelMatrix(geomTransform);
+			stepPhysics();
+			//renderCallback();
 
 			// Compute frame time
 			dt = t;
@@ -277,7 +242,7 @@ int main(int argc, char** argv)
 	// Destroy PhysX
 	/* --------------------------------------------- */
 
-	releasePhysX(interactive);
+	releasePhysX();
 
 	/* --------------------------------------------- */
 	// Destroy context and exit
@@ -288,40 +253,14 @@ int main(int argc, char** argv)
 	return EXIT_SUCCESS;
 }
 
-void stepPhysics(bool interactive)
+void stepPhysics()
 {
-	PX_UNUSED(interactive);
 	float timeStep = 1.0f / 60.0f;
 	gScene->simulate(timeStep);
 	gScene->fetchResults(true);
 }
 
-void examplePhysX(bool interactive) {
-	//Creating material
-	PxMaterial* mMaterial =
-		//static friction, dynamic friction, restitution
-		gPhysics->createMaterial(0.5, 0.5, 0.5);
-
-	//1-Creating static plane
-	PxTransform planePos = PxTransform(PxVec3(0.0f, 0,
-		0.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
-	PxRigidStatic* plane = gPhysics->createRigidStatic(planePos);
-	PxShape* shape = gPhysics->createShape(PxPlaneGeometry(), *mMaterial);
-	plane->attachShape(*shape);
-	gScene->addActor(*plane);
-
-	if (!interactive) {
-		PxRigidDynamic*gBox;
-		//2) Create cube
-		PxTransform boxPos(PxVec3(0.0f, 10.0f, 0.0f));
-		PxBoxGeometry boxGeometry(PxVec3(0.5f, 0.5f, 0.5f));
-		gBox = PxCreateDynamic(*gPhysics, boxPos, boxGeometry, *mMaterial,
-			1.0f);
-		gScene->addActor(*gBox);
-	}
-}
-
-void initPhysX(bool interactive) {
+void initPhysX() {
 	//Creating foundation for PhysX
 	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback, gDefaultErrorCallback);
 	if (!gFoundation)
@@ -381,83 +320,14 @@ PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, Px
 	return  PxFilterFlag::eDEFAULT;
 }
 
-void releasePhysX(bool interactive)
+void releasePhysX()
 {
-	PX_UNUSED(interactive);
 	gScene->release();
 	gPhysics->release();
 	PxPvdTransport* transport = gPvd->getTransport();
 	gPvd->release();
 	transport->release();
 	gFoundation->release();
-}
-
-void renderCallback()
-{
-	stepPhysics(true);
-
-	PxScene* scene;
-	PxGetPhysics().getScenes(&scene, 1);
-	PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
-	if (nbActors)
-	{
-		std::vector<PxRigidActor*> actors(nbActors);
-		scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
-		renderActors(&actors[0], static_cast<PxU32>(actors.size()), false, PxVec3(1.0f, 1.0f, 1.0f));
-	}
-
-}
-
-void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, const PxVec3 & color)
-{
-	PxShape* shapes[128];
-	for (PxU32 i = 0; i < numActors; i++)
-	{
-		const PxU32 nbShapes = actors[i]->getNbShapes();
-		PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
-		actors[i]->getShapes(shapes, nbShapes);
-		bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false;
-
-		for (PxU32 j = 0; j < nbShapes; j++)
-		{
-			const PxMat44 shapePose(PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
-			PxGeometryHolder h = shapes[j]->getGeometry();
-
-
-
-			//if (shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE)
-			//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); set to work with "Lines"
-
-			// render object
-			//glPushMatrix(); push current matrix on the stack
-			//glMultMatrixf(reinterpret_cast<const float*>(&shapePose)); multiply current matrix with &shapePose
-			//if (sleeping)
-			//{
-			//	PxVec3 darkColor = color * 0.25f;
-			//	glColor4f(darkColor.x, darkColor.y, darkColor.z, 1.0f);
-			//}
-			//else
-			//	glColor4f(color.x, color.y, color.z, 1.0f);
-			//renderGeometry(h); ka?
-			//glPopMatrix(); pop current matrix from stack
-
-			//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-			/*if (shadows) if shadows are wanted, draw them
-			{
-				const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
-				const PxReal shadowMat[] = { 1,0,0,0, -shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
-				glPushMatrix();
-				glMultMatrixf(shadowMat);
-				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
-				glDisable(GL_LIGHTING);
-				glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
-				renderGeometry(h);
-				glEnable(GL_LIGHTING);
-				glPopMatrix();
-			}*/
-		}
-	}
 }
 
 void setWindowFPS(GLFWwindow *window, float& t_sum)

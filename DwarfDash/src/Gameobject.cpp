@@ -6,7 +6,6 @@ Gameobject::Gameobject() {}
 
 Gameobject::Gameobject(Geometry* geometry) {
 	this->goGeometry = geometry;
-	cout << "Constructor with geometry called!" << endl;
 }
 
 Gameobject::~Gameobject() {}
@@ -15,14 +14,10 @@ void Gameobject::init() {
 }
 
 void Gameobject::update() {
-	cout << "Updating gameobject!" << endl;
 	PxMat44 transform;
-	if (this->goActor)
-	{
-		cout << "Its a PhysX Actor!" << endl;
+	if (this->goActor)	{
 		transform = this->goActor->getGlobalPose();
 	}else if (this->goDynamicActor) {
-		cout << "Its a PhysX Dynamic Actor!" << endl;
 		transform = this->goDynamicActor->getGlobalPose();
 	}else {
 		cout << "Error - no PhysX Actor!" << endl;
@@ -43,16 +38,7 @@ void Gameobject::update() {
 	this->goGeometry->setModelMatrix(glmTransform);
 }
 
-void Gameobject::setAsDynamicActor(PxPhysics* gPhysics) {
-	//PxBoxGeometry tempGeometry(PxVec3(0.5f, 0.5f, 0.5f)); //this->model
-	//PxRigidDynamic* dunno;
-	//dunno = PxCreateDynamic(gPhysics, this->goPosition, tempGeometry, this->goMaterial, 1.0f);
-	//this->goDynamicActor = dunno;
-}
-
-
 void Gameobject::draw() {
-	cout << "drawing gameobject!" << endl;
 	this->goGeometry->draw();
 }
 
