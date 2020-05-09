@@ -2,6 +2,7 @@
 
 #include "Utils.h"
 #include "Geometry.h"
+#include "Gameobject.h"
 
 using namespace std;
 
@@ -24,7 +25,9 @@ public:
 	
 	void addGeometry(Geometry* geometry);
 
+	void addGameobject(Gameobject* gameObject);
+
 private:
 
-	int in = 2;
+	vector<Gameobject*> gameObjects;
 };

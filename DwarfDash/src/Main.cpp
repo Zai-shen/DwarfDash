@@ -181,32 +181,19 @@ int main(int argc, char** argv)
 
 
 		// Init game
+		game->getPhysXHandles(gPhysics, gScene);
 		game->init();
 
 		//physx test
-		//Geometry* cuboi = game->currentLevel->levelObjects[4];
-		Geometry* cuboi = new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 5.f, -1.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), game->brickTextureMaterial);
-		game->addGeometry(cuboi);
-		//PxActor* cBox;
-		PxRigidDynamic* cBox;
-		PxMaterial* cMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-		PxTransform cPos(PxVec3(0.0f, 5.0f, -1.0f)); //this->position
-		PxBoxGeometry cGeometry(PxVec3(0.5f, 0.5f, 0.5f)); //this->model
-		cBox = PxCreateDynamic(*gPhysics, cPos, cGeometry, *cMaterial, 1.0f);
-		gScene->addActor(*cBox);
-
-		//enemy1Actor->mMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-		/*enemy1Actor->pos = PxTransform(PxVec3(10.0f, 0, 0.0f));
-		PxShape* enemy1shape = gPhysics->createShape(PxSphereGeometry(2.0f), enemy1Actor->mMaterial, true, PxShapeFlags(PxShapeFlag::eSIMULATION_SHAPE  PxShapeFlag::eVISUALIZATION  PxShapeFlag::eSCENE_QUERY_SHAPE));
-		enemy1shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
-		enemy1shape->setFlag(PxShapeFlag::eVISUALIZATION, true);
-		enemy1shape->setName("enemy");
-		enemy1Actor->dynamicActor = gPhysics->createRigidDynamic(enemy1Actor->pos);
-		enemy1Actor->dynamicActor->attachShape(enemy1shape);
-		enemy1Actor->dynamicActor->setName("enemy");
-		enemy1shape->release();
-		enemy1Actor->geometry = enemy;
-		gScene->addActor(*enemy1Actor->dynamicActor);*/
+		////Geometry* cuboi = new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 5.f, -1.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), game->brickTextureMaterial);
+		////game->addGeometry(cuboi);
+		//////PxActor* cBox;
+		////PxRigidDynamic* cBox;
+		////PxMaterial* cMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
+		////PxTransform cPos(PxVec3(0.0f, 5.0f, -1.0f)); //this->position
+		////PxBoxGeometry cGeometry(PxVec3(0.5f, 0.5f, 0.5f)); //this->model
+		////cBox = PxCreateDynamic(*gPhysics, cPos, cGeometry, *cMaterial, 1.0f);
+		////gScene->addActor(*cBox);
 
 		// Initialize camera
 		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
@@ -250,20 +237,20 @@ int main(int argc, char** argv)
 			//stepPhysics(interactive);
 			renderCallback();
 			//game->getCurrentLevel()->levelObjects[6]->transform(glm::rotate(glm::mat4(1.0f), glm::radians(.5f), glm::vec3(0.f, 1.f, 0.f)));
-			PxMat44 transform = cBox->getGlobalPose();
-			PxVec4 c1 = transform.column0;
-			PxVec4 c2 = transform.column1;
-			PxVec4 c3 = transform.column2;
-			PxVec4 c4 = transform.column3;
+			//PxMat44 transform = cBox->getGlobalPose();
+			//PxVec4 c1 = transform.column0;
+			//PxVec4 c2 = transform.column1;
+			//PxVec4 c3 = transform.column2;
+			//PxVec4 c4 = transform.column3;
 
-			glm::vec4 v1 = glm::vec4(c1.x, c1.y, c1.z, c1.w);
-			glm::vec4 v2 = glm::vec4(c2.x, c2.y, c2.z, c2.w);
-			glm::vec4 v3 = glm::vec4(c3.x, c3.y, c3.z, c3.w);
-			glm::vec4 v4 = glm::vec4(c4.x, c4.y, c4.z, c4.w);
+			//glm::vec4 v1 = glm::vec4(c1.x, c1.y, c1.z, c1.w);
+			//glm::vec4 v2 = glm::vec4(c2.x, c2.y, c2.z, c2.w);
+			//glm::vec4 v3 = glm::vec4(c3.x, c3.y, c3.z, c3.w);
+			//glm::vec4 v4 = glm::vec4(c4.x, c4.y, c4.z, c4.w);
 
-			glm::mat4 geomTransform = glm::mat4(v1, v2, v3, v4);
-			//std::cout << glm::to_string(geomTransform) << std::endl;
-			game->getCurrentLevel()->levelObjects[6]->setModelMatrix(geomTransform);
+			//glm::mat4 geomTransform = glm::mat4(v1, v2, v3, v4);
+			////std::cout << glm::to_string(geomTransform) << std::endl;
+			//game->getCurrentLevel()->levelObjects[6]->setModelMatrix(geomTransform);
 
 			// Compute frame time
 			dt = t;

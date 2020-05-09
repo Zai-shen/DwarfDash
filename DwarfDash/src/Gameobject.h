@@ -9,8 +9,16 @@ using namespace physx;
 class Gameobject {
 
 public:
+	PxMaterial* goMaterial;
+	PxTransform goPosition;
+	PxRigidStatic* goActor;
+	PxRigidDynamic* goDynamicActor;
+	Geometry* goGeometry;
 
 	Gameobject();
+
+	Gameobject(Geometry* geometry);
+
 	~Gameobject();
 
 	void init();
@@ -21,14 +29,8 @@ public:
 
 	void reset();
 
-
+	void setAsDynamicActor(PxPhysics* gPhysics);
 
 private:
-
-	PxMaterial* goMaterial;
-	PxTransform goPosition;
-	PxRigidStatic* goActor;
-	PxRigidDynamic* goDynamicActor;
-	Geometry* goGeometry;
 
 };
