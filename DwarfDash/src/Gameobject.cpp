@@ -8,6 +8,10 @@ Gameobject::Gameobject(Geometry* geometry) {
 	this->goGeometry = geometry;
 }
 
+Gameobject::Gameobject(Model* model) {
+	this->goModel = model;
+}
+
 Gameobject::~Gameobject() {}
 
 void Gameobject::init() {
@@ -39,7 +43,14 @@ void Gameobject::update() {
 }
 
 void Gameobject::draw() {
-	this->goGeometry->draw();
+	if (goGeometry)
+	{
+		this->goGeometry->draw();
+	}
+	else if (goModel) {
+		cout << "working soon" << endl;
+		//this->goModel->draw();
+	}
 }
 
 void Gameobject::reset() {

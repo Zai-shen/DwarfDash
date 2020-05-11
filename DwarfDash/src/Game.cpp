@@ -76,7 +76,6 @@ void Game::initLevel2() {
 	gScene->addActor(*plane);
 
 
-
 	//Gameobject* box1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(-1.f, 5.f, 0.f)), Geometry::createSphereGeometry(64, 32, 1.0f), brickTextureMaterial));
 	Gameobject* box1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 5.f, 0.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), brickTextureMaterial));
 	PxBoxGeometry tempBoxGeometry(PxVec3(0.5f, 0.5f, 0.5f)); //this->model
@@ -87,6 +86,7 @@ void Game::initLevel2() {
 	gScene->addActor(*(box1->goDynamicActor));
 	addGameobject(box1);
 
+
 	Gameobject* sphere1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 15.f, 0.f)), Geometry::createSphereGeometry(64, 32, 1.0f), woodTextureMaterial));
 	PxSphereGeometry tempSphereGeometry(PxReal(1.0f)); //this->model
 	sphere1->goMaterial = standardMaterial;
@@ -95,6 +95,10 @@ void Game::initLevel2() {
 
 	gScene->addActor(*(sphere1->goDynamicActor));
 	addGameobject(sphere1);
+
+	//Error at model.draw in gameobject
+	Gameobject* model1 = new Gameobject(new Model("assets/models/plattform/plattform.obj"));
+
 }
 
 void Game::update() {
