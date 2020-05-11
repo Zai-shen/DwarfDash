@@ -47,6 +47,7 @@ public:
 	vector<unsigned int> indices;
 	vector<MeshTexture> textures;
 	MeshMaterial material;
+
 	//unsigned int VAO;
 
 
@@ -57,6 +58,8 @@ public:
 		this->indices = indices;
 		this->textures = textures;
 		this->material = material;
+
+
 
 		// now that we have all the required data, set the vertex buffers and its attribute pointers.
 		setupMesh();

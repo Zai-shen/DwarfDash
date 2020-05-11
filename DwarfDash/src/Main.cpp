@@ -171,21 +171,21 @@ int main(int argc, char** argv)
 		shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
 
 
-		Model plattform("assets/models/plattform/plattform.obj");
-		Model nanosuit("assets/models/nanosuit/nanosuit.obj");
+		//Model plattform("assets/models/plattform/plattform.obj");
+		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
 
 		stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
-		Model backpack("assets/models/backpack/backpack.obj");
+		Model backpack("assets/models/backpack/backpack.obj", modelShader);
 
 
 		// Load shader(s)
-		shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
-		// Create textures
-		shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
-		// Create materials
-		shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
-		// Create geometry
-		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), brickTextureMaterial);
+		//shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
+		//// Create textures
+		//shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
+		//// Create materials
+		//shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
+		//// Create geometry
+		//Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), brickTextureMaterial);
 
 		// Initialize camera
 		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
@@ -212,8 +212,8 @@ int main(int argc, char** argv)
 			camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
-			setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
+			//setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
+			//setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
 
 
 			glm::mat4 model = glm::mat3(1.0f);
@@ -224,14 +224,14 @@ int main(int argc, char** argv)
 			modelShader->use();
 			modelShader->setUniform("modelMatrix", model);
 			modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-			backpack.Draw(*modelShader);
+			backpack.Draw();
 
 
-			model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));   // translate it down so it's at the center of the scene
-			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));		  //	// it's a bit too big for our scene, so scale it down
-			modelShader->setUniform("modelMatrix", model);
-			modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-			nanosuit.Draw(*modelShader);
+			//model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));   // translate it down so it's at the center of the scene
+			//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));		  //	// it's a bit too big for our scene, so scale it down
+			//modelShader->setUniform("modelMatrix", model);
+			//modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+			//nanosuit.Draw(*modelShader);
 
 			// Render
 			//cube.draw();
