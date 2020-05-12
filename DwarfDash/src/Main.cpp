@@ -174,7 +174,7 @@ int main(int argc, char** argv)
 		//Model plattform("assets/models/plattform/plattform.obj");
 		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
 
-		stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
+		//stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
 		Model backpack("assets/models/backpack/backpack.obj", modelShader);
 
 
@@ -224,7 +224,7 @@ int main(int argc, char** argv)
 			modelShader->use();
 			modelShader->setUniform("modelMatrix", model);
 			modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-			backpack.Draw();
+			backpack.draw();
 
 
 			//model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));   // translate it down so it's at the center of the scene
