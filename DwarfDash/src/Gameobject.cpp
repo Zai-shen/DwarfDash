@@ -27,7 +27,6 @@ void Gameobject::update() {
 		cout << "Error - no PhysX Actor!" << endl;
 		return;
 	}
-	
 	PxVec4 c1 = transform.column0;
 	PxVec4 c2 = transform.column1;
 	PxVec4 c3 = transform.column2;
@@ -39,7 +38,14 @@ void Gameobject::update() {
 	glm::vec4 v4 = glm::vec4(c4.x, c4.y, c4.z, c4.w);
 
 	glm::mat4 glmTransform = glm::mat4(v1, v2, v3, v4);
-	this->goGeometry->setModelMatrix(glmTransform);
+	if (goGeometry)
+	{
+		this->goGeometry->setModelMatrix(glmTransform);
+	}
+	else if (goModel) {
+		cout << "working soon" << endl;
+		//this->goModel->setModel etc etc;
+	}
 }
 
 void Gameobject::draw() {
@@ -48,8 +54,7 @@ void Gameobject::draw() {
 		this->goGeometry->draw();
 	}
 	else if (goModel) {
-		cout << "working soon" << endl;
-		//this->goModel->draw();
+		this->goModel->draw();
 	}
 }
 

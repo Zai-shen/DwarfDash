@@ -46,20 +46,26 @@ void Game::initLevels() {
 }
 
 void Game::initLevel1() {
-	//// Create geometry
-	//Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), woodTextureMaterial);
-	Geometry* platform_1 = new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)), Geometry::createCubeGeometry(8.0f, 1.f, 8.f), woodTextureMaterial);
-	Geometry* cylinder = new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(6.5f, 2.0f, 6.5f)), Geometry::createCylinderGeometry(32, 1.3f, 1.0f), brickTextureMaterial);
-	Geometry* sphere = new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 1.0f, 0.0f)), Geometry::createSphereGeometry(64, 32, 1.0f), brickTextureMaterial);
+	//Trying a model gameobject
+	//Model mo1("assets/models/plattform/plattform.obj", this->modelShader);
+	Model* mod1 = new Model("assets/models/plattform/plattform.obj", modelShader);
+	Gameobject* model1 = new Gameobject(mod1);
+	PxBoxGeometry tempBoxGeometry(PxVec3(0.5f, 0.5f, 0.5f)); //this->model
+	model1->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
+	model1->goPosition = PxTransform(PxVec3(0.0f, 0.0f, 0.0f)); // should be geometry.getPos
+	model1->goDynamicActor = PxCreateDynamic(*gPhysics, model1->goPosition, tempBoxGeometry, *(model1->goMaterial), 1.0f);
 
-	//this->currentLevel->addGeometry(platform_1);
-	//this->currentLevel->addGeometry(cylinder);
-	//this->currentLevel->addGeometry(sphere);
+	gScene->addActor(*(model1->goDynamicActor));
+	addGameobject(model1);
 
-	//Can we later on access & manipulate objects? like turn them? if we add them like this:
-	//this->addGeometry(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -14.0f)), Geometry::createCubeGeometry(8.0f, 1.f, 8.f), woodTextureMaterial));
-	//this->addGeometry(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 3.f, 0.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), brickTextureMaterial));
-	//this->addGeometry(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(-4.f, 1.f, 4.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), woodTextureMaterial));
+	Model* mod2 = new Model("assets/models/nanosuit/nanosuit.obj", modelShader);
+	Gameobject* model2 = new Gameobject(mod2);
+	model2->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
+	model2->goPosition = PxTransform(PxVec3(0.0f, 5.0f, 0.0f)); // should be geometry.getPos
+	model2->goDynamicActor = PxCreateDynamic(*gPhysics, model2->goPosition, tempBoxGeometry, *(model2->goMaterial), 1.0f);
+
+	gScene->addActor(*(model2->goDynamicActor));
+	addGameobject(model2);
 }
 
 void Game::initLevel2() {
@@ -96,11 +102,6 @@ void Game::initLevel2() {
 	gScene->addActor(*(sphere1->goDynamicActor));
 	addGameobject(sphere1);
 
-	//Trying a model gameobject
-	//Model mo1("assets/models/plattform/plattform.obj", this->modelShader);
-	Model* mod1 = new Model("assets/models/plattform/plattform.obj", modelShader);
-	Gameobject* model1 = new Gameobject(mod1);
-	addGameobject(model1);
 
 }
 
