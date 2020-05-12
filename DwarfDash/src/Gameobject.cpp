@@ -8,9 +8,9 @@ Gameobject::Gameobject(Geometry* geometry) {
 	this->goGeometry = geometry;
 }
 
-//Gameobject::Gameobject(Model* model) {
-//	this->goModel = model;
-//}
+Gameobject::Gameobject(Model* model) {
+	this->goModel = model;
+}
 
 Gameobject::~Gameobject() {}
 
@@ -43,14 +43,14 @@ void Gameobject::update() {
 }
 
 void Gameobject::draw() {
-	//if (goGeometry)
-	//{
+	if (goGeometry)
+	{
 		this->goGeometry->draw();
-	//}
-	//else if (goModel) {
-	//	cout << "working soon" << endl;
-	//	//this->goModel->draw();
-	//}
+	}
+	else if (goModel) {
+		cout << "working soon" << endl;
+		//this->goModel->draw();
+	}
 }
 
 void Gameobject::reset() {

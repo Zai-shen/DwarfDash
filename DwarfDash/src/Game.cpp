@@ -96,8 +96,10 @@ void Game::initLevel2() {
 	gScene->addActor(*(sphere1->goDynamicActor));
 	addGameobject(sphere1);
 
-	//Error at model.draw in gameobject
-	//Gameobject* model1 = new Gameobject(new Model("assets/models/plattform/plattform.obj"));
+	//Trying a model gameobject
+	Model mo1("assets/models/plattform/plattform.obj", this->modelShader);
+	//Model* mod1 = new Model("assets/models/plattform/plattform.obj", this->modelShader);
+	//Gameobject* model1 = new Gameobject(mod1);
 
 }
 

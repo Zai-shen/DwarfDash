@@ -161,18 +161,17 @@ int main(int argc, char** argv)
 		// Init PhysX
 		initPhysX();
 
-
-		// Model loading
-		///Model plattform("assets/models/plattform/plattform.obj");
-		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
-		///stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
-		//Model backpack("assets/models/backpack/backpack.obj");
-
-
 		// Init game
 		game->gPhysics = gPhysics;
 		game->gScene = gScene;
 		game->init();
+
+
+		// Model loading
+		///Model plattform("assets/models/plattform/plattform.obj",game->modelShader);
+		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
+		///stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
+		//Model backpack("assets/models/backpack/backpack.obj");
 
 
 		// Initialize camera
