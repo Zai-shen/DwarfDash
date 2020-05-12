@@ -42,16 +42,21 @@ public:
 	string directory;
 	bool gammaCorrection;
 
-	Model(string const& path, bool gamma = false) : gammaCorrection(gamma)
+	std::shared_ptr<Shader> _shader; // pointer that is used for the model
+
+	Model(string const& path, std::shared_ptr<Shader> shader, bool gamma = false) : gammaCorrection(gamma)
 	{
 		loadModel(path);
+
+		//shader = this->_shader;
+		_shader = shader;
 	}
 
 	// draws the model, and thus all its meshes
-	void draw(Shader &shader)
+	void Draw()
 	{
 		for (unsigned int i = 0; i < meshes.size(); i++)
-			meshes[i].draw(shader);
+			meshes[i].draw(*_shader);
 	}
 
 private:
