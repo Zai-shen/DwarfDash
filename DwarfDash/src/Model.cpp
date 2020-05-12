@@ -3,13 +3,19 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+using namespace std;
+
+Model::Model(){
+
+}
+
 Model::Model(string const& path, std::shared_ptr<Shader> shader) {
 	loadModel(path);
 
 	_shader = shader;
 }
 
-void Model::Draw()
+void Model::draw()
 {
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i].draw(*_shader);

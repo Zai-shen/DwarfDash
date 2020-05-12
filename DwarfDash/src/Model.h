@@ -39,10 +39,12 @@ public:
 
 	std::shared_ptr<Shader> _shader; // pointer that is used for the model
 
+	Model();
+
 	Model(string const& path, std::shared_ptr<Shader> shader);
 
 	// draws the model, and thus all its meshes
-	void Draw();
+	void draw();
 
 private:
 	void loadModel(string const& path);

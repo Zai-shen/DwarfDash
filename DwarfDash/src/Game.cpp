@@ -97,9 +97,10 @@ void Game::initLevel2() {
 	addGameobject(sphere1);
 
 	//Trying a model gameobject
-	Model mo1("assets/models/plattform/plattform.obj", this->modelShader);
-	//Model* mod1 = new Model("assets/models/plattform/plattform.obj", this->modelShader);
-	//Gameobject* model1 = new Gameobject(mod1);
+	//Model mo1("assets/models/plattform/plattform.obj", this->modelShader);
+	Model* mod1 = new Model("assets/models/plattform/plattform.obj", modelShader);
+	Gameobject* model1 = new Gameobject(mod1);
+	addGameobject(model1);
 
 }
 
