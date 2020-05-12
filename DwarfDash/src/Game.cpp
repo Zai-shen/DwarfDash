@@ -97,7 +97,7 @@ void Game::initLevel2() {
 	addGameobject(sphere1);
 
 	//Error at model.draw in gameobject
-	Gameobject* model1 = new Gameobject(new Model("assets/models/plattform/plattform.obj"));
+	//Gameobject* model1 = new Gameobject(new Model("assets/models/plattform/plattform.obj"));
 
 }
 

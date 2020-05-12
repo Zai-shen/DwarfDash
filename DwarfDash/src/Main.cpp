@@ -163,9 +163,9 @@ int main(int argc, char** argv)
 
 
 		// Model loading
-		Model plattform("assets/models/plattform/plattform.obj");
+		///Model plattform("assets/models/plattform/plattform.obj");
 		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
-		stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
+		///stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
 		//Model backpack("assets/models/backpack/backpack.obj");
 
 

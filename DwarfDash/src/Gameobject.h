@@ -2,7 +2,7 @@
 
 #include <PxPhysicsAPI.h>
 #include "Geometry.h"
-#include "Model.h"
+//#include "Model.h"
 
 using namespace std;
 using namespace physx;
@@ -15,13 +15,13 @@ public:
 	PxRigidStatic* goActor;
 	PxRigidDynamic* goDynamicActor;
 	Geometry* goGeometry;
-	Model* goModel;
+	//Model* goModel;
 
 	Gameobject();
 
 	Gameobject(Geometry* geometry);
 
-	Gameobject(Model* model);
+	//Gameobject(Model* model);
 
 	~Gameobject();
 
