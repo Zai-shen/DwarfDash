@@ -5,6 +5,8 @@
 #include "Material.h"
 #include "Geometry.h"
 #include "Level.h"
+#include "Gameobject.h"
+#include "Model.h"
 
 using namespace std;
 
@@ -17,6 +19,9 @@ public:
 	shared_ptr<Material> woodTextureMaterial;
 	shared_ptr<Material> brickTextureMaterial;
 
+	PxPhysics* gPhysics;
+	PxScene* gScene;
+
 	Game();
 	~Game();
 
@@ -28,16 +33,15 @@ public:
 
 	void reset();
 
-	void createInitialGeometry();
+	void addGameobject(Gameobject* gameObject);
 
-	void addGeometry(Geometry* geometry);
+	Level* getCurrentLevel();
 
 private:
 
 	Level* level1 = new Level();
 	Level* level2 = new Level();
-
-	Level* currentLevel = level1;
+	Level* currentLevel = level2;
 
 	int const GAME_STATE_IDLE = 0;
 	int const GAME_STATE_ACTIVE = 1;
@@ -48,5 +52,12 @@ private:
 
 	shared_ptr<Texture> woodTexture;
 	shared_ptr<Texture> brickTexture;
+
+	void initShaders();
+	void initTextures();
+	void initMaterials();
+	void initLevels();
+	void initLevel1();
+	void initLevel2();
 
 };

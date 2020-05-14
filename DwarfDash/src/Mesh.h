@@ -11,7 +11,7 @@ This code is based on: https://learnopengl.com/code_viewer_gh.php?code=includes/
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Shader.h" // ecg
-//#include "Shader_.h" // learnopengl
+
 
 #include <string>
 #include <fstream>

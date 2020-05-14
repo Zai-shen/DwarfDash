@@ -2,14 +2,13 @@
 
 #include "Utils.h"
 #include "Geometry.h"
+#include "Gameobject.h"
 
 using namespace std;
 
 class Level {
 
 public:
-
-	vector<Geometry*> levelObjects;
 
 	Level();
 	~Level();
@@ -21,8 +20,10 @@ public:
 	void draw();
 
 	void reset();
-	
+
+	void addGameobject(Gameobject* gameObject);
+
 private:
 
-	int in = 2;
+	vector<Gameobject*> gameObjects;
 };
