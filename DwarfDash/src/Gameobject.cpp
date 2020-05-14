@@ -1,6 +1,8 @@
 #include "Gameobject.h"
 
 using namespace std;
+using namespace physx;
+
 
 Gameobject::Gameobject() {}
 

@@ -18,6 +18,9 @@ void Game::init() {
 
 	// Create Geometry
 	initLevels();
+
+	// Create & init Player
+	player = new Player(gPhysics, gScene);
 }
 
 void Game::initShaders() {
@@ -107,10 +110,12 @@ void Game::initLevel2() {
 
 void Game::update() {
 	currentLevel->update();
+	player->update();
 }
 
 void Game::draw() {
 	currentLevel->draw();
+	player->draw();
 }
 
 void Game::reset() {

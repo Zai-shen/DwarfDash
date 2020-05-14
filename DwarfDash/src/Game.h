@@ -7,6 +7,8 @@
 #include "Level.h"
 #include "Gameobject.h"
 #include "Model.h"
+#include <PxPhysicsAPI.h>
+#include "Player.h"
 
 using namespace std;
 
@@ -21,6 +23,8 @@ public:
 
 	PxPhysics* gPhysics;
 	PxScene* gScene;
+
+	Player* player;
 
 	Game();
 	~Game();
