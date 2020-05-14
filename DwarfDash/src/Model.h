@@ -27,7 +27,7 @@ Code based on: https://learnopengl.com/code_viewer_gh.php?code=includes/learnope
 
 using namespace std;
 
-unsigned int TextureFromFile(const char* path, const string& directory, bool gamma = false);
+unsigned int TextureFromFile(const char* path, const string& directory);
 
 class Model
 {
@@ -38,13 +38,22 @@ public:
 	bool gammaCorrection;
 
 	std::shared_ptr<Shader> _shader; // pointer that is used for the model
+	glm::mat4 _modelMatrix = glm::mat4(1.0f);
+	glm::mat4 _transformMatrix;
 
 	Model();
 
 	Model(string const& path, std::shared_ptr<Shader> shader);
+	Model(string const& path, std::shared_ptr<Shader> shader, glm::mat4 modelMatrix);
 
 	// draws the model, and thus all its meshes
 	void draw();
+
+	glm::mat4 getModelMatrix();
+
+	void setTransformMatrix(glm::mat4 transformMatrix);
+
+	void transform(glm::mat4 transformMatrix);
 
 private:
 	void loadModel(string const& path);
@@ -61,6 +70,8 @@ private:
 	vector<MeshTexture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
 
 	unsigned int TextureFromFile(const char* path, const string& directory);
+
+
 };
 
 

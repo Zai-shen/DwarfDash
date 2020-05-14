@@ -41,7 +41,7 @@ private:
 
 	Level* level1 = new Level();
 	Level* level2 = new Level();
-	Level* currentLevel = level2;
+	Level* currentLevel = level1;
 
 	int const GAME_STATE_IDLE = 0;
 	int const GAME_STATE_ACTIVE = 1;

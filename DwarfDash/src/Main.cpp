@@ -216,7 +216,7 @@ int main(int argc, char** argv)
 			//PhysX
 			stepPhysics();
 
-			cout << "Controller pos:" << endl;
+			//cout << "Controller pos:" << endl;
 			cout << gPlayerController->getPosition().x << "x " << gPlayerController->getPosition().y << "y " << gPlayerController->getPosition().z << "z " << endl;
 			gPlayerController->move(PxVec3(0.001f, 0.0f, 0.0f), 0.0005, dt, nullptr, nullptr);
 
