@@ -67,6 +67,8 @@ static PxFoundation* gFoundation = nullptr;
 static PxPhysics* gPhysics = nullptr;
 static PxScene* gScene = nullptr;
 static PxPvd* gPvd = nullptr;
+static PxControllerManager* gCCTManager = nullptr;
+static PxController* gPlayerController = nullptr;
 
 // Game
 int frames = 0;
@@ -208,13 +210,16 @@ int main(int argc, char** argv)
 			game->modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 
 			// Render
-			//backpack.draw(*(game->modelShader)); //wont work correctly after game->draw()
 			game->update();
 			game->draw();
 
 			//PhysX
 			stepPhysics();
-			//renderCallback();
+
+			cout << "Controller pos:" << endl;
+			cout << gPlayerController->getPosition().x << "x " << gPlayerController->getPosition().y << "y " << gPlayerController->getPosition().z << "z " << endl;
+			gPlayerController->move(PxVec3(0.001f, 0.0f, 0.0f), 0.0005, dt, nullptr, nullptr);
+
 
 			// Compute frame time
 			dt = t;
@@ -290,6 +295,23 @@ void initPhysX() {
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
 
+	//Creating Character Controller Manager
+	gCCTManager = PxCreateControllerManager(*gScene);
+	//Character Controller for Player (of type capsule)
+	PxCapsuleControllerDesc charDesc;
+		//<fill the descriptor here>
+	charDesc.position = PxExtendedVec3(-3.0f, 3.0f, 0.0f);
+	charDesc.height = PxF32(0.8f);
+	charDesc.radius = PxF32(0.1f);
+	charDesc.contactOffset = 0.05f; //controller skin width for collisions
+	charDesc.stepOffset = 0.01; //max obstacle climb height
+	charDesc.slopeLimit = cosf(glm::radians(45.0f)); // max slope to walk
+	charDesc.upDirection = PxVec3(0, 1, 0); // Specifies the 'up' direction
+	charDesc.material = gPhysics->createMaterial(0.1f, 0.1f, 0.1f);
+
+	gPlayerController = gCCTManager->createController(charDesc);
+
+
 	//Pvd Client
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
 	if (pvdClient)
@@ -321,6 +343,7 @@ PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, Px
 
 void releasePhysX()
 {
+	gCCTManager->release();
 	gScene->release();
 	gPhysics->release();
 	PxPvdTransport* transport = gPvd->getTransport();
