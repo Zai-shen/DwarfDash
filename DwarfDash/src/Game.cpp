@@ -90,7 +90,7 @@ void Game::initLevel2() {
 
 	//Gameobject* box1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(-1.f, 5.f, 0.f)), Geometry::createSphereGeometry(64, 32, 1.0f), brickTextureMaterial));
 	Gameobject* box1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 5.f, 0.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), brickTextureMaterial));
-	PxBoxGeometry tempBoxGeometry(PxVec3(0.5f, 0.5f, 0.5f)); //this->model
+	PxBoxGeometry tempBoxGeometry(PxVec3(.5f, .5f, .5f)); //this->model
 	box1->goMaterial = standardMaterial;
 	box1->goPosition = PxTransform(PxVec3(0.0f, 5.0f, 0.0f)); // should be geometry.getPos
 	box1->goDynamicActor = PxCreateDynamic(*gPhysics, box1->goPosition, tempBoxGeometry, *(box1->goMaterial), 1.0f);
@@ -109,6 +109,14 @@ void Game::initLevel2() {
 	addGameobject(sphere1);
 
 
+	Gameobject* plat1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(-3.f, 5.f, 0.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), brickTextureMaterial));
+	PxBoxGeometry tempPlatGeometry(PxVec3(.5f, .5f, .5f)); //this->model
+	plat1->goMaterial = standardMaterial;
+	plat1->goPosition = PxTransform(PxVec3(-3.0f, 5.0f, 0.0f)); // should be geometry.getPos
+	plat1->goActor = PxCreateStatic(*gPhysics, plat1->goPosition, tempPlatGeometry, *(plat1->goMaterial));
+	
+	gScene->addActor(*(plat1->goActor));
+	addGameobject(plat1);
 }
 
 void Game::update() {

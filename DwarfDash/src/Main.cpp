@@ -362,29 +362,35 @@ void poll(GLFWwindow* window, float deltaTime) {
 			//glm::vec3 displacement = camera.processMovement(FORWARD, deltaTime);
 
 			glm::vec3 displacement = glm::vec3(0.f, 0.f, -1.f);
-			game->player->moveChar(displacement*0.1f, deltaTime, 0.0f);
+			game->player->moveChar(displacement*0.1f, deltaTime);
 
 			//camera.setPosition(glm::vec3(gPlayerController->getPosition().x, gPlayerController->getPosition().y, gPlayerController->getPosition().z));
 		}
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 			glm::vec3 displacement = glm::vec3(0.f, 0.f, 1.f);
-			game->player->moveChar(displacement*0.1f, deltaTime, 0.0f);
+			game->player->moveChar(displacement*0.1f, deltaTime);
 		}
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 			glm::vec3 displacement = glm::vec3(-1.f, 0.f, 0.f);
-			game->player->moveChar(displacement*0.1f, deltaTime, 0.0f);
+			game->player->moveChar(displacement*0.1f, deltaTime);
 		}
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 			glm::vec3 displacement = glm::vec3(1.f, 0.f, 0.f);
-			game->player->moveChar(displacement*0.1f, deltaTime, 0.0f);
+			game->player->moveChar(displacement*0.1f, deltaTime);
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 			//jump
+			game->player->jumping = true;
+		}else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
+			//stop jump
+			game->player->jumping = false;
 		}
 
+		game->player->jump(deltaTime);
+
 		// apply gravity
-		game->player->moveChar(glm::vec3(0.0, 0.0, 0.0), deltaTime, 0.0);
+		//game->player->moveChar(glm::vec3(0.0, 0.0, 0.0), deltaTime, 0.0);
 
 		//camera.setPosition(glm::vec3(gPlayerController->getPosition().x, gPlayerController->getPosition().y, gPlayerController->getPosition().z));
 	}
