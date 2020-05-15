@@ -44,6 +44,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 void setWindowFPS(GLFWwindow *window,float& t_sum);
 void processInput(GLFWwindow* window);
+void poll(GLFWwindow* window, float deltaTime);
 void initPhysX();
 void releasePhysX();
 void stepPhysics();
@@ -193,6 +194,7 @@ int main(int argc, char** argv)
 
 			// Poll events
 			glfwPollEvents();
+			poll(window, dt);
 
 			// Update camera
 			glfwGetCursorPos(window, &mouse_x, &mouse_y);
@@ -353,6 +355,40 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 	shader->setUniform("pointL.attenuation", pointL.attenuation);
 }
 
+void poll(GLFWwindow* window, float deltaTime) {
+	if (game->currentGameState == game->GAME_STATE_ACTIVE)
+	{
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+			//glm::vec3 displacement = camera.processMovement(FORWARD, deltaTime);
+
+			glm::vec3 displacement = glm::vec3(0.f, 0.f, -1.f);
+			game->player->moveChar(displacement*0.1f, deltaTime, 0.0f);
+
+			//camera.setPosition(glm::vec3(gPlayerController->getPosition().x, gPlayerController->getPosition().y, gPlayerController->getPosition().z));
+		}
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+			glm::vec3 displacement = glm::vec3(0.f, 0.f, 1.f);
+			game->player->moveChar(displacement*0.1f, deltaTime, 0.0f);
+		}
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+			glm::vec3 displacement = glm::vec3(-1.f, 0.f, 0.f);
+			game->player->moveChar(displacement*0.1f, deltaTime, 0.0f);
+		}
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+			glm::vec3 displacement = glm::vec3(1.f, 0.f, 0.f);
+			game->player->moveChar(displacement*0.1f, deltaTime, 0.0f);
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+			//jump
+		}
+
+		// apply gravity
+		game->player->moveChar(glm::vec3(0.0, 0.0, 0.0), deltaTime, 0.0);
+
+		//camera.setPosition(glm::vec3(gPlayerController->getPosition().x, gPlayerController->getPosition().y, gPlayerController->getPosition().z));
+	}
+}
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {

@@ -21,9 +21,9 @@ void Player::init() {
 
 	//Character Controller for Player (of type capsule)
 	PxCapsuleControllerDesc charDesc;
-	charDesc.position = PxExtendedVec3(-3.0f, 3.0f, 0.0f); //starting position
-	charDesc.height = PxF32(0.8f); //height
-	charDesc.radius = PxF32(0.1f); //from height to top/bottom
+	charDesc.position = PxExtendedVec3(-3.0f, 9.0f, 0.0f); //starting position
+	charDesc.height = PxF32(0.7f); //height
+	charDesc.radius = PxF32(0.3f); //from height to top/bottom
 	charDesc.contactOffset = 0.05f; //controller skin width for collisions
 	charDesc.stepOffset = 0.01; //max obstacle climb height
 	charDesc.slopeLimit = cosf(glm::radians(45.0f)); // max slope to walk
@@ -34,14 +34,17 @@ void Player::init() {
 }
 
 void Player::update() {
-	gPlayerController->move(PxVec3(0.001f, 0.0f, 0.0f), 0.0005, 1/60, nullptr, nullptr); // 1/60 should be dt?
 }
 
 void Player::draw() {
-	cout << "Controller pos:" << endl;
-	cout << gPlayerController->getPosition().x << "x " << gPlayerController->getPosition().y << "y " << gPlayerController->getPosition().z << "z " << endl;
+	//cout << "Controller pos:" << endl;
+	//cout << gPlayerController->getPosition().x << "x " << gPlayerController->getPosition().y << "y " << gPlayerController->getPosition().z << "z " << endl;
 }
 
 void Player::reset() {
 
+}
+
+void Player::moveChar(glm::vec3 displacement, float deltaTime, float yPos) {
+	gPlayerController->move(PxVec3(displacement.x, gGravity * deltaTime, displacement.z ), 0.01f, deltaTime, nullptr, nullptr);
 }

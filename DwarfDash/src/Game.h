@@ -15,6 +15,12 @@ using namespace std;
 class Game {
 
 public:
+	int const GAME_STATE_IDLE = 0;
+	int const GAME_STATE_ACTIVE = 1;
+	int const GAME_STATE_PAUSED = 2;
+	int const GAME_STATE_FINISHED = 3;
+
+	int currentGameState = GAME_STATE_IDLE;
 
 	shared_ptr<Shader> primaryShader;
 	shared_ptr<Shader> modelShader;
@@ -46,13 +52,6 @@ private:
 	Level* level1 = new Level();
 	Level* level2 = new Level();
 	Level* currentLevel = level2;
-
-	int const GAME_STATE_IDLE = 0;
-	int const GAME_STATE_ACTIVE = 1;
-	int const GAME_STATE_PAUSED = 2;
-	int const GAME_STATE_FINISHED = 3;
-
-	int activeGameState = GAME_STATE_IDLE;
 
 	shared_ptr<Texture> woodTexture;
 	shared_ptr<Texture> brickTexture;

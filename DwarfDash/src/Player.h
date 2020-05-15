@@ -31,7 +31,9 @@ public:
 
 	void reset();
 
+	void moveChar(glm::vec3 displacement, float deltaTime, float yPos);
+
 private:
 
-
+	float gGravity = -9.81f;
 };

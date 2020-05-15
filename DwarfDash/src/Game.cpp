@@ -21,6 +21,9 @@ void Game::init() {
 
 	// Create & init Player
 	player = new Player(gPhysics, gScene);
+
+	// Start game
+	currentGameState = GAME_STATE_ACTIVE;
 }
 
 void Game::initShaders() {
