@@ -70,6 +70,8 @@ protected:
 	 * Model matrix of the object
 	 */
 	glm::mat4 _modelMatrix;
+
+	glm::mat4 _transformMatrix;
 	
 public:
 	/*!
