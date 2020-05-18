@@ -44,15 +44,9 @@ void Gameobject::update() {
 		this->goGeometry->setModelMatrix(glmTransform);
 	}
 	else if (goModel) {
-		//cout << "working soon" << endl;
-		//this->goModel->setModel etc etc;
-		//this->goModel->useShader(model.getModelshader)
 		this->goModel->_shader->use();
 		this->goModel->setModelMatrix(glmTransform);
 		this->goModel->_shader->setUniform("modelMatrix", this->goModel->getModelMatrix());
-		//this->goModel->setTransformMatrix(glmTransform);
-		//this->goModel->transform(glmTransform);
-		//this->goModel->setModelMatrix(goModel->getModelMatrix * goModel->scaleModel(glmTransform));
 	}
 }
 
@@ -62,8 +56,7 @@ void Gameobject::draw() {
 		this->goGeometry->draw();
 	}
 	else if (goModel) {
-		this->goModel->draw();
-		
+		this->goModel->draw();	
 	}
 }
 
