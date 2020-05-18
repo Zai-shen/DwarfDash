@@ -11,17 +11,30 @@ Model::Model(){
 
 Model::Model(string const& path, std::shared_ptr<Shader> shader) {
 	loadModel(path);
-
 	_shader = shader;
+	_modelMatrix = glm::mat4(1.0f);
 }
 
-void Model::draw()
-{
+Model::Model(string const& path, std::shared_ptr<Shader> shader, glm::mat4 modelMatrix) {
+	loadModel(path);
+	_shader = shader;
+	_modelMatrix = modelMatrix;
+}
+
+Model::Model(string const& path, std::shared_ptr<Shader> shader, glm::mat4 modelMatrix, glm::vec3 position, glm::vec3 scale) {
+	loadModel(path);
+	_shader = shader;
+	_modelMatrix = modelMatrix;
+	_position = position;
+	_scale = scale;
+}
+
+void Model::draw(){
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i].draw(*_shader);
 }
 
-	void Model::loadModel(string const& path)
+void Model::loadModel(string const& path)
 	{
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -38,8 +51,8 @@ void Model::draw()
 		processNode(scene->mRootNode, scene);
 	}
 
-	// processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
-	void Model::processNode(aiNode* node, const aiScene* scene)
+// processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
+void Model::processNode(aiNode* node, const aiScene* scene)
 	{
 		// process each mesh located at the current node
 		for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -57,7 +70,7 @@ void Model::draw()
 
 	}
 
-	Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
+Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 	{
 		vector<Vertex> vertices;
 		vector<unsigned int> indices;
@@ -154,7 +167,7 @@ void Model::draw()
 		return Mesh(vertices, indices, textures, materialColors);
 	}
 
-	MeshMaterial Model::loadMaterial(aiMaterial* mat) {
+MeshMaterial Model::loadMaterial(aiMaterial* mat) {
 		MeshMaterial material;
 		aiColor3D color(0.f, 0.f, 0.f);
 		float shininess;
@@ -174,9 +187,9 @@ void Model::draw()
 		return material;
 	}
 
-	// checks all material textures of a given type and loads the textures if they're not loaded yet.
-	// the required info is returned as a Texture struct.
-	vector<MeshTexture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName)
+// checks all material textures of a given type and loads the textures if they're not loaded yet.
+// the required info is returned as a Texture struct.
+vector<MeshTexture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName)
 	{
 		vector<MeshTexture> textures;
 		for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
@@ -245,4 +258,25 @@ unsigned int Model::TextureFromFile(const char* path, const string& directory)
 	}
 
 	return textureID;
+}
+
+void Model::setModelMatrix(glm::mat4 modelMatrix) {
+	_modelMatrix = modelMatrix;
+}
+
+glm::mat4 Model::getModelMatrix() {
+	// return glm::translate(position) * (glm::mat4)(roation) * glm::scale(scale)
+	return _modelMatrix;
+}
+
+void Model::setTransformMatrix(glm::mat4 transformationMatrix) {
+	_transformMatrix = transformationMatrix;
+}
+
+void Model::transform(glm::mat4 transformationMatrix) {
+	_modelMatrix = _modelMatrix * transformationMatrix;
+}
+
+void Model::scaleModel(glm::vec3 scale) {
+	_scale = scale;
 }

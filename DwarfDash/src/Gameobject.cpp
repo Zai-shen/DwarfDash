@@ -40,11 +40,13 @@ void Gameobject::update() {
 	glm::mat4 glmTransform = glm::mat4(v1, v2, v3, v4);
 	if (goGeometry)
 	{
+
 		this->goGeometry->setModelMatrix(glmTransform);
 	}
 	else if (goModel) {
-		cout << "working soon" << endl;
-		//this->goModel->setModel etc etc;
+		this->goModel->_shader->use();
+		this->goModel->setModelMatrix(glmTransform);
+		this->goModel->_shader->setUniform("modelMatrix", this->goModel->getModelMatrix());
 	}
 }
 
@@ -54,7 +56,7 @@ void Gameobject::draw() {
 		this->goGeometry->draw();
 	}
 	else if (goModel) {
-		this->goModel->draw();
+		this->goModel->draw();	
 	}
 }
 

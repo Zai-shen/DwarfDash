@@ -27,7 +27,7 @@ Code based on: https://learnopengl.com/code_viewer_gh.php?code=includes/learnope
 
 using namespace std;
 
-unsigned int TextureFromFile(const char* path, const string& directory, bool gamma = false);
+unsigned int TextureFromFile(const char* path, const string& directory);
 
 class Model
 {
@@ -38,13 +38,32 @@ public:
 	bool gammaCorrection;
 
 	std::shared_ptr<Shader> _shader; // pointer that is used for the model
+	glm::mat4 _modelMatrix = glm::mat4(1.0f);
+	glm::mat4 _transformMatrix;
+
+	glm::vec3 _position; // position of the object
+	glm::vec3 _scale;    // how much the object should be scaled
+	glm::vec3 _roation;  // how much the object should be rotated
+
 
 	Model();
 
 	Model(string const& path, std::shared_ptr<Shader> shader);
+	Model(string const& path, std::shared_ptr<Shader> shader, glm::mat4 modelMatrix);
+	Model(string const& path, std::shared_ptr<Shader> shader, glm::mat4 modelMatrix, glm::vec3 position, glm::vec3 scale);
 
 	// draws the model, and thus all its meshes
 	void draw();
+
+	void setModelMatrix(glm::mat4 modelMatrix);
+
+	void scaleModel(glm::vec3 scale);
+
+	glm::mat4 getModelMatrix();
+
+	void setTransformMatrix(glm::mat4 transformMatrix);
+
+	void transform(glm::mat4 transformMatrix);
 
 private:
 	void loadModel(string const& path);
@@ -61,6 +80,8 @@ private:
 	vector<MeshTexture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
 
 	unsigned int TextureFromFile(const char* path, const string& directory);
+
+
 };
 
 

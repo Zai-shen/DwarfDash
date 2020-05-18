@@ -204,22 +204,12 @@ int main(int argc, char** argv)
 			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
 			setPerFrameUniforms(game->modelShader.get(), camera, dirL, pointL);
 
-			// Models
-			game->modelShader->use();
-			game->modelShader->setUniform("modelMatrix", glm::translate(glm::mat4(1.f), glm::vec3(0.f,2.f,-10.f)));
-			game->modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-
 			// Render
 			game->update();
 			game->draw();
 
 			//PhysX
 			stepPhysics();
-
-			cout << "Controller pos:" << endl;
-			cout << gPlayerController->getPosition().x << "x " << gPlayerController->getPosition().y << "y " << gPlayerController->getPosition().z << "z " << endl;
-			gPlayerController->move(PxVec3(0.001f, 0.0f, 0.0f), 0.0005, dt, nullptr, nullptr);
-
 
 			// Compute frame time
 			dt = t;
