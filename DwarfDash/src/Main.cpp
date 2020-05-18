@@ -168,14 +168,6 @@ int main(int argc, char** argv)
 		game->gScene = gScene;
 		game->init();
 
-
-		// Model loading
-		///Model plattform("assets/models/plattform/plattform.obj",game->modelShader);
-		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
-		///stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
-		//Model backpack("assets/models/backpack/backpack.obj");
-
-
 		// Initialize camera
 		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
@@ -201,7 +193,7 @@ int main(int argc, char** argv)
 			camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
+			//setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
 			setPerFrameUniforms(game->modelShader.get(), camera, dirL, pointL);
 
 			// Render

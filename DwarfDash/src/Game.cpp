@@ -60,29 +60,24 @@ void Game::initLevel1() {
 	PxRigidStatic* plane = gPhysics->createRigidStatic(planePos);
 	PxShape* shape = gPhysics->createShape(PxPlaneGeometry(), *standardMaterial);
 	plane->attachShape(*shape);
+	
 	gScene->addActor(*plane);
 
 
+	Model* mod1 = new Model("assets/models/backpack/backpack.obj", modelShader);
+	Gameobject* model1 = new Gameobject(mod1);
+	PxBoxGeometry tempBoxGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
+	model1->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
+	model1->goPosition = PxTransform(PxVec3(5.0f, 25.0f, 5.0f)); // should be geometry.getPos
+	model1->goDynamicActor = PxCreateDynamic(*gPhysics, model1->goPosition, tempBoxGeometry, *(model1->goMaterial), 1.0f);
 
-	//Trying a model gameobject
-	//Model mo1("assets/models/plattform/plattform.obj", this->modelShader);
-	//Model* mod1 = new Model("assets/models/plattform/plattform.obj", modelShader);
-	//mod1->setTransformMatrix(glm::mat4(1.f));
-	//mod1->getModelMatrix();
-
-	//Gameobject* model1 = new Gameobject(mod1);
-	PxBoxGeometry tempBoxGeometry(PxVec3(5.f, 5.f, 5.f)); //this->model
-	//model1->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-	//model1->goPosition = PxTransform(PxVec3(0.0f, 0.0f, 0.0f)); // should be geometry.getPos
-	//model1->goDynamicActor = PxCreateDynamic(*gPhysics, model1->goPosition, tempBoxGeometry, *(model1->goMaterial), 1.0f);
-
-	//gScene->addActor(*(model1->goDynamicActor));
-	//addGameobject(model1);
+	gScene->addActor(*(model1->goDynamicActor));
+	addGameobject(model1);
 
 	Model* mod2 = new Model("assets/models/nanosuit/nanosuit.obj", modelShader);
 	Gameobject* model2 = new Gameobject(mod2);
 	model2->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-	model2->goPosition = PxTransform(PxVec3(0.0f, 50.0f, 0.0f)); // should be geometry.getPos
+	model2->goPosition = PxTransform(PxVec3(-5.0f, 50.0f, -5.0f)); // should be geometry.getPos
 	model2->goDynamicActor = PxCreateDynamic(*gPhysics, model2->goPosition, tempBoxGeometry, *(model2->goMaterial), 1.0f);
 
 	gScene->addActor(*(model2->goDynamicActor));

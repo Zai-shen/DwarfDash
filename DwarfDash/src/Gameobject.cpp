@@ -40,7 +40,6 @@ void Gameobject::update() {
 	glm::mat4 glmTransform = glm::mat4(v1, v2, v3, v4);
 	if (goGeometry)
 	{
-
 		this->goGeometry->setModelMatrix(glmTransform);
 	}
 	else if (goModel) {
