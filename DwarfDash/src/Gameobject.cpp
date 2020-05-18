@@ -37,17 +37,18 @@ void Gameobject::update() {
 	glm::vec4 v3 = glm::vec4(c3.x, c3.y, c3.z, c3.w);
 	glm::vec4 v4 = glm::vec4(c4.x, c4.y, c4.z, c4.w);
 
-	glm::mat4 glmTransform = glm::mat4(v1, v2, v3, v4);
+	glm::mat4 glmTransform = glm::mat4((v1 * 10.0f), (v2*10.0f), v3, v4);
 	if (goGeometry)
 	{
 
 		this->goGeometry->setModelMatrix(glmTransform);
 	}
 	else if (goModel) {
-		cout << "working soon" << endl;
+		//cout << "working soon" << endl;
 		//this->goModel->setModel etc etc;
 		this->goModel->setTransformMatrix(glmTransform);
 		this->goModel->transform(glmTransform);
+		//this->goModel->setModelMatrix(goModel->getModelMatrix * goModel->scaleModel(glmTransform));
 	}
 }
 
@@ -58,6 +59,7 @@ void Gameobject::draw() {
 	}
 	else if (goModel) {
 		this->goModel->draw();
+		
 	}
 }
 

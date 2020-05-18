@@ -21,8 +21,15 @@ Model::Model(string const& path, std::shared_ptr<Shader> shader, glm::mat4 model
 	_modelMatrix = modelMatrix;
 }
 
-void Model::draw()
-{
+Model::Model(string const& path, std::shared_ptr<Shader> shader, glm::mat4 modelMatrix, glm::vec3 position, glm::vec3 scale) {
+	loadModel(path);
+	_shader = shader;
+	_modelMatrix = modelMatrix;
+	_position = position;
+	_scale = scale;
+}
+
+void Model::draw(){
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i].draw(*_shader);
 }
@@ -253,7 +260,12 @@ unsigned int Model::TextureFromFile(const char* path, const string& directory)
 	return textureID;
 }
 
+void Model::setModelMatrix(glm::mat4 modelMatrix) {
+	_modelMatrix = modelMatrix;
+}
+
 glm::mat4 Model::getModelMatrix() {
+	// return glm::translate(position) * (glm::mat4)(roation) * glm::scale(scale)
 	return _modelMatrix;
 }
 
@@ -263,5 +275,8 @@ void Model::setTransformMatrix(glm::mat4 transformationMatrix) {
 
 void Model::transform(glm::mat4 transformationMatrix) {
 	_modelMatrix = _modelMatrix * transformationMatrix;
+}
 
+void Model::scaleModel(glm::vec3 scale) {
+	_scale = scale;
 }

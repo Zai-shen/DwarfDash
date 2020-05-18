@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <vector>
 #include <memory>
 #include <glm\glm.hpp>
@@ -12,7 +11,7 @@
 /*!
  * Stores all data for a geometry object
  */
-struct GeometryData {
+	struct GeometryData {
 	/*!
 	 * Vertex positions
 	 */
@@ -55,7 +54,7 @@ protected:
 	 * Vertex buffer object that stores the indices
 	 */
 	GLuint _vboIndices;
-	
+
 	/*!
 	 * Number of elements to be rendered
 	 */
@@ -71,8 +70,9 @@ protected:
 	 */
 	glm::mat4 _modelMatrix;
 
+	// from here on our implementations 
 	glm::mat4 _transformMatrix;
-	
+
 public:
 	/*!
 	 * Geometry object constructor
@@ -82,6 +82,7 @@ public:
 	 * @param material: material of the geometry object
 	 */
 	Geometry(glm::mat4 modelMatrix, GeometryData& data, std::shared_ptr<Material> material);
+
 	~Geometry();
 
 	Geometry();
@@ -106,7 +107,7 @@ public:
 	 * Resets the model matrix to the identity matrix
 	 */
 	void resetModelMatrix();
-	
+
 	/*!
 	 * Creates a cube geometry
 	 * @param width: width of the cube
@@ -131,4 +132,11 @@ public:
 	 * @return all sphere data
 	 */
 	static GeometryData createSphereGeometry(unsigned int longitudeSegments, unsigned int latitudeSegments, float radius);
+
+	// from here on our implementations
+
+	glm::mat4 Geometry::getModelMatrix();
+
+	void Geometry::setTransformMatrix(glm::mat4 transformationMatrix);
+
 };
