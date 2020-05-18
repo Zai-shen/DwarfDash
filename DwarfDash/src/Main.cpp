@@ -206,7 +206,7 @@ int main(int argc, char** argv)
 
 			// Models
 			game->modelShader->use();
-			game->modelShader->setUniform("modelMatrix", glm::translate(glm::mat4(1.f), glm::vec3(0.f,2.f,-10.f)));
+			//game->modelShader->setUniform("modelMatrix", glm::translate(glm::mat4(1.f), glm::vec3(0.f,2.f,-10.f)));
 			game->modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 
 			// Render
