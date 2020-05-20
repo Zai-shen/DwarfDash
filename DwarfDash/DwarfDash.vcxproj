@@ -9,6 +9,7 @@
     <ClInclude Include="src\Geometry.h" />
     <ClInclude Include="src\INIReader.h" />
     <ClInclude Include="src\Light.h" />
+    <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClInclude Include="src\Mesh.h" />

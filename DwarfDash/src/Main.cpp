@@ -18,10 +18,9 @@ using namespace std;
 
 //Config
 #include "Configuration.h"
-//
+
 // Model loading
 #include "Model.h"
-
 #include "FPSCamera.h"
 
 
@@ -84,10 +83,12 @@ static PxPvd* gPvd = nullptr;
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-FPSCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = config.width / 2.0f;
 float lastY = config.height / 2.0f;
 bool firstMouse = true;
+
+FPSCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+//FPSCamera camera2(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ); // new constructor
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -197,7 +198,7 @@ int main(int argc, char** argv)
 		// FPS Camera
 		// per-frame time logic
 		// --------------------
-		float currentFrame = glfwGetTime();
+		double currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
@@ -250,9 +251,7 @@ int main(int argc, char** argv)
 			
 			// view/projection transformations
 			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)config.width / (float)config.height, 0.1f, 100.0f);
-
-			glm::mat4 view = camera.GetViewMatrix();
-
+			glm::mat4 view = camera.getViewMatrix();
 			modelShader->setUniform("projection", projection);
 			modelShader->setUniform("view", view);
 
@@ -397,7 +396,7 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 	//shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 	//shader->setUniform("camera_world", camera.getPosition());
 
-	shader->setUniform("view", camera.GetViewMatrix());
+	shader->setUniform("view", camera.getViewMatrix());
 	shader->setUniform("camera_world", camera.getPosition());
 
 	shader->setUniform("dirL.color", dirL.color);
@@ -455,7 +454,7 @@ void processInput(GLFWwindow* window)
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+void mouse_callback(GLFWwindow* window, float xpos, float ypos)
 {
 	if (firstMouse)
 	{
