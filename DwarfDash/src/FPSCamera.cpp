@@ -1,18 +1,18 @@
 #include "FPSCamera.h"
 
+/*
 // Constructor with vectors
 //FPSCamera::FPSCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH)
-//	: Front(glm::vec3(0.0f, 0.0f, -1.0f))
-//{
+//	: Front(glm::vec3(0.0f, 0.0f, -1.0f)){
 //	Position = position; // a vector in world space that points to the camera's position
 //	WorldUp = up;
 //	Yaw = yaw;
 //	Pitch = pitch;
 //
 //	updateCameraVectors();
-//}
+//
 
-/*
+
 // Constructor with scalar values
 FPSCamera::FPSCamera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch)
 	: Front(glm::vec3(0.0f, 0.0f, 100.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
@@ -29,7 +29,10 @@ FPSCamera::FPSCamera(float posX, float posY, float posZ, float upX, float upY, f
 FPSCamera::FPSCamera(double fov, double aspect, double nearC, double farC)
 	: perspective(glm::perspective(glm::radians(fov), aspect, nearC, farC)) {
 
-	//projMatrix = glm::perspective(glm::radians(fov), aspect, nearC, farC);
+	//view = glm::perspective(glm::radians(fov), aspect, nearC, farC);
+	//Position = glm::vec3(0.0f, 0.0f, 10.0f);
+	WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
 	MouseSensitivity = SENSITIVITY;
 	MovementSpeed = SPEED;
 	Yaw = YAW;
@@ -45,6 +48,10 @@ FPSCamera::~FPSCamera() {
 // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
 glm::mat4 FPSCamera::getViewMatrix() {
 	return glm::lookAt(Position, Position + Front, Up);
+}
+
+glm::mat4 FPSCamera::getProjectionMatrix() {
+	return perspective;
 }
 
 glm::vec3 FPSCamera::getPosition() {
@@ -75,7 +82,7 @@ glm::vec3 FPSCamera::resetPosition() {
 	return Position = glm::vec3(0.0f, 0.0f, -1.0f);
 }
 
-void FPSCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime){
+void FPSCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
 
 	float velocity = MovementSpeed * deltaTime;
 
@@ -137,6 +144,7 @@ void FPSCamera::updateCameraVectors()
 	Right = glm::normalize(glm::cross(Front, WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
 	Up = glm::normalize(glm::cross(Right, Front));
 }
+
 
 void FPSCamera::updateViewMatrix() {
 	view = glm::lookAt(Position, Position + Front, Up);

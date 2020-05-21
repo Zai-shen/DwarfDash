@@ -19,9 +19,9 @@ enum Camera_Movement {
 };
 
 // Default camera values
-const float YAW = -90.0f; // X
-const float PITCH = 0.0f; // Y
-const float SPEED = 0.1f; // camera speed
+const float YAW = -90.0f; // X rotation
+const float PITCH = 0.0f; // Y rotation
+const float SPEED = 0.05f; // camera speed
 const float SENSITIVITY = 0.1f; // mouse sensitivity
 const float ZOOM = 45.0f;
 
@@ -32,12 +32,13 @@ public:
 	// Camera Attributes
 	glm::vec3 Position;
 	glm::vec3 Front;
-	glm::vec3 Up;
-	glm::vec3 Right;
+	glm::vec3 Up;    // this vector points upwards in world space
+	glm::vec3 Right; // positive x axis of the camera space
+
 	glm::vec3 WorldUp;
 
 	// my declarations
-	glm::mat4 perspective; // projection 
+	glm::mat4 perspective; // projection  matrix
 	glm::mat4 view;
 
 
@@ -62,6 +63,8 @@ public:
 
 	// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
 	glm::mat4 getViewMatrix();
+
+	glm::mat4 getProjectionMatrix();
 
 	glm::vec3 getPosition();
 

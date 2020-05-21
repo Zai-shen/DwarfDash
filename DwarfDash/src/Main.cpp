@@ -250,7 +250,7 @@ int main(int argc, char** argv)
 			modelShader->use();
 			
 			// view/projection transformations
-			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)config.width / (float)config.height, 0.1f, 100.0f);
+			glm::mat4 projection = glm::perspective(glm::radians(config.fov), (float)config.width / (float)config.height, 0.1f, 100.0f);
 			glm::mat4 view = camera.getViewMatrix();
 			modelShader->setUniform("projection", projection);
 			modelShader->setUniform("view", view);
@@ -420,32 +420,27 @@ void processInput(GLFWwindow* window)
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		//std::cout << "Pressed W" << std::endl;
 		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.ProcessKeyboard(FORWARD, deltaTime);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		//std::cout << "Pressed S" << std::endl;
 		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.ProcessKeyboard(BACKWARD, deltaTime);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		//std::cout << "Pressed A" << std::endl;
 		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.ProcessKeyboard(LEFT, deltaTime);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		//std::cout << "Pressed D" << std::endl;
 		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.ProcessKeyboard(RIGHT, deltaTime);
 	}
 
 	// reset camera to 0
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
-		//std::cout << "Pressed X" << std::endl;
 		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.resetPosition();
 	}
