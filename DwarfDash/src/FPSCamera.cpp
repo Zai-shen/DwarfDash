@@ -1,18 +1,18 @@
 #include "FPSCamera.h"
 
-/*
 // Constructor with vectors
-FPSCamera::FPSCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH)
-	: Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
-{
-	Position = position; // a vector in world space that points to the camera's position
-	WorldUp = up;
-	Yaw = yaw;
-	Pitch = pitch;
+//FPSCamera::FPSCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH)
+//	: Front(glm::vec3(0.0f, 0.0f, -1.0f))
+//{
+//	Position = position; // a vector in world space that points to the camera's position
+//	WorldUp = up;
+//	Yaw = yaw;
+//	Pitch = pitch;
+//
+//	updateCameraVectors();
+//}
 
-	updateCameraVectors();
-}
-
+/*
 // Constructor with scalar values
 FPSCamera::FPSCamera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch)
 	: Front(glm::vec3(0.0f, 0.0f, 100.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
@@ -35,6 +35,10 @@ FPSCamera::FPSCamera(double fov, double aspect, double nearC, double farC)
 	Yaw = YAW;
 	Pitch = PITCH;
 	Zoom = ZOOM;
+}
+
+FPSCamera::~FPSCamera() {
+
 }
 
 
@@ -113,7 +117,6 @@ void FPSCamera::ProcessMouseMovement(float xoffset, float yoffset) {
 	if (Pitch < -89.0f) {
 		Pitch = -89.0f;
 	}
-
 
 	// Update Front, Right and Up Vectors using the updated Euler angles
 	updateCameraVectors();

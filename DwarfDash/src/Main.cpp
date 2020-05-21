@@ -87,8 +87,8 @@ float lastX = config.width / 2.0f;
 float lastY = config.height / 2.0f;
 bool firstMouse = true;
 
-FPSCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-//FPSCamera camera2(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ); // new constructor
+//FPSCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ); // new constructor
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -210,7 +210,7 @@ int main(int argc, char** argv)
 		shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
 
 		stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
-		Model backpack("assets/models/backpack/backpack.obj");
+		Model backpack("assets/models/plattform/Plattform2.obj");
 
 		//shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
 		//shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
@@ -257,7 +257,7 @@ int main(int argc, char** argv)
 
 			// render the loaded model
 			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+			model = glm::translate(model, glm::vec3(-2.0f, -2.0f, -2.0f)); // translate it down so it's at the center of the scene
 			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 			modelShader->setUniform("model", model);
 			backpack.Draw(*modelShader);
@@ -454,7 +454,7 @@ void processInput(GLFWwindow* window)
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
-void mouse_callback(GLFWwindow* window, float xpos, float ypos)
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	if (firstMouse)
 	{
