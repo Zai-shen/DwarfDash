@@ -78,19 +78,13 @@ static PxPhysics* gPhysics = nullptr;
 static PxScene* gScene = nullptr;
 static PxPvd* gPvd = nullptr;
 
-
 // fps camera
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
 float lastX = config.width / 2.0f;
 float lastY = config.height / 2.0f;
 bool firstMouse = true;
-
-//FPSCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ); // new constructor
-
-// timing
+// timing for fps camera 
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
@@ -210,7 +204,8 @@ int main(int argc, char** argv)
 		shared_ptr<Shader> modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
 
 		stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
-		Model backpack("assets/models/plattform/Plattform2.obj");
+		//Model backpack("assets/models/plattform/Plattform2.obj");
+		Model backpack("assets/models/plattform/PlattformTorch.obj");
 
 		//shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
 		//shared_ptr<Material> brickTextureMaterial = make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
