@@ -237,23 +237,23 @@ int main(int argc, char** argv)
 			//camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			//setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
+			setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
 
 
 
 			// this works with a shared pointer
-			modelShader->use();
+			//modelShader->use();
 			
 			// view/projection transformations
-			glm::mat4 projection = glm::perspective(glm::radians(config.fov), (float)config.width / (float)config.height, 0.1f, 100.0f);
-			glm::mat4 view = camera.getViewMatrix();
-			modelShader->setUniform("projection", projection);
-			modelShader->setUniform("view", view);
+			//glm::mat4 projection = glm::perspective(glm::radians(config.fov), (float)config.width / (float)config.height, 0.1f, 100.0f);
+			//glm::mat4 view = camera.getViewMatrix();
+			//modelShader->setUniform("projection", projection);
+			//modelShader->setUniform("view", view);
 
 			// render the loaded model
 			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(-2.0f, -2.0f, -2.0f)); // translate it down so it's at the center of the scene
-			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+			//model = glm::translate(model, glm::vec3(-2.0f, -2.0f, -2.0f)); // translate it down so it's at the center of the scene
+			//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 			modelShader->setUniform("model", model);
 			backpack.Draw(*modelShader);
 
@@ -390,6 +390,11 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 	// these two lines belong to the old ecg camera class
 	//shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 	//shader->setUniform("camera_world", camera.getPosition());
+
+	glm::mat4 projection = glm::perspective(glm::radians(config.fov), (float)config.width / (float)config.height, 0.1f, 100.0f);
+	glm::mat4 view = camera.getViewMatrix();
+	shader->setUniform("projection", projection);
+	shader->setUniform("view", view);
 
 	shader->setUniform("view", camera.getViewMatrix());
 	shader->setUniform("camera_world", camera.getPosition());
