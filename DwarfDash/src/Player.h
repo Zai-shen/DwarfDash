@@ -12,12 +12,6 @@ class Player {
 
 public:
 
-	bool jumping = false;
-	float jumpVelocity = 0.25f;
-	bool jumpGoingUp = true;
-	float cappedHeight = 10.0f;
-	PxExtended currentHeight = 0.0f;
-
 	PxPhysics* gPhysics;
 	PxScene* gScene;
 	PxControllerManager* gCCTManager = nullptr;
@@ -42,9 +36,13 @@ public:
 
 	void jump(float deltaTime);
 
+	void wantsToJump();
 
 private:
-
+	bool jumping = false;
+	float jumpVelocity = 0.25f;
+	float cappedHeight = 10.0f;
+	PxExtended currentHeight = 0.0f;
 	float gGravity = -9.81f;
 	PxF32 pHeight = PxF32(1.4f);
 	PxF32 pRadius = PxF32(0.6f);

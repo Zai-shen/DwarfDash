@@ -288,6 +288,8 @@ void initPhysX() {
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
+
 	gScene = gPhysics->createScene(sceneDesc);
 
 	//Pvd Client
@@ -316,6 +318,8 @@ PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, Px
 		| PxPairFlag::eNOTIFY_TOUCH_FOUND
 		| PxPairFlag::eNOTIFY_TOUCH_PERSISTS
 		| PxPairFlag::eNOTIFY_CONTACT_POINTS | PxPairFlag::eTRIGGER_DEFAULT;
+	pairFlags |= PxPairFlag::eDETECT_CCD_CONTACT;
+
 	return  PxFilterFlag::eDEFAULT;
 }
 
@@ -362,35 +366,26 @@ void poll(GLFWwindow* window, float deltaTime) {
 			//glm::vec3 displacement = camera.processMovement(FORWARD, deltaTime);
 
 			glm::vec3 displacement = glm::vec3(0.f, 0.f, -1.f);
-			game->player->moveChar(displacement*0.1f, deltaTime);
-
-			//camera.setPosition(glm::vec3(gPlayerController->getPosition().x, gPlayerController->getPosition().y, gPlayerController->getPosition().z));
+			game->player->moveChar(displacement*0.05f, deltaTime);
 		}
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 			glm::vec3 displacement = glm::vec3(0.f, 0.f, 1.f);
-			game->player->moveChar(displacement*0.1f, deltaTime);
+			game->player->moveChar(displacement*0.05f, deltaTime);
 		}
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 			glm::vec3 displacement = glm::vec3(-1.f, 0.f, 0.f);
-			game->player->moveChar(displacement*0.1f, deltaTime);
+			game->player->moveChar(displacement*0.05f, deltaTime);
 		}
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 			glm::vec3 displacement = glm::vec3(1.f, 0.f, 0.f);
-			game->player->moveChar(displacement*0.1f, deltaTime);
+			game->player->moveChar(displacement*0.05f, deltaTime);
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-			//jump
-			game->player->jumping = true;
-		}else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
-			//stop jump
-			game->player->jumping = false;
+			game->player->wantsToJump();
 		}
 
 		game->player->jump(deltaTime);
-
-		// apply gravity
-		//game->player->moveChar(glm::vec3(0.0, 0.0, 0.0), deltaTime, 0.0);
 
 		//camera.setPosition(glm::vec3(gPlayerController->getPosition().x, gPlayerController->getPosition().y, gPlayerController->getPosition().z));
 	}

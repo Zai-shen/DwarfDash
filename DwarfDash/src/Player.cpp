@@ -51,13 +51,23 @@ void Player::moveChar(glm::vec3 displacement, float deltaTime, PxControllerFilte
 	collFlags = gPlayerController->move(PxVec3(displacement.x, displacement.y, displacement.z ), 0.01f, deltaTime, filter, nullptr);
 }
 
+void Player::wantsToJump() {
+	if (collFlags & PxControllerCollisionFlag::eCOLLISION_DOWN)
+	{
+		currentHeight = gPlayerController->getPosition().y;
+		cappedHeight = currentHeight + 5.f;
+		jumping = true;
+		cout << "collision down!" << endl;
+	}
+}
+
+
 void Player::jump(float deltaTime) {
 
 	const PxControllerFilters pxCF;
 
 	if (jumping)
 	{
-
 		currentHeight = gPlayerController->getPosition().y;
 
 		//jumpVelocity += gGravity/10 * deltaTime;
@@ -65,33 +75,23 @@ void Player::jump(float deltaTime) {
 		//	jumpVelocity = 0.0f;
 		//}
 
-
 		if (currentHeight >= cappedHeight)
 		{
-			jumpGoingUp = false;
-		}
-
-		if (jumpGoingUp)
-		{
-			moveChar(glm::vec3(0.0, -gGravity * deltaTime, 0.0), deltaTime, pxCF);
+			jumping = false;
 		}
 		else {
-			moveChar(glm::vec3(0.0, gGravity * deltaTime, 0.0), deltaTime, pxCF);
+			//JUMP
+			moveChar(glm::vec3(0.0, -gGravity * deltaTime, 0.0), deltaTime, pxCF);
 		}
 		
-		if (collFlags & PxControllerCollisionFlag::eCOLLISION_DOWN)
-		{
-			jumpGoingUp = true;
-			cout << "collision down!" << endl;
-		}
 		if (collFlags & PxControllerCollisionFlag::eCOLLISION_UP)
 		{
-			jumpGoingUp = false;
+			jumping = false;
 			cout << "collision up!" << endl;
 		}
 	}
 	else {
-		jumpVelocity = .1f;
+		//FALL
 		moveChar(glm::vec3(0.0, gGravity * deltaTime, 0.0), deltaTime, pxCF);
 	}
 }
