@@ -10,8 +10,6 @@ void main(){
 	fragColor = texture(textureUnit, TexCoords);
 }
 
-
-// CODE VON  LEARNOPENGL.COM
 //#version 330 core
 //out vec4 FragColor;
 //

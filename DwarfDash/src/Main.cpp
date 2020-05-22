@@ -48,6 +48,12 @@ void initPhysX();
 void releasePhysX();
 void stepPhysics();
 
+// FPS Camera
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void processInput(GLFWwindow* window);
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
+
+
 /* --------------------------------------------- */
 // Global variables
 /* --------------------------------------------- */
@@ -73,6 +79,15 @@ static PxController* gPlayerController = nullptr;
 // Game
 int frames = 0;
 Game* game = new Game();
+
+// fps camera settings
+float lastX = config.width / 2.0f;
+float lastY = config.height / 2.0f;
+bool firstMouse = true;
+// timing for fps camera 
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
+FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ); // new constructor
 
 /* --------------------------------------------- */
 // Main
@@ -147,9 +162,13 @@ int main(int argc, char** argv)
 	}
 
 	// set callbacks
+	//glfwSetMouseButtonCallback(window, mouse_button_callback); // not needed in fps
+	//glfwSetScrollCallback(window, scroll_callback);  // not needed in fps
 	glfwSetKeyCallback(window, key_callback);
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
-	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+
+	// tell GLFW to capture our mouse
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// set GL defaults
 	glClearColor(0.5, 0.5, 0.5, 1);
@@ -160,6 +179,13 @@ int main(int argc, char** argv)
 	// Initialize scene and render loop
 	/* --------------------------------------------- */
 	{
+		// FPS Camera
+		// per-frame time logic
+		// --------------------
+		double currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		// Init PhysX
 		initPhysX();
 
@@ -169,7 +195,8 @@ int main(int argc, char** argv)
 		game->init();
 
 		// Initialize camera
-		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
+		//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
+
 
 		// Initialize lights
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f));
@@ -182,6 +209,10 @@ int main(int argc, char** argv)
 		double mouse_x, mouse_y;
 
 		while (!glfwWindowShouldClose(window)) {
+			// input fps cam
+			// -----
+			processInput(window);
+
 			// Clear backbuffer
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -189,8 +220,8 @@ int main(int argc, char** argv)
 			glfwPollEvents();
 
 			// Update camera
-			glfwGetCursorPos(window, &mouse_x, &mouse_y);
-			camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
+			//glfwGetCursorPos(window, &mouse_x, &mouse_y);
+			//camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
 			//setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
@@ -346,6 +377,21 @@ void setWindowFPS(GLFWwindow *window, float& t_sum)
 	}
 }
 
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL){
+	shader->use();
+
+	glm::mat4 projection = glm::perspective(glm::radians(config.fov), (float)config.width / (float)config.height, 0.1f, 100.0f);
+	shader->setUniform("projection", projection);
+	shader->setUniform("view", camera.getViewMatrix());
+
+	shader->setUniform("dirL.color", dirL.color);
+	shader->setUniform("dirL.direction", dirL.direction);
+
+	shader->setUniform("pointL.color", pointL.color);
+	shader->setUniform("pointL.position", pointL.position);
+	shader->setUniform("pointL.attenuation", pointL.attenuation);
+}
+
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL)
 {
 	shader->use();
@@ -374,11 +420,64 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 }
 
 // FPS Camera 
-void processInput(GLFWwindow* window)
-{
+// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+// ---------------------------------------------------------------------------------------------------------
+void processInput(GLFWwindow* window){
+	
+	glm::vec3 pos = camera.getPosition();
 
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		std::cout << "Pressed ESC" << std::endl;
+		glfwSetWindowShouldClose(window, true);
+	}
 
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
+		camera.ProcessKeyboard(FORWARD, deltaTime);
+	}
 
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
+		camera.ProcessKeyboard(LEFT, deltaTime);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
+		camera.ProcessKeyboard(RIGHT, deltaTime);
+	}
+
+	// reset camera to 0
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
+		camera.resetPosition();
+	}
+	
+}
+
+// glfw: whenever the mouse moves, this callback is called
+// -------------------------------------------------------
+void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+	
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+	lastX = xpos;
+	lastY = ypos;
+
+	camera.ProcessMouseMovement(xoffset, yoffset);
+	
 }
 
 

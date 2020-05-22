@@ -29,8 +29,7 @@ FPSCamera::FPSCamera(float posX, float posY, float posZ, float upX, float upY, f
 FPSCamera::FPSCamera(double fov, double aspect, double nearC, double farC)
 	: perspective(glm::perspective(glm::radians(fov), aspect, nearC, farC)) {
 
-	//view = glm::perspective(glm::radians(fov), aspect, nearC, farC);
-	//Position = glm::vec3(0.0f, 0.0f, 10.0f);
+	Position = glm::vec3(0.0f, 0.0f, 10.0f);
 	WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	MouseSensitivity = SENSITIVITY;
