@@ -45,7 +45,7 @@ void Gameobject::update() {
 	else if (goModel) {
 		this->goModel->_shader->use();
 		this->goModel->setModelMatrix(glmTransform);
-		this->goModel->_shader->setUniform("modelMatrix", this->goModel->getModelMatrix());
+		//this->goModel->_shader->setUniform("modelMatrix", this->goModel->getModelMatrix()); // this should be called right before the draw call 
 	}
 }
 
@@ -55,6 +55,7 @@ void Gameobject::draw() {
 		this->goGeometry->draw();
 	}
 	else if (goModel) {
+		this->goModel->_shader->setUniform("modelMatrix", this->goModel->getModelMatrix());
 		this->goModel->draw();	
 	}
 }
