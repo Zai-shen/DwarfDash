@@ -36,7 +36,7 @@ public:
 
 	void jump(float deltaTime);
 
-	void wantsToJump();
+	void wantsToJump(float deltaTime);
 
 private:
 	bool jumping = false;

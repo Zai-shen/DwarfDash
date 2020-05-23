@@ -382,7 +382,7 @@ void poll(GLFWwindow* window, float deltaTime) {
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-			game->player->wantsToJump();
+			game->player->wantsToJump(deltaTime);
 		}
 
 		game->player->jump(deltaTime);

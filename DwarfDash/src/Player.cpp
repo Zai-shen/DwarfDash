@@ -51,7 +51,8 @@ void Player::moveChar(glm::vec3 displacement, float deltaTime, PxControllerFilte
 	collFlags = gPlayerController->move(PxVec3(displacement.x, displacement.y, displacement.z ), 0.01f, deltaTime, filter, nullptr);
 }
 
-void Player::wantsToJump() {
+void Player::wantsToJump(float deltaTime) {
+	moveChar(glm::vec3(0.0, gGravity, 0.0), deltaTime); // now he moves down all the time - collflags only tracks a collision, if there is a collision immediately from moving down with move()
 	if (collFlags & PxControllerCollisionFlag::eCOLLISION_DOWN)
 	{
 		currentHeight = gPlayerController->getPosition().y;
