@@ -380,8 +380,7 @@ void setWindowFPS(GLFWwindow *window, float& t_sum)
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL){
 	shader->use();
 
-	glm::mat4 projection = glm::perspective(glm::radians(config.fov), (float)config.width / (float)config.height, 0.1f, 100.0f);
-	shader->setUniform("projection", projection);
+	shader->setUniform("projection", camera.getProjectionMatrix());
 	shader->setUniform("view", camera.getViewMatrix());
 
 	shader->setUniform("dirL.color", dirL.color);
