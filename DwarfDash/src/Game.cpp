@@ -4,7 +4,11 @@ using namespace std;
 
 Game::Game() {}
 
-Game::~Game() {}
+Game::~Game() {
+	player->~Player();
+	cout << "destroying game variables" << endl;
+	currentLevel->~Level();
+}
 
 void Game::init() {
 	// Load shaders
@@ -15,6 +19,10 @@ void Game::init() {
 
 	// Create materials
 	initMaterials();
+
+	// Init PhysX materials
+		//static friction, dynamic friction, restitution
+	standardMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
 
 	// Create Geometry
 	initLevels();
@@ -51,6 +59,16 @@ void Game::initLevels() {
 	}
 }
 
+void Game::createGroundPlane() {
+	PxTransform planePos = PxTransform(PxVec3(0.0f, 0,
+		0.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
+	PxRigidStatic* plane = gPhysics->createRigidStatic(planePos);
+	PxShape* shape = gPhysics->createShape(PxPlaneGeometry(), *standardMaterial);
+	plane->attachShape(*shape);
+	gScene->addActor(*plane);
+}
+
+
 void Game::initLevel1() {
 	//Trying a model gameobject
 	//Model mo1("assets/models/plattform/plattform.obj", this->modelShader);
@@ -75,18 +93,8 @@ void Game::initLevel1() {
 }
 
 void Game::initLevel2() {
-	PxMaterial* standardMaterial =
-		//static friction, dynamic friction, restitution
-		gPhysics->createMaterial(0.5, 0.5, 0.5);
-
 	//1-Creating static plane
-	PxTransform planePos = PxTransform(PxVec3(0.0f, 0,
-		0.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
-	PxRigidStatic* plane = gPhysics->createRigidStatic(planePos);
-	PxShape* shape = gPhysics->createShape(PxPlaneGeometry(), *standardMaterial);
-	plane->attachShape(*shape);
-	gScene->addActor(*plane);
-
+	createGroundPlane();
 
 	//Gameobject* box1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(-1.f, 5.f, 0.f)), Geometry::createSphereGeometry(64, 32, 1.0f), brickTextureMaterial));
 	Gameobject* box1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 5.f, 0.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), brickTextureMaterial));

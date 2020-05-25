@@ -167,14 +167,6 @@ int main(int argc, char** argv)
 		game->gScene = gScene;
 		game->init();
 
-
-		// Model loading
-		///Model plattform("assets/models/plattform/plattform.obj",game->modelShader);
-		//Model nanosuit("assets/models/nanosuit/nanosuit.obj");
-		///stbi_set_flip_vertically_on_load(true); // only needs to be flipped for backpack
-		//Model backpack("assets/models/backpack/backpack.obj");
-
-
 		// Initialize camera
 		Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
@@ -209,12 +201,12 @@ int main(int argc, char** argv)
 			game->modelShader->setUniform("modelMatrix", glm::translate(glm::mat4(1.f), glm::vec3(0.f,2.f,-10.f)));
 			game->modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 
+			//PhysX
+			stepPhysics();
+
 			// Render
 			game->update();
 			game->draw();
-
-			//PhysX
-			stepPhysics();
 
 			// Compute frame time
 			dt = t;
@@ -236,6 +228,13 @@ int main(int argc, char** argv)
 	/* --------------------------------------------- */
 
 	destroyFramework();
+
+
+	/* --------------------------------------------- */
+	// Destroy Game
+	/* --------------------------------------------- */
+
+	game->~Game();
 
 	/* --------------------------------------------- */
 	// Destroy PhysX

@@ -63,4 +63,6 @@ private:
 	void initLevel1();
 	void initLevel2();
 
+	void createGroundPlane();
+	PxMaterial* standardMaterial;
 };

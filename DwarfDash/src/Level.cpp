@@ -4,7 +4,12 @@ using namespace std;
 
 Level::Level() {}
 
-Level::~Level() {}
+Level::~Level() {
+	cout << "destroying level variables" << endl;
+	for (std::size_t i = 0; i < this->gameObjects.size(); ++i) {
+		this->gameObjects[i]->~Gameobject();
+	}
+}
 
 void Level::init() {
 }

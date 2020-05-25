@@ -41,7 +41,7 @@ public:
 private:
 	bool jumping = false;
 	float jumpVelocity = 0.25f;
-	float cappedHeight = 10.0f;
+	float cappedHeight = 5.0f;
 	PxExtended currentHeight = 0.0f;
 	float gGravity = -9.81f;
 	PxF32 pHeight = PxF32(1.4f);

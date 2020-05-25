@@ -14,7 +14,15 @@ Gameobject::Gameobject(Model* model) {
 	this->goModel = model;
 }
 
-Gameobject::~Gameobject() {}
+Gameobject::~Gameobject() {
+	cout << "destroying gameobject variables" << endl;
+	if (this->goActor) {
+		goActor->release();
+	}
+	else if (this->goDynamicActor) {
+		goDynamicActor->release();
+	}
+}
 
 void Gameobject::init() {
 }

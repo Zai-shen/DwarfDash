@@ -13,7 +13,11 @@ Player::Player(PxPhysics* gPhysics, PxScene* gScene) {
 	init();
 }
 
-Player::~Player() {}
+Player::~Player() {
+	cout << "destroying player variables" << endl;
+	gPlayerController->release();
+	gCCTManager->release();
+}
 
 void Player::init() {
 	//Creating Character Controller Manager
@@ -26,7 +30,7 @@ void Player::init() {
 	charDesc.height = pHeight; //height
 	charDesc.radius = pRadius; //from height to top/bottom
 	charDesc.position = pStartPos; //starting position
-	charDesc.contactOffset = 0.05f; //controller skin width for collisions
+	charDesc.contactOffset = 0.00001f; //controller skin width for collisions
 	charDesc.stepOffset = 0.01f; //max obstacle climb height
 	charDesc.slopeLimit = cosf(glm::radians(45.0f)); // max slope to walk
 	charDesc.upDirection = PxVec3(0.f, 1.f, 0.f); // Specifies the 'up' direction
@@ -52,7 +56,7 @@ void Player::moveChar(glm::vec3 displacement, float deltaTime, PxControllerFilte
 }
 
 void Player::wantsToJump(float deltaTime) {
-	moveChar(glm::vec3(0.0, gGravity, 0.0), deltaTime); // now he moves down all the time - collflags only tracks a collision, if there is a collision immediately from moving down with move()
+	moveChar(glm::vec3(0.0, -0.1, 0.0), deltaTime); // now he moves down all the time - collflags only tracks a collision, if there is a collision immediately from moving down with move()
 	if (collFlags & PxControllerCollisionFlag::eCOLLISION_DOWN)
 	{
 		currentHeight = gPlayerController->getPosition().y;
@@ -70,11 +74,6 @@ void Player::jump(float deltaTime) {
 	if (jumping)
 	{
 		currentHeight = gPlayerController->getPosition().y;
-
-		//jumpVelocity += gGravity/10 * deltaTime;
-		//if (jumpVelocity < 0.0f) {
-		//	jumpVelocity = 0.0f;
-		//}
 
 		if (currentHeight >= cappedHeight)
 		{
