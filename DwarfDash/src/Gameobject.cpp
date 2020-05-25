@@ -1,6 +1,8 @@
 #include "Gameobject.h"
 
 using namespace std;
+using namespace physx;
+
 
 Gameobject::Gameobject() {}
 
@@ -12,7 +14,15 @@ Gameobject::Gameobject(Model* model) {
 	this->goModel = model;
 }
 
-Gameobject::~Gameobject() {}
+Gameobject::~Gameobject() {
+	cout << "destroying gameobject variables" << endl;
+	if (this->goActor) {
+		goActor->release();
+	}
+	else if (this->goDynamicActor) {
+		goDynamicActor->release();
+	}
+}
 
 void Gameobject::init() {
 }

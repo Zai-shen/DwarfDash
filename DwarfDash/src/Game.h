@@ -7,12 +7,20 @@
 #include "Level.h"
 #include "Gameobject.h"
 #include "Model.h"
+#include <PxPhysicsAPI.h>
+#include "Player.h"
 
 using namespace std;
 
 class Game {
 
 public:
+	int const GAME_STATE_IDLE = 0;
+	int const GAME_STATE_ACTIVE = 1;
+	int const GAME_STATE_PAUSED = 2;
+	int const GAME_STATE_FINISHED = 3;
+
+	int currentGameState = GAME_STATE_IDLE;
 
 	shared_ptr<Shader> primaryShader;
 	shared_ptr<Shader> modelShader;
@@ -21,6 +29,8 @@ public:
 
 	PxPhysics* gPhysics;
 	PxScene* gScene;
+
+	Player* player;
 
 	Game();
 	~Game();
@@ -44,13 +54,6 @@ private:
 	Level* level3 = new Level();
 	Level* currentLevel = level1;
 
-	int const GAME_STATE_IDLE = 0;
-	int const GAME_STATE_ACTIVE = 1;
-	int const GAME_STATE_PAUSED = 2;
-	int const GAME_STATE_FINISHED = 3;
-
-	int activeGameState = GAME_STATE_IDLE;
-
 	shared_ptr<Texture> woodTexture;
 	shared_ptr<Texture> brickTexture;
 
@@ -63,4 +66,6 @@ private:
 	void initLevel3();
 
 
+	void createGroundPlane();
+	PxMaterial* standardMaterial;
 };

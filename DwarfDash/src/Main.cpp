@@ -44,6 +44,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 void setWindowFPS(GLFWwindow *window,float& t_sum);
 void processInput(GLFWwindow* window);
+void poll(GLFWwindow* window, float deltaTime);
 void initPhysX();
 void releasePhysX();
 void stepPhysics();
@@ -52,7 +53,6 @@ void stepPhysics();
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow* window);
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
-
 
 /* --------------------------------------------- */
 // Global variables
@@ -73,13 +73,11 @@ static PxFoundation* gFoundation = nullptr;
 static PxPhysics* gPhysics = nullptr;
 static PxScene* gScene = nullptr;
 static PxPvd* gPvd = nullptr;
-static PxControllerManager* gCCTManager = nullptr;
-static PxController* gPlayerController = nullptr;
 
 // Game
-int frames = 0;
 Game* game = new Game();
 
+int frames = 0;
 // fps camera settings
 float lastX = config.width / 2.0f;
 float lastY = config.height / 2.0f;
@@ -197,7 +195,6 @@ int main(int argc, char** argv)
 		// Initialize camera
 		//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
-
 		// Initialize lights
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f));
 		PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f));
@@ -218,6 +215,7 @@ int main(int argc, char** argv)
 
 			// Poll events
 			glfwPollEvents();
+			poll(window, dt);
 
 			// Update camera
 			//glfwGetCursorPos(window, &mouse_x, &mouse_y);
@@ -227,12 +225,12 @@ int main(int argc, char** argv)
 			//setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
 			setPerFrameUniforms(game->modelShader.get(), camera, dirL, pointL);
 
+			//PhysX
+			stepPhysics();
+
 			// Render
 			game->update();
 			game->draw();
-
-			//PhysX
-			stepPhysics();
 
 			// Compute frame time
 			dt = t;
@@ -254,6 +252,13 @@ int main(int argc, char** argv)
 	/* --------------------------------------------- */
 
 	destroyFramework();
+
+
+	/* --------------------------------------------- */
+	// Destroy Game
+	/* --------------------------------------------- */
+
+	game->~Game();
 
 	/* --------------------------------------------- */
 	// Destroy PhysX
@@ -306,24 +311,9 @@ void initPhysX() {
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
+
 	gScene = gPhysics->createScene(sceneDesc);
-
-	//Creating Character Controller Manager
-	gCCTManager = PxCreateControllerManager(*gScene);
-	//Character Controller for Player (of type capsule)
-	PxCapsuleControllerDesc charDesc;
-		//<fill the descriptor here>
-	charDesc.position = PxExtendedVec3(-3.0f, 3.0f, 0.0f);
-	charDesc.height = PxF32(0.8f);
-	charDesc.radius = PxF32(0.1f);
-	charDesc.contactOffset = 0.05f; //controller skin width for collisions
-	charDesc.stepOffset = 0.01; //max obstacle climb height
-	charDesc.slopeLimit = cosf(glm::radians(45.0f)); // max slope to walk
-	charDesc.upDirection = PxVec3(0, 1, 0); // Specifies the 'up' direction
-	charDesc.material = gPhysics->createMaterial(0.1f, 0.1f, 0.1f);
-
-	gPlayerController = gCCTManager->createController(charDesc);
-
 
 	//Pvd Client
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
@@ -351,12 +341,13 @@ PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, Px
 		| PxPairFlag::eNOTIFY_TOUCH_FOUND
 		| PxPairFlag::eNOTIFY_TOUCH_PERSISTS
 		| PxPairFlag::eNOTIFY_CONTACT_POINTS | PxPairFlag::eTRIGGER_DEFAULT;
+	pairFlags |= PxPairFlag::eDETECT_CCD_CONTACT;
+
 	return  PxFilterFlag::eDEFAULT;
 }
 
 void releasePhysX()
 {
-	gCCTManager->release();
 	gScene->release();
 	gPhysics->release();
 	PxPvdTransport* transport = gPvd->getTransport();
@@ -404,6 +395,37 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 	shader->setUniform("pointL.attenuation", pointL.attenuation);
 }
 
+void poll(GLFWwindow* window, float deltaTime) {
+	if (game->currentGameState == game->GAME_STATE_ACTIVE)
+	{
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+			//glm::vec3 displacement = camera.processMovement(FORWARD, deltaTime);
+
+			glm::vec3 displacement = glm::vec3(0.f, 0.f, -1.f);
+			game->player->moveChar(displacement*0.05f, deltaTime);
+		}
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+			glm::vec3 displacement = glm::vec3(0.f, 0.f, 1.f);
+			game->player->moveChar(displacement*0.05f, deltaTime);
+		}
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+			glm::vec3 displacement = glm::vec3(-1.f, 0.f, 0.f);
+			game->player->moveChar(displacement*0.05f, deltaTime);
+		}
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+			glm::vec3 displacement = glm::vec3(1.f, 0.f, 0.f);
+			game->player->moveChar(displacement*0.05f, deltaTime);
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+			game->player->wantsToJump(deltaTime);
+		}
+
+		game->player->jump(deltaTime);
+
+		//camera.setPosition(glm::vec3(gPlayerController->getPosition().x, gPlayerController->getPosition().y, gPlayerController->getPosition().z));
+	}
+}
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {

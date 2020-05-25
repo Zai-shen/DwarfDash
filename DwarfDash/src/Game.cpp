@@ -4,7 +4,11 @@ using namespace std;
 
 Game::Game() {}
 
-Game::~Game() {}
+Game::~Game() {
+	player->~Player();
+	cout << "destroying game variables" << endl;
+	currentLevel->~Level();
+}
 
 void Game::init() {
 	// Load shaders
@@ -16,8 +20,18 @@ void Game::init() {
 	// Create materials
 	initMaterials();
 
+	// Init PhysX materials
+		//static friction, dynamic friction, restitution
+	standardMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
+
 	// Create Geometry
 	initLevels();
+
+	// Create & init Player
+	player = new Player(gPhysics, gScene);
+
+	// Start game
+	currentGameState = GAME_STATE_ACTIVE;
 }
 
 void Game::initShaders() {
@@ -49,20 +63,19 @@ void Game::initLevels() {
 	}
 }
 
-void Game::initLevel1() {
-	PxMaterial* standardMaterial =
-		//static friction, dynamic friction, restitution
-		gPhysics->createMaterial(0.5, 0.5, 0.5);
-
-	//1-Creating static plane
+void Game::createGroundPlane() {
 	PxTransform planePos = PxTransform(PxVec3(0.0f, 0,
 		0.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
 	PxRigidStatic* plane = gPhysics->createRigidStatic(planePos);
 	PxShape* shape = gPhysics->createShape(PxPlaneGeometry(), *standardMaterial);
 	plane->attachShape(*shape);
-	
 	gScene->addActor(*plane);
+}
 
+
+void Game::initLevel1() {
+	//1-Creating static plane
+	createGroundPlane();
 
 	Model* mod1 = new Model("assets/models/backpack/backpack.obj", modelShader);
 	Gameobject* model1 = new Gameobject(mod1);
@@ -85,19 +98,10 @@ void Game::initLevel1() {
 }
 
 void Game::initLevel2() {
-	PxMaterial* standardMaterial =
-		//static friction, dynamic friction, restitution
-		gPhysics->createMaterial(0.5, 0.5, 0.5);
-
 	//1-Creating static plane
-	PxTransform planePos = PxTransform(PxVec3(0.0f, 0,
-		0.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
-	PxRigidStatic* plane = gPhysics->createRigidStatic(planePos);
-	PxShape* shape = gPhysics->createShape(PxPlaneGeometry(), *standardMaterial);
-	plane->attachShape(*shape);
-	gScene->addActor(*plane);
+	createGroundPlane();
 
-
+	// Dynamic model example
 	Model* mod2 = new Model("assets/models/backpack/backpack.obj", modelShader);
 	Gameobject* model2 = new Gameobject(mod2);
 	PxBoxGeometry tempBackGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
@@ -107,19 +111,36 @@ void Game::initLevel2() {
 
 	gScene->addActor(*(model2->goDynamicActor));
 	addGameobject(model2);
+
+	// Static actor example
+	Gameobject* sphere1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 15.f, 0.f)), Geometry::createSphereGeometry(64, 32, 1.0f), woodTextureMaterial));
+	PxSphereGeometry tempSphereGeometry(PxReal(1.0f)); //this->model
+	sphere1->goMaterial = standardMaterial;
+	sphere1->goPosition = PxTransform(PxVec3(0.0f, 15.0f, 0.0f)); // should be geometry.getPos
+	sphere1->goDynamicActor = PxCreateDynamic(*gPhysics, sphere1->goPosition, tempSphereGeometry, *(sphere1->goMaterial), 1.0f);
 }
 
 void Game::initLevel3() {
-
+	//Geometry no longer supported - level 3 is only a placeholder
+	Gameobject* plat1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(-3.f, 5.f, 0.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), brickTextureMaterial));
+	PxBoxGeometry tempPlatGeometry(PxVec3(.5f, .5f, .5f)); //this->model
+	plat1->goMaterial = standardMaterial;
+	plat1->goPosition = PxTransform(PxVec3(-3.0f, 5.0f, 0.0f)); // should be geometry.getPos
+	plat1->goActor = PxCreateStatic(*gPhysics, plat1->goPosition, tempPlatGeometry, *(plat1->goMaterial));
+	
+	gScene->addActor(*(plat1->goActor));
+	addGameobject(plat1);
 }
 
 
 void Game::update() {
 	currentLevel->update();
+	player->update();
 }
 
 void Game::draw() {
 	currentLevel->draw();
+	player->draw();
 }
 
 void Game::reset() {
