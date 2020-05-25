@@ -5,8 +5,8 @@ using namespace std;
 Game::Game() {}
 
 Game::~Game() {
-	player->~Player();
 	cout << "destroying game variables" << endl;
+	player->~Player();
 	currentLevel->~Level();
 }
 
@@ -113,11 +113,11 @@ void Game::initLevel2() {
 	addGameobject(model2);
 
 	// Static actor example
-	Gameobject* sphere1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 15.f, 0.f)), Geometry::createSphereGeometry(64, 32, 1.0f), woodTextureMaterial));
-	PxSphereGeometry tempSphereGeometry(PxReal(1.0f)); //this->model
-	sphere1->goMaterial = standardMaterial;
-	sphere1->goPosition = PxTransform(PxVec3(0.0f, 15.0f, 0.0f)); // should be geometry.getPos
-	sphere1->goDynamicActor = PxCreateDynamic(*gPhysics, sphere1->goPosition, tempSphereGeometry, *(sphere1->goMaterial), 1.0f);
+	//Gameobject* sphere1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 15.f, 0.f)), Geometry::createSphereGeometry(64, 32, 1.0f), woodTextureMaterial));
+	//PxSphereGeometry tempSphereGeometry(PxReal(1.0f)); //this->model
+	//sphere1->goMaterial = standardMaterial;
+	//sphere1->goPosition = PxTransform(PxVec3(0.0f, 15.0f, 0.0f)); // should be geometry.getPos
+	//sphere1->goDynamicActor = PxCreateDynamic(*gPhysics, sphere1->goPosition, tempSphereGeometry, *(sphere1->goMaterial), 1.0f);
 }
 
 void Game::initLevel3() {

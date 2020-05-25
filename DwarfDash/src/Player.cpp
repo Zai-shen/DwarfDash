@@ -56,13 +56,16 @@ void Player::moveChar(glm::vec3 displacement, float deltaTime, PxControllerFilte
 }
 
 void Player::wantsToJump(float deltaTime) {
-	moveChar(glm::vec3(0.0, -0.1, 0.0), deltaTime); // now he moves down all the time - collflags only tracks a collision, if there is a collision immediately from moving down with move()
-	if (collFlags & PxControllerCollisionFlag::eCOLLISION_DOWN)
+	if (!jumping)
 	{
-		currentHeight = gPlayerController->getPosition().y;
-		cappedHeight = currentHeight + 5.f;
-		jumping = true;
-		cout << "collision down!" << endl;
+		moveChar(glm::vec3(0.0, -0.1, 0.0), deltaTime); // now he moves down all the time - collflags only tracks a collision, if there is a collision immediately from moving down with move()
+		if (collFlags & PxControllerCollisionFlag::eCOLLISION_DOWN)
+		{
+			currentHeight = gPlayerController->getPosition().y;
+			cappedHeight = currentHeight + 5.f;
+			jumping = true;
+			//cout << "collision down!" << endl;
+		}
 	}
 }
 
@@ -87,7 +90,7 @@ void Player::jump(float deltaTime) {
 		if (collFlags & PxControllerCollisionFlag::eCOLLISION_UP)
 		{
 			jumping = false;
-			cout << "collision up!" << endl;
+			//cout << "collision up!" << endl;
 		}
 	}
 	else {
