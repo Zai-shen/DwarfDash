@@ -113,7 +113,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NO_BONUS;WIN32;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)external/include;$(SolutionDir)external\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external\include;$(SolutionDir)external\include\physxInclude</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>

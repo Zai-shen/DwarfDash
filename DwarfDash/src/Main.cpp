@@ -1,4 +1,8 @@
 #include "Utils.h"
+
+//Config
+#include "Configuration.h"
+
 #include <sstream>
 #include "Camera.h"
 #include "Shader.h"
@@ -13,8 +17,7 @@
 #include "physxInclude/pvd/PxPvdSceneClient.h"
 #include "physxInclude/pvd/PxPvdTransport.h"
 
-//Config
-#include "Configuration.h"
+
 
 // Model loading
 #include "Model.h"
@@ -43,7 +46,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 void setWindowFPS(GLFWwindow *window,float& t_sum);
-void processInput(GLFWwindow* window);
 void poll(GLFWwindow* window, float deltaTime);
 void initPhysX();
 void releasePhysX();
@@ -51,7 +53,7 @@ void stepPhysics();
 
 // FPS Camera
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* window, float deltaTime);
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
 
 /* --------------------------------------------- */
@@ -82,9 +84,6 @@ int frames = 0;
 float lastX = config.width / 2.0f;
 float lastY = config.height / 2.0f;
 bool firstMouse = true;
-// timing for fps camera 
-float deltaTime = 0.0f;	// time between current frame and last frame
-float lastFrame = 0.0f;
 FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ); // new constructor
 
 /* --------------------------------------------- */
@@ -177,13 +176,6 @@ int main(int argc, char** argv)
 	// Initialize scene and render loop
 	/* --------------------------------------------- */
 	{
-		// FPS Camera
-		// per-frame time logic
-		// --------------------
-		double currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
 		// Init PhysX
 		initPhysX();
 
@@ -206,16 +198,15 @@ int main(int argc, char** argv)
 		double mouse_x, mouse_y;
 
 		while (!glfwWindowShouldClose(window)) {
-			// input fps cam
-			// -----
-			processInput(window);
-
 			// Clear backbuffer
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			// Poll events
+			// input fps cam
+			// -----
 			glfwPollEvents();
-			poll(window, dt);
+			processInput(window, dt);
+			//poll(window, dt);
 
 			// Update camera
 			//glfwGetCursorPos(window, &mouse_x, &mouse_y);
@@ -443,7 +434,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 // FPS Camera 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow* window){
+void processInput(GLFWwindow* window, float deltaTime){
 	
 	glm::vec3 pos = camera.getPosition();
 
