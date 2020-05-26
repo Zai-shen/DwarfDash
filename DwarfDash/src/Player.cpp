@@ -52,18 +52,19 @@ void Player::reset() {
 }
 
 void Player::moveChar(glm::vec3 displacement, float deltaTime, PxControllerFilters filter) {
-	collFlags = gPlayerController->move(PxVec3(displacement.x, displacement.y, displacement.z ), 0.01f, deltaTime, filter, nullptr);
+	collFlags = gPlayerController->move(PxVec3(displacement.x, displacement.y, displacement.z ), 0.001f, deltaTime, filter, nullptr);
 }
 
 void Player::wantsToJump(float deltaTime) {
 	if (!jumping)
 	{
-		moveChar(glm::vec3(0.0, -0.1, 0.0), deltaTime); // now he moves down all the time - collflags only tracks a collision, if there is a collision immediately from moving down with move()
+		moveChar(glm::vec3(0.0, -0.1, 0.0), deltaTime); // moves down so collflags tracks a collision, and collision down gets forced
 		if (collFlags & PxControllerCollisionFlag::eCOLLISION_DOWN)
 		{
 			currentHeight = gPlayerController->getPosition().y;
 			cappedHeight = currentHeight + 5.f;
 			jumping = true;
+			jumpingUp = true;
 			//cout << "collision down!" << endl;
 		}
 	}
@@ -77,16 +78,26 @@ void Player::jump(float deltaTime) {
 	if (jumping)
 	{
 		currentHeight = gPlayerController->getPosition().y;
-
 		if (currentHeight >= cappedHeight)
 		{
-			jumping = false;
+			jumpingUp = false;
 		}
-		else {
+
+		if (jumpingUp)
+		{
 			//JUMP
 			moveChar(glm::vec3(0.0, -gGravity * deltaTime, 0.0), deltaTime, pxCF);
 		}
+		else
+		{
+			//FALL
+			moveChar(glm::vec3(0.0, gGravity * deltaTime, 0.0), deltaTime, pxCF);
+		}
 		
+		if (collFlags & PxControllerCollisionFlag::eCOLLISION_DOWN)
+		{
+			jumping = false;
+		}
 		if (collFlags & PxControllerCollisionFlag::eCOLLISION_UP)
 		{
 			jumping = false;

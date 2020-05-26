@@ -81,24 +81,28 @@ glm::vec3 FPSCamera::resetPosition() {
 	return Position = glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
-void FPSCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
+glm::vec3 FPSCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
 
 	float velocity = MovementSpeed * deltaTime;
 
 	if (direction == FORWARD) {
 		Position += Front * velocity;
+		return Front * velocity;
 	}
 
 	if (direction == BACKWARD) {
 		Position -= Front * velocity;
+		return -Front * velocity;
 	}
 
 	if (direction == LEFT) {
 		Position -= Right * velocity;
+		return -Right * velocity;
 	}
 
 	if (direction == RIGHT) {
 		Position += Right * velocity;
+		return Right * velocity;
 	}
 
 

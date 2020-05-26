@@ -40,12 +40,13 @@ public:
 
 private:
 	bool jumping = false;
+	bool jumpingUp = true;
 	float jumpVelocity = 0.25f;
 	float cappedHeight = 5.0f;
 	PxExtended currentHeight = 0.0f;
 	float gGravity = -9.81f;
 	PxF32 pHeight = PxF32(1.4f);
 	PxF32 pRadius = PxF32(0.6f);
-	PxExtendedVec3 pStartPos = PxExtendedVec3(-3.0f, pHeight, 0.0f);
+	PxExtendedVec3 pStartPos = PxExtendedVec3(0.0f, pHeight, 0.0f);
 
 };

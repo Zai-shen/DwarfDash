@@ -106,7 +106,7 @@ void Game::initLevel2() {
 	Gameobject* goCoin = new Gameobject(coin);
 	PxBoxGeometry tempBackGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
 	goCoin->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-	goCoin->goPosition = PxTransform(PxVec3(0.0f, 5.0f, 0.0f)); // should be geometry.getPos
+	goCoin->goPosition = PxTransform(PxVec3(0.0f, 5.0f, -10.0f)); // should be geometry.getPos
 	goCoin->goDynamicActor = PxCreateDynamic(*gPhysics, goCoin->goPosition, tempBackGeometry, *(goCoin->goMaterial), 1.0f);
 
 	gScene->addActor(*(goCoin->goDynamicActor));
@@ -116,7 +116,7 @@ void Game::initLevel2() {
 	Model* heart = new Model("assets/models/heart/Heart_low_poly_colored.obj", modelShader);
 	Gameobject* goHeart = new Gameobject(heart);
 	goHeart->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-	goHeart->goPosition = PxTransform(PxVec3(5.0f, 5.0f, 0.0f)); // should be geometry.getPos
+	goHeart->goPosition = PxTransform(PxVec3(5.0f, 5.0f, -10.0f)); // should be geometry.getPos
 	goHeart->goDynamicActor = PxCreateDynamic(*gPhysics, goHeart->goPosition, tempBackGeometry, *(goHeart->goMaterial), 1.0f);
 
 	gScene->addActor(*(goHeart->goDynamicActor));
@@ -126,7 +126,7 @@ void Game::initLevel2() {
 	Model* shield = new Model("assets/models/shield/Shield_low_poly_colored.obj", modelShader);
 	Gameobject* goShield = new Gameobject(shield);
 	goShield->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-	goShield->goPosition = PxTransform(PxVec3(-5.0f, 5.0f, 0.0f)); // should be geometry.getPos
+	goShield->goPosition = PxTransform(PxVec3(-5.0f, 5.0f, -10.0f)); // should be geometry.getPos
 	goShield->goDynamicActor = PxCreateDynamic(*gPhysics, goShield->goPosition, tempBackGeometry, *(goShield->goMaterial), 1.0f);
 
 	gScene->addActor(*(goShield->goDynamicActor));

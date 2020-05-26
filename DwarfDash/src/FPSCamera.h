@@ -80,7 +80,7 @@ public:
 
 	glm::vec3 resetPosition();
 
-	void ProcessKeyboard(Camera_Movement direction, float deltaTime);
+	glm::vec3 ProcessKeyboard(Camera_Movement direction, float deltaTime);
 
 	void ProcessMouseMovement(float xoffset, float yoffset);
 

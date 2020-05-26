@@ -46,7 +46,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 void setWindowFPS(GLFWwindow *window,float& t_sum);
-void poll(GLFWwindow* window, float deltaTime);
 void initPhysX();
 void releasePhysX();
 void stepPhysics();
@@ -202,13 +201,10 @@ int main(int argc, char** argv)
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			// Poll events
-			// input fps cam
-			// -----
 			glfwPollEvents();
 			processInput(window, dt);
-			//poll(window, dt);
 
-			// Update camera
+			// Update old camera
 			//glfwGetCursorPos(window, &mouse_x, &mouse_y);
 			//camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
@@ -386,38 +382,6 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 	shader->setUniform("pointL.attenuation", pointL.attenuation);
 }
 
-void poll(GLFWwindow* window, float deltaTime) {
-	if (game->currentGameState == game->GAME_STATE_ACTIVE)
-	{
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-			//glm::vec3 displacement = camera.processMovement(FORWARD, deltaTime);
-
-			glm::vec3 displacement = glm::vec3(0.f, 0.f, -1.f);
-			game->player->moveChar(displacement*0.05f, deltaTime);
-		}
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-			glm::vec3 displacement = glm::vec3(0.f, 0.f, 1.f);
-			game->player->moveChar(displacement*0.05f, deltaTime);
-		}
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-			glm::vec3 displacement = glm::vec3(-1.f, 0.f, 0.f);
-			game->player->moveChar(displacement*0.05f, deltaTime);
-		}
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-			glm::vec3 displacement = glm::vec3(1.f, 0.f, 0.f);
-			game->player->moveChar(displacement*0.05f, deltaTime);
-		}
-
-		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-			game->player->wantsToJump(deltaTime);
-		}
-
-		game->player->jump(deltaTime);
-
-		//camera.setPosition(glm::vec3(gPlayerController->getPosition().x, gPlayerController->getPosition().y, gPlayerController->getPosition().z));
-	}
-}
-
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
@@ -431,44 +395,48 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	}
 }
 
-// FPS Camera 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
+// FPS Camera & Player input processing
 void processInput(GLFWwindow* window, float deltaTime){
 	
-	glm::vec3 pos = camera.getPosition();
+	glm::vec3 displacement = glm::vec3(0.f);
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-		std::cout << "Pressed ESC" << std::endl;
 		glfwSetWindowShouldClose(window, true);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
-		camera.ProcessKeyboard(FORWARD, deltaTime);
+		displacement = camera.ProcessKeyboard(FORWARD, deltaTime);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
+		displacement = camera.ProcessKeyboard(BACKWARD, deltaTime);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
-		camera.ProcessKeyboard(LEFT, deltaTime);
+		displacement = camera.ProcessKeyboard(LEFT, deltaTime);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
-		camera.ProcessKeyboard(RIGHT, deltaTime);
+		displacement = camera.ProcessKeyboard(RIGHT, deltaTime);
 	}
 
-	// reset camera to 0
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
-		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
+		std::cout << "Camera Position: " + glm::to_string(camera.getPosition()) << std::endl;
 		camera.resetPosition();
 	}
 	
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		game->player->wantsToJump(deltaTime);
+	}
+
+	game->player->jump(deltaTime);
+
+	game->player->moveChar(displacement, deltaTime);
+
+	camera.setPosition(glm::vec3(
+		game->player->gPlayerController->getPosition().x,
+		game->player->gPlayerController->getPosition().y,
+		game->player->gPlayerController->getPosition().z));
 }
 
 // glfw: whenever the mouse moves, this callback is called
