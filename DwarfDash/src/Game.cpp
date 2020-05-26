@@ -102,11 +102,11 @@ void Game::initLevel2() {
 	createGroundPlane();
 
 	// Dynamic model example
-	Model* mod2 = new Model("assets/models/backpack/backpack.obj", modelShader);
+	Model* mod2 = new Model("assets/models/coin/Coin_low_poly.obj", modelShader);
 	Gameobject* model2 = new Gameobject(mod2);
 	PxBoxGeometry tempBackGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
 	model2->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-	model2->goPosition = PxTransform(PxVec3(-2.0f, 50.0f, 0.0f)); // should be geometry.getPos
+	model2->goPosition = PxTransform(PxVec3(0.0f, 5.0f, 0.0f)); // should be geometry.getPos
 	model2->goDynamicActor = PxCreateDynamic(*gPhysics, model2->goPosition, tempBackGeometry, *(model2->goMaterial), 1.0f);
 
 	gScene->addActor(*(model2->goDynamicActor));
