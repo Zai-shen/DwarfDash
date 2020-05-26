@@ -1,4 +1,4 @@
-# Blender MTL File: 'Shield_low_poly.blend'
+# Blender MTL File: 'Heart_low_poly_colored.blend'
 # Material Count: 1
 
 newmtl Material
@@ -10,3 +10,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
+map_Kd 50_shades_of_red_dividedBy10.png
