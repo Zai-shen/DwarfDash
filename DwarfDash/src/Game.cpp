@@ -102,15 +102,35 @@ void Game::initLevel2() {
 	createGroundPlane();
 
 	// Dynamic model example
-	Model* mod2 = new Model("assets/models/coin/Coin_low_poly.obj", modelShader);
-	Gameobject* model2 = new Gameobject(mod2);
+	Model* coin = new Model("assets/models/coin/Coin_low_poly.obj", modelShader);
+	Gameobject* goCoin = new Gameobject(coin);
 	PxBoxGeometry tempBackGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
-	model2->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-	model2->goPosition = PxTransform(PxVec3(0.0f, 5.0f, 0.0f)); // should be geometry.getPos
-	model2->goDynamicActor = PxCreateDynamic(*gPhysics, model2->goPosition, tempBackGeometry, *(model2->goMaterial), 1.0f);
+	goCoin->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
+	goCoin->goPosition = PxTransform(PxVec3(0.0f, 5.0f, 0.0f)); // should be geometry.getPos
+	goCoin->goDynamicActor = PxCreateDynamic(*gPhysics, goCoin->goPosition, tempBackGeometry, *(goCoin->goMaterial), 1.0f);
 
-	gScene->addActor(*(model2->goDynamicActor));
-	addGameobject(model2);
+	gScene->addActor(*(goCoin->goDynamicActor));
+	addGameobject(goCoin);
+
+	// Dynamic model example
+	Model* heart = new Model("assets/models/heart/Heart_low_poly.obj", modelShader);
+	Gameobject* goHeart = new Gameobject(heart);
+	goHeart->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
+	goHeart->goPosition = PxTransform(PxVec3(5.0f, 5.0f, 0.0f)); // should be geometry.getPos
+	goHeart->goDynamicActor = PxCreateDynamic(*gPhysics, goHeart->goPosition, tempBackGeometry, *(goHeart->goMaterial), 1.0f);
+
+	gScene->addActor(*(goHeart->goDynamicActor));
+	addGameobject(goHeart);
+
+	// Dynamic model example
+	Model* shield = new Model("assets/models/shield/Shield_low_poly.obj", modelShader);
+	Gameobject* goShield = new Gameobject(shield);
+	goShield->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
+	goShield->goPosition = PxTransform(PxVec3(-5.0f, 5.0f, 0.0f)); // should be geometry.getPos
+	goShield->goDynamicActor = PxCreateDynamic(*gPhysics, goShield->goPosition, tempBackGeometry, *(goShield->goMaterial), 1.0f);
+
+	gScene->addActor(*(goShield->goDynamicActor));
+	addGameobject(goShield);
 
 	// Static actor example
 	//Gameobject* sphere1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 15.f, 0.f)), Geometry::createSphereGeometry(64, 32, 1.0f), woodTextureMaterial));
