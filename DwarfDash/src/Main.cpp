@@ -43,7 +43,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 void setWindowFPS(GLFWwindow *window,float& t_sum);
-void processInput(GLFWwindow* window);
 void initPhysX();
 void releasePhysX();
 void stepPhysics();
@@ -87,7 +86,9 @@ bool firstMouse = true;
 // timing for fps camera 
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
-FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ); // new constructor
+
+FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
+//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
 /* --------------------------------------------- */
 // Main
@@ -164,11 +165,12 @@ int main(int argc, char** argv)
 	// set callbacks
 	//glfwSetMouseButtonCallback(window, mouse_button_callback); // not needed in fps
 	//glfwSetScrollCallback(window, scroll_callback);  // not needed in fps
-	glfwSetKeyCallback(window, key_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
+
+	glfwSetKeyCallback(window, key_callback); // only needed in fps
+	glfwSetCursorPosCallback(window, mouse_callback); // only needed in fps
 
 	// tell GLFW to capture our mouse
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// set GL defaults
 	glClearColor(0.5, 0.5, 0.5, 1);
@@ -212,6 +214,7 @@ int main(int argc, char** argv)
 			double currentFrame = glfwGetTime();
 			deltaTime = currentFrame - lastFrame;
 			lastFrame = currentFrame;
+
 			// input fps cam
 			// -----
 			processInput(window);
@@ -381,10 +384,9 @@ void setWindowFPS(GLFWwindow *window, float& t_sum)
 }
 
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL){
-	shader->use();
 
-	shader->setUniform("projection", camera.getProjectionMatrix());
-	shader->setUniform("view", camera.getViewMatrix());
+	shader->use();
+	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
@@ -425,8 +427,9 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window){
-	
+
 	glm::vec3 pos = camera.getPosition();
+	//std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		std::cout << "Pressed ESC" << std::endl;
@@ -481,8 +484,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
 	camera.ProcessMouseMovement(xoffset, yoffset);
 	
 }
-
-
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
