@@ -230,8 +230,8 @@ int main(int argc, char** argv)
 			//camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			//setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
-			setPerFrameUniforms(game->modelShader.get(), camera, dirL, pointL);
+			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
+			//setPerFrameUniforms(game->modelShader.get(), camera, dirL, pointL);
 
 			// Render
 			game->update();
@@ -387,10 +387,10 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 
 	shader->use();
 	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+	shader->setUniform("camera_world", camera.getPosition());
 
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
-
 	shader->setUniform("pointL.color", pointL.color);
 	shader->setUniform("pointL.position", pointL.position);
 	shader->setUniform("pointL.attenuation", pointL.attenuation);
