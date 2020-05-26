@@ -179,12 +179,7 @@ int main(int argc, char** argv)
 	// Initialize scene and render loop
 	/* --------------------------------------------- */
 	{
-		// FPS Camera
-		// per-frame time logic
-		// --------------------
-		double currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+
 
 		// Init PhysX
 		initPhysX();
@@ -209,6 +204,14 @@ int main(int argc, char** argv)
 		double mouse_x, mouse_y;
 
 		while (!glfwWindowShouldClose(window)) {
+
+			// FPS Camera
+			// per-frame time logic
+			// --------------------
+
+			double currentFrame = glfwGetTime();
+			deltaTime = currentFrame - lastFrame;
+			lastFrame = currentFrame;
 			// input fps cam
 			// -----
 			processInput(window);
