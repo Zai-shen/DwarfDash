@@ -42,15 +42,19 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
-void setWindowFPS(GLFWwindow *window,float& t_sum);
+void setWindowFPS(GLFWwindow *window, float& t_sum);
 void initPhysX();
 void releasePhysX();
 void stepPhysics();
+
+void setupcube();
 
 // FPS Camera
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow* window);
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
+
+
 
 
 /* --------------------------------------------- */
@@ -104,7 +108,7 @@ int main(int argc, char** argv)
 	}
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // Request OpenGL version 4.3
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Request core profile
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);  // Create an OpenGL debug context 
 	glfwWindowHint(GLFW_REFRESH_RATE, config.refresh_rate); // Set refresh rate
@@ -196,8 +200,10 @@ int main(int argc, char** argv)
 
 
 		// Initialize lights
-		PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
-		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
+		//PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
+		//DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
+
+		Shader lightCubeShader("light_cube.vert", "light_cube.frag");
 
 		std::shared_ptr<Shader> textureShader = std::make_shared<Shader>("texture.vert", "texture.frag");
 		std::shared_ptr<Texture> woodTexture = std::make_shared<Texture>("wood_texture.dds");
@@ -205,11 +211,11 @@ int main(int argc, char** argv)
 		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), woodTextureMaterial);
 
 
+		//PointLight pointL(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointL(glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(0.2f, 0.2f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
+		DirectionalLight dirL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));			  // color,  direction;
 
-		//DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(10.0f, -1.0f, -1.0f)); // color,  direction;
-		//PointLight pointL(glm::vec3(1.0f), glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
-
-
+		setupcube();
 
 		// Render loop
 		float t = float(glfwGetTime());
@@ -219,8 +225,82 @@ int main(int argc, char** argv)
 
 		//textureShader.get()->use();
 		//textureShader.get() -> setUniform("texture_diffuse", 0);
-		game->primaryShader->use();
-		game->primaryShader->setUniform("texture_diffuse", 0);
+		//game->primaryShader->use();
+		//game->primaryShader->setUniform("texture_diffuse", 0);
+
+		/*****************************************************************/
+
+			// set up vertex data (and buffer(s)) and configure vertex attributes
+			// ------------------------------------------------------------------
+		float vertices[] = {
+			-0.5f, -0.5f, -0.5f,
+			 0.5f, -0.5f, -0.5f,
+			 0.5f,  0.5f, -0.5f,
+			 0.5f,  0.5f, -0.5f,
+			-0.5f,  0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f,
+
+			-0.5f, -0.5f,  0.5f,
+			 0.5f, -0.5f,  0.5f,
+			 0.5f,  0.5f,  0.5f,
+			 0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f,  0.5f,
+			-0.5f, -0.5f,  0.5f,
+
+			-0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f,
+			-0.5f, -0.5f,  0.5f,
+			-0.5f,  0.5f,  0.5f,
+
+			 0.5f,  0.5f,  0.5f,
+			 0.5f,  0.5f, -0.5f,
+			 0.5f, -0.5f, -0.5f,
+			 0.5f, -0.5f, -0.5f,
+			 0.5f, -0.5f,  0.5f,
+			 0.5f,  0.5f,  0.5f,
+
+			-0.5f, -0.5f, -0.5f,
+			 0.5f, -0.5f, -0.5f,
+			 0.5f, -0.5f,  0.5f,
+			 0.5f, -0.5f,  0.5f,
+			-0.5f, -0.5f,  0.5f,
+			-0.5f, -0.5f, -0.5f,
+
+			-0.5f,  0.5f, -0.5f,
+			 0.5f,  0.5f, -0.5f,
+			 0.5f,  0.5f,  0.5f,
+			 0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f, -0.5f,
+		};
+
+		// first, configure the cube's VAO (and VBO)
+		unsigned int VBO, cubeVAO;
+		glGenVertexArrays(1, &cubeVAO);
+		glGenBuffers(1, &VBO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glBindVertexArray(cubeVAO);
+
+		// position attribute
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
+		unsigned int lightCubeVAO;
+		glGenVertexArrays(1, &lightCubeVAO);
+		glBindVertexArray(lightCubeVAO);
+
+		// we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+
 
 		while (!glfwWindowShouldClose(window)) {
 
@@ -248,7 +328,7 @@ int main(int argc, char** argv)
 
 			// Set per-frame uniforms
 			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
-			//setPerFrameUniforms(textureShader.get(), camera, dirL, pointL); // only used for cube
+			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL); // only used for cube
 			//setPerFrameUniforms(game->modelShader.get(), camera, dirL, pointL);
 
 			// Render
@@ -256,6 +336,19 @@ int main(int argc, char** argv)
 			game->draw();
 
 			cube.draw();
+
+			// visualize where the pointlight is
+			/***********************************/
+			lightCubeShader.use();
+			lightCubeShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, glm::vec3(5.0f, 15.0f, 10.0f));
+			model = glm::scale(model, glm::vec3(0.4f)); // a smaller cube
+			lightCubeShader.setUniform("modelMatrix", model);
+			glBindVertexArray(lightCubeVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			/***********************************/
+
 
 			//PhysX
 			stepPhysics();
@@ -267,7 +360,7 @@ int main(int argc, char** argv)
 			t_sum += dt;
 			frames++;
 
-			setWindowFPS(window,t_sum);
+			setWindowFPS(window, t_sum);
 
 			// Swap buffers
 			glfwSwapBuffers(window);
@@ -295,6 +388,11 @@ int main(int argc, char** argv)
 
 	return EXIT_SUCCESS;
 }
+
+void setupcube() {
+
+}
+
 
 void stepPhysics()
 {
@@ -338,7 +436,7 @@ void initPhysX() {
 	gCCTManager = PxCreateControllerManager(*gScene);
 	//Character Controller for Player (of type capsule)
 	PxCapsuleControllerDesc charDesc;
-		//<fill the descriptor here>
+	//<fill the descriptor here>
 	charDesc.position = PxExtendedVec3(-3.0f, 3.0f, 0.0f);
 	charDesc.height = PxF32(0.8f);
 	charDesc.radius = PxF32(0.1f);
@@ -403,7 +501,7 @@ void setWindowFPS(GLFWwindow *window, float& t_sum)
 	}
 }
 
-void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL){
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL) {
 
 	shader->use();
 	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
@@ -411,6 +509,7 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
+
 	shader->setUniform("pointL.color", pointL.color);
 	shader->setUniform("pointL.position", pointL.position);
 	shader->setUniform("pointL.attenuation", pointL.attenuation);
@@ -435,11 +534,14 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		_dragging = true;
-	} else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+	}
+	else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
 		_dragging = false;
-	} else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+	}
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
 		_strafing = true;
-	} else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+	}
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
 		_strafing = false;
 	}
 }
@@ -447,7 +549,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 // FPS Camera 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow* window){
+void processInput(GLFWwindow* window) {
 
 	glm::vec3 pos = camera.getPosition();
 	//std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
@@ -487,7 +589,7 @@ void processInput(GLFWwindow* window){
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
-void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	/*
 	if (firstMouse)
 	{
@@ -521,18 +623,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	switch (key)
 	{
-		case GLFW_KEY_ESCAPE:
-			glfwSetWindowShouldClose(window, true);
-			break;
-		case GLFW_KEY_F1:
-			config.wireframe = !config.wireframe;
-			glPolygonMode(GL_FRONT_AND_BACK, config.wireframe ? GL_LINE : GL_FILL);
-			break;
-		case GLFW_KEY_F2:
-			config.culling = !config.culling;
-			if (config.culling) glEnable(GL_CULL_FACE);
-			else glDisable(GL_CULL_FACE);
-			break;
+	case GLFW_KEY_ESCAPE:
+		glfwSetWindowShouldClose(window, true);
+		break;
+	case GLFW_KEY_F1:
+		config.wireframe = !config.wireframe;
+		glPolygonMode(GL_FRONT_AND_BACK, config.wireframe ? GL_LINE : GL_FILL);
+		break;
+	case GLFW_KEY_F2:
+		config.culling = !config.culling;
+		if (config.culling) glEnable(GL_CULL_FACE);
+		else glDisable(GL_CULL_FACE);
+		break;
 	}
 }
 

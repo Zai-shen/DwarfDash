@@ -48,6 +48,9 @@ public:
 	vector<MeshTexture> textures;
 	MeshMaterial material;
 	//unsigned int VAO;
+	float ambient;
+	float diffuse;
+	float specular;
 
 
 	//Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<MeshTexture> textures){
@@ -57,6 +60,10 @@ public:
 		this->indices = indices;
 		this->textures = textures;
 		this->material = material;
+
+		this->ambient =  0.5f;
+		this->diffuse =  1.0f;
+		this->specular = 0.8f;
 
 		// now that we have all the required data, set the vertex buffers and its attribute pointers.
 		setupMesh();
@@ -93,8 +100,8 @@ public:
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
 		}
 
-		glUniform3f(glGetUniformLocation(shader.getHandle(), "materialCoefficients"), 0.5f, 0.5f, 0.5f);
-		glUniform1f(glGetUniformLocation(shader.getHandle(), "specularAlpha"), 0.5f);
+		glUniform3f(glGetUniformLocation(shader.getHandle(), "materialCoefficients"), ambient, diffuse, specular);
+		glUniform1f(glGetUniformLocation(shader.getHandle(), "specularAlpha"), 10.0f);
 
 		// draw mesh
 		glBindVertexArray(VAO);
@@ -103,6 +110,13 @@ public:
 
 		// always good practice to set everything back to defaults once configured.
 		glActiveTexture(GL_TEXTURE0);
+	}
+
+
+	void setMaterialCoefficients(float ambient, float diffuse, float specular) {
+		this->ambient = ambient;
+		this->diffuse = diffuse;
+		this->specular = specular;
 	}
 
 private:

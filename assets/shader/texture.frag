@@ -52,10 +52,8 @@ void main() {
 	vec3 v = normalize(camera_world - vert.position_world);
 	
 	//vec3 texColor = texture(diffuseTexture, vert.uv).rgb; // ecg
-
-
-	//vec3 texColor = texture(textureUnit, vert.uv).rgb; // my own
 	vec3 texColor = texture(texture_diffuse, vert.uv).rgb; // my own
+
 
 	color = vec4(texColor * materialCoefficients.x, 1); // ambient
 	
