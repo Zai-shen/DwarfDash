@@ -104,10 +104,10 @@ void Game::initLevel2() {
 	// Dynamic model example
 	Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", modelShader);
 	Gameobject* goCoin = new Gameobject(coin);
-	PxBoxGeometry tempBackGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
+	PxBoxGeometry tempBoxGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
 	goCoin->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
 	goCoin->goPosition = PxTransform(PxVec3(0.0f, 5.0f, -10.0f)); // should be geometry.getPos
-	goCoin->goDynamicActor = PxCreateDynamic(*gPhysics, goCoin->goPosition, tempBackGeometry, *(goCoin->goMaterial), 1.0f);
+	goCoin->goDynamicActor = PxCreateDynamic(*gPhysics, goCoin->goPosition, tempBoxGeometry, *(goCoin->goMaterial), 1.0f);
 
 	gScene->addActor(*(goCoin->goDynamicActor));
 	addGameobject(goCoin);
@@ -117,7 +117,7 @@ void Game::initLevel2() {
 	Gameobject* goHeart = new Gameobject(heart);
 	goHeart->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
 	goHeart->goPosition = PxTransform(PxVec3(5.0f, 5.0f, -10.0f)); // should be geometry.getPos
-	goHeart->goDynamicActor = PxCreateDynamic(*gPhysics, goHeart->goPosition, tempBackGeometry, *(goHeart->goMaterial), 1.0f);
+	goHeart->goDynamicActor = PxCreateDynamic(*gPhysics, goHeart->goPosition, tempBoxGeometry, *(goHeart->goMaterial), 1.0f);
 
 	gScene->addActor(*(goHeart->goDynamicActor));
 	addGameobject(goHeart);
@@ -127,17 +127,20 @@ void Game::initLevel2() {
 	Gameobject* goShield = new Gameobject(shield);
 	goShield->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
 	goShield->goPosition = PxTransform(PxVec3(-5.0f, 5.0f, -10.0f)); // should be geometry.getPos
-	goShield->goDynamicActor = PxCreateDynamic(*gPhysics, goShield->goPosition, tempBackGeometry, *(goShield->goMaterial), 1.0f);
+	goShield->goDynamicActor = PxCreateDynamic(*gPhysics, goShield->goPosition, tempBoxGeometry, *(goShield->goMaterial), 1.0f);
 
 	gScene->addActor(*(goShield->goDynamicActor));
 	addGameobject(goShield);
 
 	// Static actor example
-	//Gameobject* sphere1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 15.f, 0.f)), Geometry::createSphereGeometry(64, 32, 1.0f), woodTextureMaterial));
+	Model* goal = new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", modelShader);
+	Gameobject* goGoal = new Gameobject(goal);
 	//PxSphereGeometry tempSphereGeometry(PxReal(1.0f)); //this->model
-	//sphere1->goMaterial = standardMaterial;
-	//sphere1->goPosition = PxTransform(PxVec3(0.0f, 15.0f, 0.0f)); // should be geometry.getPos
-	//sphere1->goDynamicActor = PxCreateDynamic(*gPhysics, sphere1->goPosition, tempSphereGeometry, *(sphere1->goMaterial), 1.0f);
+	goGoal->goMaterial = standardMaterial;
+	goGoal->goPosition = PxTransform(PxVec3(0.0f, 2.5f, -20.0f)); // should be geometry.getPos
+	goGoal->goActor = PxCreateStatic(*gPhysics, goGoal->goPosition, tempBoxGeometry, *(goGoal->goMaterial));
+	gScene->addActor(*(goGoal->goActor));
+	addGameobject(goGoal);
 }
 
 void Game::initLevel3() {

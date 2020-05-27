@@ -405,19 +405,19 @@ void processInput(GLFWwindow* window, float deltaTime){
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		displacement = camera.ProcessKeyboard(FORWARD, deltaTime);
+		displacement += camera.ProcessKeyboard(FORWARD, deltaTime);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		displacement = camera.ProcessKeyboard(BACKWARD, deltaTime);
+		displacement += camera.ProcessKeyboard(BACKWARD, deltaTime);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		displacement = camera.ProcessKeyboard(LEFT, deltaTime);
+		displacement += camera.ProcessKeyboard(LEFT, deltaTime);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		displacement = camera.ProcessKeyboard(RIGHT, deltaTime);
+		displacement += camera.ProcessKeyboard(RIGHT, deltaTime);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
