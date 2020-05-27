@@ -56,6 +56,7 @@ void Gameobject::draw() {
 	}
 	else if (goModel) {
 		this->goModel->_shader->setUniform("modelMatrix", this->goModel->getModelMatrix());
+		this->goModel->_shader->setUniform("normalMatrix", glm::mat3(glm::transpose(glm::inverse(this->goModel->getModelMatrix()))));
 		this->goModel->draw();	
 	}
 }

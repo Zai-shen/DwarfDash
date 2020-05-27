@@ -196,9 +196,8 @@ int main(int argc, char** argv)
 
 
 		// Initialize lights
-		//PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
-		//DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
-
+		PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
+		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
 
 		std::shared_ptr<Shader> textureShader = std::make_shared<Shader>("texture.vert", "texture.frag");
 		std::shared_ptr<Texture> woodTexture = std::make_shared<Texture>("wood_texture.dds");
@@ -207,8 +206,8 @@ int main(int argc, char** argv)
 
 
 
-		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(10.0f, -1.0f, -1.0f)); // color,  direction;
-		PointLight pointL(glm::vec3(1.0f), glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
+		//DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(10.0f, -1.0f, -1.0f)); // color,  direction;
+		//PointLight pointL(glm::vec3(1.0f), glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
 
 
 
@@ -218,7 +217,10 @@ int main(int argc, char** argv)
 		float t_sum = 0.0f;
 		double mouse_x, mouse_y;
 
-		textureShader.get() -> setUniform("texture_diffuse", 0);
+		//textureShader.get()->use();
+		//textureShader.get() -> setUniform("texture_diffuse", 0);
+		game->primaryShader->use();
+		game->primaryShader->setUniform("texture_diffuse", 0);
 
 		while (!glfwWindowShouldClose(window)) {
 
@@ -246,7 +248,7 @@ int main(int argc, char** argv)
 
 			// Set per-frame uniforms
 			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
-			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL); // only used for cube
+			//setPerFrameUniforms(textureShader.get(), camera, dirL, pointL); // only used for cube
 			//setPerFrameUniforms(game->modelShader.get(), camera, dirL, pointL);
 
 			// Render
@@ -407,8 +409,6 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 	shader->setUniform("camera_world", camera.getPosition());
 
-	shader->setUniform("texture_diffuse", 0); // test?
-
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
 	shader->setUniform("pointL.color", pointL.color);
@@ -421,8 +421,6 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 	shader->use();
 	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 	shader->setUniform("camera_world", camera.getPosition());
-
-	shader->setUniform("texture_diffuse", 0); // test?
 
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);

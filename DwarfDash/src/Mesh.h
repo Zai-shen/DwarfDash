@@ -63,8 +63,8 @@ public:
 	}
 
 	// render the mesh
-	void draw(Shader &shader)
-	{
+	void draw(Shader &shader)	{
+
 		// bind appropriate textures
 		unsigned int diffuseNr = 1;
 		unsigned int specularNr = 1;
@@ -92,6 +92,9 @@ public:
 			// and finally bind the texture
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
 		}
+
+		glUniform3f(glGetUniformLocation(shader.getHandle(), "materialCoefficients"), 0.5f, 0.5f, 0.5f);
+		glUniform1f(glGetUniformLocation(shader.getHandle(), "specularAlpha"), 0.5f);
 
 		// draw mesh
 		glBindVertexArray(VAO);
