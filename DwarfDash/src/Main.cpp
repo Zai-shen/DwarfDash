@@ -218,6 +218,8 @@ int main(int argc, char** argv)
 		float t_sum = 0.0f;
 		double mouse_x, mouse_y;
 
+		textureShader.get() -> setUniform("texture_diffuse", 0);
+
 		while (!glfwWindowShouldClose(window)) {
 
 			// FPS Camera
@@ -405,6 +407,8 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 	shader->setUniform("camera_world", camera.getPosition());
 
+	shader->setUniform("texture_diffuse", 0); // test?
+
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
 	shader->setUniform("pointL.color", pointL.color);
@@ -418,8 +422,11 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 	shader->setUniform("camera_world", camera.getPosition());
 
+	shader->setUniform("texture_diffuse", 0); // test?
+
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
+
 	shader->setUniform("pointL.color", pointL.color);
 	shader->setUniform("pointL.position", pointL.position);
 	shader->setUniform("pointL.attenuation", pointL.attenuation);

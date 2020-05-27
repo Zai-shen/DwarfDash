@@ -20,10 +20,8 @@ uniform float specularAlpha;
 uniform sampler2D diffuseTexture;
 
 // learnopengl 
-
 uniform sampler2D textureUnit; 
-
-uniform sampler2D texture_diffuse1; 
+uniform sampler2D texture_diffuse; 
 uniform sampler2D texture_specular1; 
 uniform sampler2D texture_normal1; 
 uniform sampler2D texture_height1; 
@@ -53,7 +51,12 @@ void main() {
 	vec3 n = normalize(vert.normal_world);
 	vec3 v = normalize(camera_world - vert.position_world);
 	
-	vec3 texColor = texture(diffuseTexture, vert.uv).rgb;
+	//vec3 texColor = texture(diffuseTexture, vert.uv).rgb; // ecg
+
+
+	//vec3 texColor = texture(textureUnit, vert.uv).rgb; // my own
+	vec3 texColor = texture(texture_diffuse, vert.uv).rgb; // my own
+
 	color = vec4(texColor * materialCoefficients.x, 1); // ambient
 	
 	// add directional light contribution
