@@ -179,7 +179,7 @@ int main(int argc, char** argv)
 
 
 		// Load shader(s)
-		//shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
+		shared_ptr<Shader> textureShader = make_shared<Shader>("texture.vert", "texture.frag");
 		//// Create textures
 		//shared_ptr<Texture> brickTexture = make_shared<Texture>("bricks_diffuse.dds");
 		//// Create materials
@@ -200,6 +200,9 @@ int main(int argc, char** argv)
 		float t_sum = 0.0f;
 		double mouse_x, mouse_y;
 
+		textureShader.get() -> use();
+		textureShader.get() -> setUniform("diffuseTexture", 0);
+
 		while (!glfwWindowShouldClose(window)) {
 			// Clear backbuffer
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -212,7 +215,7 @@ int main(int argc, char** argv)
 			camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			//setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
+			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
 			//setPerFrameUniforms(modelShader.get(), camera, dirL, pointL);
 
 
@@ -221,9 +224,14 @@ int main(int argc, char** argv)
 			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));		   // it's a bit too big for our scene, so scale it down
 
 			// this works with a shared pointer
-			modelShader->use();
-			modelShader->setUniform("modelMatrix", model);
-			modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+			//modelShader->use();
+			//modelShader->setUniform("modelMatrix", model);
+			//modelShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+			//backpack.draw();
+
+			textureShader->use();
+			textureShader->setUniform("modelMatrix", model);
+			textureShader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 			backpack.draw();
 
 
