@@ -19,6 +19,15 @@ uniform vec3 materialCoefficients; // x = ambient, y = diffuse, z = specular
 uniform float specularAlpha;
 uniform sampler2D diffuseTexture;
 
+// learnopengl 
+
+uniform sampler2D textureUnit; 
+
+uniform sampler2D texture_diffuse1; 
+uniform sampler2D texture_specular1; 
+uniform sampler2D texture_normal1; 
+uniform sampler2D texture_height1; 
+
 uniform struct DirectionalLight {
 	vec3 color;
 	vec3 direction;

@@ -64,7 +64,8 @@ void Game::initLevel1() {
 	gScene->addActor(*plane);
 
 
-	Model* mod1 = new Model("assets/models/plattform/plattform_normal.obj", primaryShader);
+	//Model* mod1 = new Model("assets/models/plattform/plattform_normal.obj", primaryShader);
+	Model* mod1 = new Model("assets/models/nanosuit/nanosuit.obj", primaryShader);
 	Gameobject* model1 = new Gameobject(mod1);
 	PxBoxGeometry tempBoxGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
 	model1->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);

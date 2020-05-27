@@ -132,8 +132,6 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 				indices.push_back(face.mIndices[j]);
 		}
 
-
-
 		// process materials
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 

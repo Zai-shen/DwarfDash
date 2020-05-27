@@ -87,8 +87,8 @@ bool firstMouse = true;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
-FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
-//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
+//FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
+Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
 /* --------------------------------------------- */
 // Main
@@ -163,8 +163,8 @@ int main(int argc, char** argv)
 	}
 
 	// set callbacks
-	//glfwSetMouseButtonCallback(window, mouse_button_callback); // not needed in fps
-	//glfwSetScrollCallback(window, scroll_callback);  // not needed in fps
+	glfwSetMouseButtonCallback(window, mouse_button_callback); // not needed in fps
+	glfwSetScrollCallback(window, scroll_callback);  // not needed in fps
 
 	glfwSetKeyCallback(window, key_callback); // only needed in fps
 	glfwSetCursorPosCallback(window, mouse_callback); // only needed in fps
@@ -196,8 +196,21 @@ int main(int argc, char** argv)
 
 
 		// Initialize lights
-		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f));
-		PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f));
+		//PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
+		//DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
+
+
+		std::shared_ptr<Shader> textureShader = std::make_shared<Shader>("texture.vert", "texture.frag");
+		std::shared_ptr<Texture> woodTexture = std::make_shared<Texture>("wood_texture.dds");
+		std::shared_ptr<Material> woodTextureMaterial = std::make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.1f), 2.0f, woodTexture);
+		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), woodTextureMaterial);
+
+
+
+		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(10.0f, -1.0f, -1.0f)); // color,  direction;
+		PointLight pointL(glm::vec3(1.0f), glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
+
+
 
 		// Render loop
 		float t = float(glfwGetTime());
@@ -226,16 +239,19 @@ int main(int argc, char** argv)
 			glfwPollEvents();
 
 			// Update camera
-			//glfwGetCursorPos(window, &mouse_x, &mouse_y);
-			//camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
+			glfwGetCursorPos(window, &mouse_x, &mouse_y);
+			camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
 			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
+			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL); // only used for cube
 			//setPerFrameUniforms(game->modelShader.get(), camera, dirL, pointL);
 
 			// Render
 			game->update();
 			game->draw();
+
+			cube.draw();
 
 			//PhysX
 			stepPhysics();
@@ -430,7 +446,7 @@ void processInput(GLFWwindow* window){
 
 	glm::vec3 pos = camera.getPosition();
 	//std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
-
+	/*
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		std::cout << "Pressed ESC" << std::endl;
 		glfwSetWindowShouldClose(window, true);
@@ -461,13 +477,13 @@ void processInput(GLFWwindow* window){
 		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.resetPosition();
 	}
-	
+	*/
 }
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos){
-	
+	/*
 	if (firstMouse)
 	{
 		lastX = xpos;
@@ -482,7 +498,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
 	lastY = ypos;
 
 	camera.ProcessMouseMovement(xoffset, yoffset);
-	
+	*/
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
