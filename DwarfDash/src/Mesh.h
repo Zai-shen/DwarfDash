@@ -47,7 +47,7 @@ public:
 	vector<unsigned int> indices;
 	vector<MeshTexture> textures;
 	MeshMaterial material;
-	//unsigned int VAO;
+
 	float ambient;
 	float diffuse;
 	float specular;
@@ -112,11 +112,13 @@ public:
 		glActiveTexture(GL_TEXTURE0);
 	}
 
-	// to set the values to something different thant the initial values
+	// to set the values to something different than the initial values
 	void setMaterialCoefficients(float ambient, float diffuse, float specular) {
 		this->ambient = ambient;
 		this->diffuse = diffuse;
 		this->specular = specular;
+
+		//std::cout << ambient << std::endl;
 	}
 
 private:

@@ -134,6 +134,7 @@ void Game::initLevel2() {
 
 	// Static actor example
 	Model* goal = new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader);
+	//goal->setMaterialCoefficients(10.0f, 10.0f, 10.0f);
 	Gameobject* goGoal = new Gameobject(goal);
 	//PxSphereGeometry tempSphereGeometry(PxReal(1.0f)); //this->model
 	goGoal->goMaterial = standardMaterial;

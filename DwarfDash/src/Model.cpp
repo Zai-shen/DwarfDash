@@ -256,6 +256,13 @@ unsigned int Model::TextureFromFile(const char* path, const string& directory){
 	return textureID;
 }
 
+// change the material coefficients for each mesh of the model
+void Model::setMaterialCoefficients(float ambient, float diffuse, float specular) {
+	for each(Mesh mesh in meshes) {
+		mesh.setMaterialCoefficients(ambient, diffuse, specular);
+	}
+}
+
 void Model::setModelMatrix(glm::mat4 modelMatrix) {
 	_modelMatrix = modelMatrix;
 }

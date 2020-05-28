@@ -33,7 +33,7 @@ class Model
 {
 public:
 	vector<MeshTexture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
-	vector<Mesh> meshes;
+	vector<Mesh> meshes; // stores all the meshes from a model
 	string directory;
 	bool gammaCorrection;
 
@@ -52,6 +52,7 @@ public:
 	Model(string const& path, std::shared_ptr<Shader> shader, glm::mat4 modelMatrix);
 	Model(string const& path, std::shared_ptr<Shader> shader, glm::mat4 modelMatrix, glm::vec3 position, glm::vec3 scale);
 
+
 	// draws the model, and thus all its meshes
 	void draw();
 
@@ -64,6 +65,8 @@ public:
 	void setTransformMatrix(glm::mat4 transformMatrix);
 
 	void transform(glm::mat4 transformMatrix);
+
+	void setMaterialCoefficients(float ambient, float diffuse, float specular);
 
 private:
 	void loadModel(string const& path);
