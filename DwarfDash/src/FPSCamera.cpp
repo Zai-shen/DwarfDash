@@ -43,6 +43,7 @@ FPSCamera::~FPSCamera() {
 
 }
 
+
 // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
 glm::mat4 FPSCamera::getViewMatrix() {
 	return glm::lookAt(Position, Position + Front, Up);
@@ -50,11 +51,6 @@ glm::mat4 FPSCamera::getViewMatrix() {
 
 glm::mat4 FPSCamera::getProjectionMatrix() {
 	return perspective;
-}
-
-glm::mat4 FPSCamera::getViewProjectionMatrix() {
-	updateViewMatrix(); // make sure the view matrix is updated
-	return perspective * view;
 }
 
 glm::vec3 FPSCamera::getPosition() {

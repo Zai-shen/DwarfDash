@@ -197,7 +197,6 @@ int main(int argc, char** argv)
 		double mouse_x, mouse_y;
 
 		while (!glfwWindowShouldClose(window)) {
-			// input fps cam
 			// Clear backbuffer
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

@@ -22,9 +22,7 @@ uniform mat3 normalMatrix;
 void main() {
 	vert.normal_world = normalMatrix * normal;
 	vert.uv = uv;
-
 	vec4 position_world_ = modelMatrix * vec4(position, 1);
 	vert.position_world = position_world_.xyz;
-
 	gl_Position = viewProjMatrix * position_world_;
 }

@@ -18,7 +18,6 @@ uniform vec3 camera_world;
 uniform vec3 materialCoefficients; // x = ambient, y = diffuse, z = specular 
 uniform float specularAlpha;
 uniform sampler2D diffuseTexture;
-uniform sampler2D texture_diffuse1; 
 
 uniform struct DirectionalLight {
 	vec3 color;
@@ -45,10 +44,7 @@ void main() {
 	vec3 n = normalize(vert.normal_world);
 	vec3 v = normalize(camera_world - vert.position_world);
 	
-	//vec3 texColor = texture(diffuseTexture, vert.uv).rgb; // ecg
-	vec3 texColor = texture(texture_diffuse1, vert.uv).rgb; // my own
-
-
+	vec3 texColor = texture(diffuseTexture, vert.uv).rgb;
 	color = vec4(texColor * materialCoefficients.x, 1); // ambient
 	
 	// add directional light contribution

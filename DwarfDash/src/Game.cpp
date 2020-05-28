@@ -77,8 +77,7 @@ void Game::initLevel1() {
 	//1-Creating static plane
 	createGroundPlane();
 
-	//Model* mod1 = new Model("assets/models/plattform/plattform_normal.obj", primaryShader);
-	Model* mod1 = new Model("assets/models/nanosuit/nanosuit.obj", primaryShader);
+	Model* mod1 = new Model("assets/models/backpack/backpack.obj", modelShader);
 	Gameobject* model1 = new Gameobject(mod1);
 	PxBoxGeometry tempBoxGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
 	model1->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
@@ -88,7 +87,7 @@ void Game::initLevel1() {
 	gScene->addActor(*(model1->goDynamicActor));
 	addGameobject(model1);
 
-	Model* mod2 = new Model("assets/models/plattform/plattform_torch.obj", primaryShader);
+	Model* mod2 = new Model("assets/models/nanosuit/nanosuit.obj", modelShader);
 	Gameobject* model2 = new Gameobject(mod2);
 	model2->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
 	model2->goPosition = PxTransform(PxVec3(-5.0f, 50.0f, -5.0f)); // should be geometry.getPos
