@@ -22,6 +22,7 @@ enum Camera_Movement {
 const float YAW = -90.0f; // X rotation
 const float PITCH = 0.0f; // Y rotation
 const float SPEED = 10.f; // camera speed
+const float SPEED = 10.95f; // camera speed
 const float SENSITIVITY = 0.1f; // mouse sensitivity
 const float ZOOM = 45.0f;
 
@@ -65,6 +66,8 @@ public:
 	glm::mat4 getViewMatrix();
 
 	glm::mat4 getProjectionMatrix();
+
+	glm::mat4 getViewProjectionMatrix();
 
 	glm::vec3 getPosition();
 
