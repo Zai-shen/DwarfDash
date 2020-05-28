@@ -61,9 +61,9 @@ public:
 		this->textures = textures;
 		this->material = material;
 
-		this->ambient =  0.5f;
+		this->ambient =  0.0f;
 		this->diffuse =  1.0f;
-		this->specular = 0.8f;
+		this->specular = 1.0f;
 
 		// now that we have all the required data, set the vertex buffers and its attribute pointers.
 		setupMesh();
@@ -89,9 +89,9 @@ public:
 			else if (name == "texture_specular")
 				number = std::to_string(specularNr++); // transfer unsigned int to stream
 			else if (name == "texture_normal")
-				number = std::to_string(normalNr++); // transfer unsigned int to stream
+				number = std::to_string(normalNr++); // actually Height texture according to tuwel
 			else if (name == "texture_height")
-				number = std::to_string(heightNr++); // transfer unsigned int to stream
+				number = std::to_string(heightNr++); // actually Ambient  texture according to tuwel
 
 			// now set the sampler to the correct texture unit
 			glUniform1i(glGetUniformLocation(shader.getHandle(), (name + number).c_str()), i);
@@ -112,7 +112,7 @@ public:
 		glActiveTexture(GL_TEXTURE0);
 	}
 
-
+	// to set the values to something different thant the initial values
 	void setMaterialCoefficients(float ambient, float diffuse, float specular) {
 		this->ambient = ambient;
 		this->diffuse = diffuse;

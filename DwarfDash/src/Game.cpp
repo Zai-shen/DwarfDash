@@ -66,8 +66,6 @@ void Game::initLevel1() {
 
 	//Model* mod1 = new Model("assets/models/plattform/plattform_normal.obj", primaryShader);
 	Model* mod1 = new Model("assets/models/nanosuit/nanosuit.obj", primaryShader);
-		primaryShader->use();
-		primaryShader->setUniform("materialCoefficients", glm::vec3(0.5f, 1.0f, 0.5f));
 	Gameobject* model1 = new Gameobject(mod1);
 	PxBoxGeometry tempBoxGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
 	model1->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
