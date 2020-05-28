@@ -61,7 +61,7 @@ public:
 		this->textures = textures;
 		this->material = material;
 
-		this->ambient =  0.0f;
+		this->ambient =  0.4f;
 		this->diffuse =  1.0f;
 		this->specular = 1.0f;
 
