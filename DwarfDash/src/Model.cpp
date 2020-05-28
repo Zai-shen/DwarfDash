@@ -132,8 +132,6 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 				indices.push_back(face.mIndices[j]);
 		}
 
-
-
 		// process materials
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
@@ -189,8 +187,7 @@ MeshMaterial Model::loadMaterial(aiMaterial* mat) {
 
 // checks all material textures of a given type and loads the textures if they're not loaded yet.
 // the required info is returned as a Texture struct.
-vector<MeshTexture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName)
-	{
+vector<MeshTexture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName)	{
 		vector<MeshTexture> textures;
 		for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 		{
@@ -220,8 +217,7 @@ vector<MeshTexture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType t
 		return textures;
 	}
 
-unsigned int Model::TextureFromFile(const char* path, const string& directory)
-{
+unsigned int Model::TextureFromFile(const char* path, const string& directory){
 	string filename = string(path);
 	filename = directory + '/' + filename;
 

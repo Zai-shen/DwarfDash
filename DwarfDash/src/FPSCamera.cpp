@@ -53,6 +53,11 @@ glm::mat4 FPSCamera::getProjectionMatrix() {
 	return perspective;
 }
 
+glm::mat4 FPSCamera::getViewProjectionMatrix() {
+	updateViewMatrix(); // make sure the view matrix is updated
+	return perspective * view;
+}
+
 glm::vec3 FPSCamera::getPosition() {
 	return this->Position;
 }

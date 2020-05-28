@@ -48,6 +48,9 @@ public:
 	vector<MeshTexture> textures;
 	MeshMaterial material;
 	//unsigned int VAO;
+	float ambient;
+	float diffuse;
+	float specular;
 
 
 	//Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<MeshTexture> textures){
@@ -58,13 +61,17 @@ public:
 		this->textures = textures;
 		this->material = material;
 
+		this->ambient = 0.4f;
+		this->diffuse = 1.0f;
+		this->specular = 0.8f;
+
 		// now that we have all the required data, set the vertex buffers and its attribute pointers.
 		setupMesh();
 	}
 
 	// render the mesh
-	void draw(Shader &shader)
-	{
+	void draw(Shader &shader)	{
+
 		// bind appropriate textures
 		unsigned int diffuseNr = 1;
 		unsigned int specularNr = 1;
@@ -82,9 +89,9 @@ public:
 			else if (name == "texture_specular")
 				number = std::to_string(specularNr++); // transfer unsigned int to stream
 			else if (name == "texture_normal")
-				number = std::to_string(normalNr++); // transfer unsigned int to stream
+				number = std::to_string(normalNr++); // actually Height texture according to tuwel
 			else if (name == "texture_height")
-				number = std::to_string(heightNr++); // transfer unsigned int to stream
+				number = std::to_string(heightNr++); // actually Ambient  texture according to tuwel
 
 			// now set the sampler to the correct texture unit
 			glUniform1i(glGetUniformLocation(shader.getHandle(), (name + number).c_str()), i);
@@ -93,6 +100,9 @@ public:
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
 		}
 
+		glUniform3f(glGetUniformLocation(shader.getHandle(), "materialCoefficients"), ambient, diffuse, specular);
+		glUniform1f(glGetUniformLocation(shader.getHandle(), "specularAlpha"), 10.0f);
+
 		// draw mesh
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
@@ -100,6 +110,13 @@ public:
 
 		// always good practice to set everything back to defaults once configured.
 		glActiveTexture(GL_TEXTURE0);
+	}
+
+	// to set the values to something different thant the initial values
+	void setMaterialCoefficients(float ambient, float diffuse, float specular) {
+		this->ambient = ambient;
+		this->diffuse = diffuse;
+		this->specular = specular;
 	}
 
 private:

@@ -66,6 +66,8 @@ public:
 
 	glm::mat4 getProjectionMatrix();
 
+	glm::mat4 getViewProjectionMatrix();
+
 	glm::vec3 getPosition();
 
 	glm::vec3 getFront();

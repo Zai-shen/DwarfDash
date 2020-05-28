@@ -102,7 +102,7 @@ void Game::initLevel2() {
 	createGroundPlane();
 
 	// Dynamic model example
-	Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", modelShader);
+	Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
 	Gameobject* goCoin = new Gameobject(coin);
 	PxBoxGeometry tempBoxGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
 	goCoin->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
@@ -113,7 +113,7 @@ void Game::initLevel2() {
 	addGameobject(goCoin);
 
 	// Dynamic model example
-	Model* heart = new Model("assets/models/heart/Heart_low_poly_colored.obj", modelShader);
+	Model* heart = new Model("assets/models/heart/Heart_low_poly_colored.obj", primaryShader);
 	Gameobject* goHeart = new Gameobject(heart);
 	goHeart->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
 	goHeart->goPosition = PxTransform(PxVec3(5.0f, 5.0f, -10.0f)); // should be geometry.getPos
@@ -123,7 +123,7 @@ void Game::initLevel2() {
 	addGameobject(goHeart);
 
 	// Dynamic model example
-	Model* shield = new Model("assets/models/shield/Shield_low_poly_colored.obj", modelShader);
+	Model* shield = new Model("assets/models/shield/Shield_low_poly_colored.obj", primaryShader);
 	Gameobject* goShield = new Gameobject(shield);
 	goShield->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
 	goShield->goPosition = PxTransform(PxVec3(-5.0f, 5.0f, -10.0f)); // should be geometry.getPos
@@ -133,7 +133,7 @@ void Game::initLevel2() {
 	addGameobject(goShield);
 
 	// Static actor example
-	Model* goal = new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", modelShader);
+	Model* goal = new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader);
 	Gameobject* goGoal = new Gameobject(goal);
 	//PxSphereGeometry tempSphereGeometry(PxReal(1.0f)); //this->model
 	goGoal->goMaterial = standardMaterial;
