@@ -75,7 +75,7 @@ void Game::initLevel1() {
 	gScene->addActor(*(model1->goDynamicActor));
 	addGameobject(model1);
 
-	Model* mod2 = new Model("assets/models/plattform/plattform_torch.obj", primaryShader);
+	Model* mod2 = new Model("assets/models/plattform/plattform_wood.obj", primaryShader);
 	Gameobject* model2 = new Gameobject(mod2);
 	model2->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
 	model2->goPosition = PxTransform(PxVec3(-5.0f, 50.0f, -5.0f)); // should be geometry.getPos

@@ -201,7 +201,7 @@ int main(int argc, char** argv)
 
 		// Initialize lights
 		//PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
-		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
+		//DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
 
 		Shader lightCubeShader("light_cube.vert", "light_cube.frag");
 
@@ -212,7 +212,7 @@ int main(int argc, char** argv)
 
 
 		PointLight pointL(glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(0.2f, 0.2f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
-		//DirectionalLight dirL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));			  // color,  direction;
+		DirectionalLight dirL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));			  // color,  direction;
 
 		setupcube();
 
@@ -221,6 +221,7 @@ int main(int argc, char** argv)
 		float dt = 0.0f;
 		float t_sum = 0.0f;
 		double mouse_x, mouse_y;
+
 
 		//textureShader.get()->use();
 		//textureShader.get() -> setUniform("texture_diffuse", 0);
@@ -299,6 +300,10 @@ int main(int argc, char** argv)
 
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
+
+
+
+		//textureShader.get() -> setUniform("texture_diffuse", 0);
 
 
 		while (!glfwWindowShouldClose(window)) {

@@ -14,6 +14,7 @@ in VertexData {
 out vec4 color;
 
 uniform vec3 camera_world;
+
 uniform vec3 materialCoefficients; // x = ambient, y = diffuse, z = specular 
 uniform float specularAlpha;
 
@@ -33,6 +34,7 @@ uniform struct PointLight {
 	vec3 position;
 	vec3 attenuation;
 } pointL;
+
 
 //vec3 phong(vec3 n, vec3 l, vec3 v, vec3 diffuseC, float diffuseF, vec3 specularC, float specularF, float alpha, bool attenuate, vec3 attenuation) {
 vec3 phong(vec3 n, vec3 l, vec3 v, vec3 diffuseC, float diffuseF, vec3 specularC, vec3 specularF, float alpha, bool attenuate, vec3 attenuation) {
