@@ -16,6 +16,7 @@ public:
 
 	shared_ptr<Shader> primaryShader;
 	shared_ptr<Shader> modelShader;
+	shared_ptr<Shader> lightShader;
 	shared_ptr<Material> woodTextureMaterial;
 	shared_ptr<Material> brickTextureMaterial;
 

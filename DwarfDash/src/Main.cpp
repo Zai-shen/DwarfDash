@@ -42,18 +42,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
+
 void setWindowFPS(GLFWwindow *window, float& t_sum);
 void initPhysX();
 void releasePhysX();
 void stepPhysics();
 
-void setupcube();
 
 // FPS Camera
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow* window);
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
-
+void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray);
 
 
 
@@ -211,10 +211,21 @@ int main(int argc, char** argv)
 		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), woodTextureMaterial);
 
 
-		PointLight pointL(glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(0.2f, 0.2f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
-		DirectionalLight dirL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));			  // color,  direction;
+		//PointLight pointL(glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(0.2f, 0.2f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointL(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 
-		setupcube();
+
+		DirectionalLight dirL(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.0f, 1.0f, 1.0f));			  // color,  direction;
+
+
+		std::vector<PointLight> pointlightArray = std::vector<PointLight>();
+		PointLight pointLight1 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight2 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		//PointLight pointLight3 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		pointlightArray.push_back(pointLight1);
+		pointlightArray.push_back(pointLight2);
+		//pointlightArray.push_back(pointLight3);
+
 
 		// Render loop
 		float t = float(glfwGetTime());
@@ -331,7 +342,10 @@ int main(int argc, char** argv)
 			camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
+			//setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
+			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointlightArray); // multiple pointlights
+
+
 			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL); // only used for cube
 			//setPerFrameUniforms(game->modelShader.get(), camera, dirL, pointL);
 
@@ -391,10 +405,6 @@ int main(int argc, char** argv)
 	glfwTerminate();
 
 	return EXIT_SUCCESS;
-}
-
-void setupcube() {
-
 }
 
 
@@ -517,6 +527,14 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 	shader->setUniform("pointL.color", pointL.color);
 	shader->setUniform("pointL.position", pointL.position);
 	shader->setUniform("pointL.attenuation", pointL.attenuation);
+
+	for (GLuint i = 0; i < 4; i++) {
+		string number = to_string(i);
+
+
+	}
+
+
 }
 
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL)
@@ -531,6 +549,32 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 	shader->setUniform("pointL.color", pointL.color);
 	shader->setUniform("pointL.position", pointL.position);
 	shader->setUniform("pointL.attenuation", pointL.attenuation);
+
+}
+
+// for multiple pointlights
+void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray)
+{
+	shader->use();
+	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+	shader->setUniform("camera_world", camera.getPosition());
+
+	shader->setUniform("dirL.color", dirL.color);
+	shader->setUniform("dirL.direction", dirL.direction);
+
+	// this "works" but it looks like it only draws the last pointlight
+	for (GLuint i = 0; i < pointlightArray.size(); i++) {
+		string number = std::to_string(i);
+		PointLight& pointLight = pointlightArray[i];
+
+		shader->setUniform("pointL.color", pointLight.color);
+		shader->setUniform("pointL.position", pointLight.position);
+		shader->setUniform("pointL.attenuation", pointLight.attenuation);
+		//std::cout << "pointLights[" + number + "].attenuation" << std::endl;
+		//std::cout << glm::to_string(pointLight.attenuation) << std::endl;
+
+	}
+
 }
 
 

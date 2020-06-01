@@ -34,7 +34,10 @@ uniform struct PointLight {
 	vec3 attenuation;
 } pointL;
 
-//vec3 phong(vec3 n, vec3 l, vec3 v, vec3 diffuseC, float diffuseF, vec3 specularC, float specularF, float alpha, bool attenuate, vec3 attenuation) {
+#define NR_POINT_LIGHTS 2  
+uniform PointLight pointLights[NR_POINT_LIGHTS];
+
+//vec3 phong(vec3 n, vec3 l, vec3 v, vec3 diffuseC, float diffuseF, vec3 specularC, float specularF, float alpha, bool attenuate, vec3 attenuation) { // without specular maps
 vec3 phong(vec3 n, vec3 l, vec3 v, vec3 diffuseC, float diffuseF, vec3 specularC, vec3 specularF, float alpha, bool attenuate, vec3 attenuation) {
 	float d = length(l);
 	l = normalize(l);
@@ -54,11 +57,16 @@ void main() {
 	color = vec4(texColor * materialCoefficients.x, 1); // ambient
 	
 	// add directional light contribution
-	//color.rgb += phong(n, -dirL.direction, v, dirL.color * texColor, materialCoefficients.y, dirL.color, materialCoefficients.z, specularAlpha, false, vec3(0));
+	//color.rgb += phong(n, -dirL.direction, v, dirL.color * texColor, materialCoefficients.y, dirL.color, materialCoefficients.z, specularAlpha, false, vec3(0)); // without specular maps
 	color.rgb += phong(n, -dirL.direction, v, dirL.color * texColor, materialCoefficients.y, dirL.color, vec3(texture(texture_specular1, vert.uv).rgb), specularAlpha, false, vec3(0));
 			
 	// add point light contribution
-	//color.rgb += phong(n, pointL.position - vert.position_world, v, pointL.color * texColor, materialCoefficients.y, pointL.color, materialCoefficients.z, specularAlpha, true, pointL.attenuation);
+	for(int i = 0; i <= NR_POINT_LIGHTS; i++){
+		//color.rgb += phong(n, pointLights[i].position - vert.position_world, v,  pointLights[i].color * texColor, materialCoefficients.y,  pointLights[i].color,  vec3(texture(texture_specular1, vert.uv).rgb), specularAlpha, true,  pointLights[i].attenuation);
+	}
+
+	//color.rgb += phong(n, pointL.position - vert.position_world, v, pointL.color * texColor, materialCoefficients.y, pointL.color, materialCoefficients.z, specularAlpha, true, pointL.attenuation); // without specular maps
 	color.rgb += phong(n, pointL.position - vert.position_world, v, pointL.color * texColor, materialCoefficients.y, pointL.color,  vec3(texture(texture_specular1, vert.uv).rgb), specularAlpha, true, pointL.attenuation);
+
 }
 

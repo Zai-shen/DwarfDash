@@ -23,6 +23,7 @@ void Game::init() {
 void Game::initShaders() {
 	primaryShader = make_shared<Shader>("texture.vert", "texture.frag");
 	modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
+	lightShader = make_shared<Shader>("light.vert", "light.frag");
 }
 
 void Game::initTextures() {
@@ -75,7 +76,8 @@ void Game::initLevel1() {
 	gScene->addActor(*(model1->goDynamicActor));
 	addGameobject(model1);
 
-	Model* mod2 = new Model("assets/models/plattform/plattform_wood.obj", primaryShader);
+	Model* mod2 = new Model("assets/models/plattform/plattform_brick.obj", primaryShader);
+	//Model* mod2 = new Model("assets/models/plattform/plattform.obj", primaryShader);
 	Gameobject* model2 = new Gameobject(mod2);
 	model2->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
 	model2->goPosition = PxTransform(PxVec3(-5.0f, 50.0f, -5.0f)); // should be geometry.getPos
