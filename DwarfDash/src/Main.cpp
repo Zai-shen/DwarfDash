@@ -200,7 +200,7 @@ int main(int argc, char** argv)
 
 
 		// Initialize lights
-		//PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
+		PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
 		//DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
 
 		Shader lightCubeShader("light_cube.vert", "light_cube.frag");
@@ -212,15 +212,15 @@ int main(int argc, char** argv)
 
 
 		//PointLight pointL(glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(0.2f, 0.2f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointL(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		//PointLight pointL(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 
 
-		DirectionalLight dirL(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.0f, 1.0f, 1.0f));			  // color,  direction;
-
+		//DirectionalLight dirL(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.0f, 1.0f, 1.0f));			  // color,  direction;
+		DirectionalLight dirL(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.0f, 0.0f, 0.0f));			  // color,  direction;
 
 		std::vector<PointLight> pointlightArray = std::vector<PointLight>();
-		PointLight pointLight1 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight2 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight1 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(5.0f, 25.0f, 10.0f), glm::vec3(1.0f, 0.05f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight2 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(5.0f, 10.0f, -10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		//PointLight pointLight3 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		pointlightArray.push_back(pointLight1);
 		pointlightArray.push_back(pointLight2);
@@ -360,7 +360,7 @@ int main(int argc, char** argv)
 			lightCubeShader.use();
 			lightCubeShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(5.0f, 15.0f, 10.0f));
+			model = glm::translate(model, glm::vec3(5.0f, 15.0f, 10.0f)); // position of the cube
 			model = glm::scale(model, glm::vec3(0.4f)); // a smaller cube
 			lightCubeShader.setUniform("modelMatrix", model);
 			glBindVertexArray(lightCubeVAO);
@@ -563,6 +563,7 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 	shader->setUniform("dirL.direction", dirL.direction);
 
 	// this "works" but it looks like it only draws the last pointlight
+	
 	for (GLuint i = 0; i < pointlightArray.size(); i++) {
 		string number = std::to_string(i);
 		PointLight& pointLight = pointlightArray[i];
@@ -572,8 +573,19 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 		shader->setUniform("pointL.attenuation", pointLight.attenuation);
 		//std::cout << "pointLights[" + number + "].attenuation" << std::endl;
 		//std::cout << glm::to_string(pointLight.attenuation) << std::endl;
-
 	}
+		
+
+	//for (GLuint i = 0; i < pointlightArray.size(); i++) {
+	//	string number = std::to_string(i);
+	//	PointLight& pointLight = pointlightArray[i];
+	//
+	//	shader->setUniform(("pointLights[" + number + "].color").c_str(), pointLight.color);
+	//	shader->setUniform(("pointLights[" + number + "].position").c_str(), pointLight.position);
+	//	shader->setUniform(("pointLights[" + number + "].attenuation").c_str(), pointLight.attenuation);
+	//	//std::cout << "pointLights[" + number + "].attenuation" << std::endl;
+	//	//std::cout << glm::to_string(pointLight.attenuation) << std::endl;
+	//}
 
 }
 
