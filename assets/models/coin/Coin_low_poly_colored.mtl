@@ -1,5 +1,5 @@
-# Blender MTL File: 'Coin_low_poly.blend'
-# Material Count: 2
+# Blender MTL File: 'Coin_low_poly_colored.blend'
+# Material Count: 1
 
 newmtl Material.001
 Ns 225.000000
@@ -11,11 +11,3 @@ Ni 1.450000
 d 1.000000
 illum 2
 map_Kd Coin_Color_Palette.png
-
-newmtl None
-Ns 500
-Ka 0.8 0.8 0.8
-Kd 0.8 0.8 0.8
-Ks 0.8 0.8 0.8
-d 1
-illum 2
