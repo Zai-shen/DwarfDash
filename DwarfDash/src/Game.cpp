@@ -116,7 +116,7 @@ void Game::initLevel2() {
 	Model* heart = new Model("assets/models/heart/Heart_low_poly_colored.obj", primaryShader);
 	Gameobject* goHeart = new Gameobject(heart);
 	goHeart->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-	goHeart->goPosition = PxTransform(PxVec3(5.0f, 5.0f, -10.0f)); // should be geometry.getPos
+	goHeart->goPosition = PxTransform(PxVec3(5.0f, 5.0f, -10.0f));
 	goHeart->goDynamicActor = PxCreateDynamic(*gPhysics, goHeart->goPosition, tempBoxGeometry, *(goHeart->goMaterial), 1.0f);
 
 	gScene->addActor(*(goHeart->goDynamicActor));
@@ -126,7 +126,7 @@ void Game::initLevel2() {
 	Model* shield = new Model("assets/models/shield/Shield_low_poly_colored.obj", primaryShader);
 	Gameobject* goShield = new Gameobject(shield);
 	goShield->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-	goShield->goPosition = PxTransform(PxVec3(-5.0f, 5.0f, -10.0f)); // should be geometry.getPos
+	goShield->goPosition = PxTransform(PxVec3(-5.0f, 5.0f, -10.0f)); 
 	goShield->goDynamicActor = PxCreateDynamic(*gPhysics, goShield->goPosition, tempBoxGeometry, *(goShield->goMaterial), 1.0f);
 
 	gScene->addActor(*(goShield->goDynamicActor));
@@ -136,12 +136,34 @@ void Game::initLevel2() {
 	Model* goal = new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader);
 	//goal->setMaterialCoefficients(10.0f, 10.0f, 10.0f);
 	Gameobject* goGoal = new Gameobject(goal);
-	//PxSphereGeometry tempSphereGeometry(PxReal(1.0f)); //this->model
+	//PxSphereGeometry tempSphereGeometry(PxReal(1.0f));
 	goGoal->goMaterial = standardMaterial;
-	goGoal->goPosition = PxTransform(PxVec3(0.0f, 2.5f, -20.0f)); // should be geometry.getPos
+	goGoal->goPosition = PxTransform(PxVec3(0.0f, 2.5f, -20.0f));
 	goGoal->goActor = PxCreateStatic(*gPhysics, goGoal->goPosition, tempBoxGeometry, *(goGoal->goMaterial));
+
 	gScene->addActor(*(goGoal->goActor));
 	addGameobject(goGoal);
+
+	// Static actor example
+	Model* platNorm = new Model("assets/models/plattform/plattform_normal.obj", primaryShader);
+	Gameobject* goPlatNorm = new Gameobject(platNorm);
+	PxBoxGeometry platGeometry(PxVec3(2.f, .5f, 2.f)); 
+	goPlatNorm->goMaterial = standardMaterial;
+	goPlatNorm->goPosition = PxTransform(PxVec3(-10.0f, 2.5f, -20.0f));
+	goPlatNorm->goActor = PxCreateStatic(*gPhysics, goPlatNorm->goPosition, platGeometry, *(goPlatNorm->goMaterial));
+
+	gScene->addActor(*(goPlatNorm->goActor));
+	addGameobject(goPlatNorm);
+
+	// Static actor example
+	Model* platTorch = new Model("assets/models/plattform/plattform_torch.obj", primaryShader);
+	Gameobject* goPlatTorch = new Gameobject(platTorch);
+	goPlatTorch->goMaterial = standardMaterial;
+	goPlatTorch->goPosition = PxTransform(PxVec3(-10.0f, 2.5f, -30.0f));
+	goPlatTorch->goActor = PxCreateStatic(*gPhysics, goPlatTorch->goPosition, platGeometry, *(goPlatTorch->goMaterial));
+
+	gScene->addActor(*(goPlatTorch->goActor));
+	addGameobject(goPlatTorch);
 }
 
 void Game::initLevel3() {
