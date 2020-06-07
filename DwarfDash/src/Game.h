@@ -10,6 +10,13 @@
 #include <PxPhysicsAPI.h>
 #include "Player.h"
 
+enum Direction {
+	F,
+	B,
+	L,
+	R
+};
+
 using namespace std;
 
 class Game {
@@ -66,7 +73,7 @@ private:
 	void initLevel1();
 	void initLevel2();
 	void initLevel3();
-
+	void addPlatformLine(int length, Direction direction, PxVec3 startingPosition);
 	void createGroundPlane();
 	PxMaterial* defaultMaterial;
 	PxBoxGeometry* defaultPlatGeometry;

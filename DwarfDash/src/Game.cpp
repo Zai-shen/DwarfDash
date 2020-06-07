@@ -82,13 +82,36 @@ void Game::initLevel1() {
 	// Dynamic model example
 	Gameobject* goCoin = new Gameobject(new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader));
 	
-	addGameobject(goCoin, true, PxVec3(0.0f, 5.0f, -10.0f), *defaultPickUpGeometry);
+	addGameobject(goCoin, true, PxVec3(-10.0f, 5.0f, -10.0f), *defaultPickUpGeometry);
 
 	// Static actor example
 	Gameobject* goPlatNorm = new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader));
 
 	addGameobject(goPlatNorm, false, PxVec3(-10.0f, 2.5f, .0f), *defaultPlatGeometry);
 
+	addPlatformLine(5, F, PxVec3(0.f,0.f,0.f));
+	addPlatformLine(3, L, PxVec3(0.f,0.f,-20.f));
+}
+
+void Game::addPlatformLine(int length, Direction direction, PxVec3 startingPosition) {
+	for (int i = 0; i < length; i++)
+	{
+		PxVec3 spacing(0.0f, 0.0f, 0.0f);
+		if (direction == F)
+		{
+			spacing = PxVec3(0.f, 0.f, -4.f);
+		}
+		if (direction == B) {
+			spacing = PxVec3(0.f, 0.f, 4.f);
+		}
+		if (direction == L) {
+			spacing = PxVec3(-4.f, 0.f, 0.f);
+		}
+		if (direction == R) {
+			spacing = PxVec3(4.f, 0.f, 0.f);
+		}
+		addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)), false, startingPosition + (spacing * (float)i), *defaultPlatGeometry);
+	}
 }
 
 void Game::initLevel2() {
