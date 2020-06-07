@@ -43,7 +43,7 @@ public:
 
 	void reset();
 
-	void addGameobject(Gameobject* gameObject, bool dynamic = false, PxVec3 position = PxVec3(0.f, 0.f, 0.f), PxBoxGeometry geometry = PxBoxGeometry(PxVec3(2.f, 2.f, 2.f)));
+	void addGameobject(Gameobject* gameObject, bool dynamic = false, PxVec3 position = PxVec3(0.f, 0.f, 0.f), PxGeometryHolder geometry = PxBoxGeometry(PxVec3(2.f, 2.f, 2.f)));
 
 	//void addGameobject(Gameobject* gameObject);
 

@@ -82,13 +82,13 @@ void Game::initLevel1() {
 	// Dynamic model example
 	Gameobject* goCoin = new Gameobject(new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader));
 	
-	addGameobject(goCoin, true, PxVec3(0.0f, 5.0f, -10.0f) );//, *defaultPickUpGeometry);
+	addGameobject(goCoin, true, PxVec3(0.0f, 5.0f, -10.0f), *defaultPickUpGeometry);
 
 	// Static actor example
-	Model* platNorm = new Model("assets/models/plattform/plattform_normal.obj", primaryShader);
-	Gameobject* goPlatNorm = new Gameobject(platNorm);
+	Gameobject* goPlatNorm = new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader));
 
 	addGameobject(goPlatNorm, false, PxVec3(-10.0f, 2.5f, .0f), *defaultPlatGeometry);
+
 }
 
 void Game::initLevel2() {
@@ -187,7 +187,7 @@ void Game::reset() {
 	initLevels();
 }
 
-void Game::addGameobject(Gameobject* gameObject, bool dynamic, PxVec3 position, PxBoxGeometry geometry) {
+void Game::addGameobject(Gameobject* gameObject, bool dynamic, PxVec3 position, PxGeometryHolder geometry) {
 	if (!gameObject->goMaterial) {
 		gameObject->goMaterial = defaultMaterial;
 	}
@@ -196,11 +196,11 @@ void Game::addGameobject(Gameobject* gameObject, bool dynamic, PxVec3 position, 
 
 	if (dynamic)
 	{
-		gameObject->goDynamicActor = PxCreateDynamic(*gPhysics, gameObject->goPosition, geometry, *(gameObject->goMaterial), 1.0f);
+		gameObject->goDynamicActor = PxCreateDynamic(*gPhysics, gameObject->goPosition, geometry.any(), *(gameObject->goMaterial), 1.0f);
 		gScene->addActor(*(gameObject->goDynamicActor));
 	}
 	else {
-		gameObject->goActor = PxCreateStatic(*gPhysics, gameObject->goPosition, geometry, *(gameObject->goMaterial));
+		gameObject->goActor = PxCreateStatic(*gPhysics, gameObject->goPosition, geometry.any(), *(gameObject->goMaterial));
 		gScene->addActor(*(gameObject->goActor));
 	}
 
