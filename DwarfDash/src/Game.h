@@ -43,7 +43,9 @@ public:
 
 	void reset();
 
-	void addGameobject(Gameobject* gameObject);
+	void addGameobject(Gameobject* gameObject, bool dynamic = false, PxVec3 position = PxVec3(0.f, 0.f, 0.f), PxBoxGeometry geometry = PxBoxGeometry(PxVec3(2.f, 2.f, 2.f)));
+
+	//void addGameobject(Gameobject* gameObject);
 
 	Level* getCurrentLevel();
 
@@ -52,7 +54,7 @@ private:
 	Level* level1 = new Level();
 	Level* level2 = new Level();
 	Level* level3 = new Level();
-	Level* currentLevel = level2;
+	Level* currentLevel = level1;
 
 	shared_ptr<Texture> woodTexture;
 	shared_ptr<Texture> brickTexture;
@@ -65,7 +67,8 @@ private:
 	void initLevel2();
 	void initLevel3();
 
-
 	void createGroundPlane();
-	PxMaterial* standardMaterial;
+	PxMaterial* defaultMaterial;
+	PxBoxGeometry* defaultPlatGeometry;
+	PxSphereGeometry* defaultPickUpGeometry;
 };

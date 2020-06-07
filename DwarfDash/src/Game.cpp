@@ -20,9 +20,11 @@ void Game::init() {
 	// Create materials
 	initMaterials();
 
-	// Init PhysX materials
+	// Init defaults
 		//static friction, dynamic friction, restitution
-	standardMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
+	defaultMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
+	defaultPlatGeometry = new PxBoxGeometry(PxVec3(2.f, .5f, 2.f));
+	defaultPickUpGeometry = new PxSphereGeometry(PxReal(1.5f));
 
 	// Create Geometry
 	initLevels();
@@ -67,7 +69,7 @@ void Game::createGroundPlane() {
 	PxTransform planePos = PxTransform(PxVec3(0.0f, 0,
 		0.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
 	PxRigidStatic* plane = gPhysics->createRigidStatic(planePos);
-	PxShape* shape = gPhysics->createShape(PxPlaneGeometry(), *standardMaterial);
+	PxShape* shape = gPhysics->createShape(PxPlaneGeometry(), *defaultMaterial);
 	plane->attachShape(*shape);
 	gScene->addActor(*plane);
 }
@@ -77,31 +79,21 @@ void Game::initLevel1() {
 	//1-Creating static plane
 	createGroundPlane();
 
-	Model* mod1 = new Model("assets/models/backpack/backpack.obj", modelShader);
-	Gameobject* model1 = new Gameobject(mod1);
-	PxBoxGeometry tempBoxGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
-	model1->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-	model1->goPosition = PxTransform(PxVec3(5.0f, 25.0f, 5.0f)); // should be geometry.getPos
-	model1->goDynamicActor = PxCreateDynamic(*gPhysics, model1->goPosition, tempBoxGeometry, *(model1->goMaterial), 1.0f);
+	// Dynamic model example
+	Gameobject* goCoin = new Gameobject(new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader));
+	
+	addGameobject(goCoin, true, PxVec3(0.0f, 5.0f, -10.0f) );//, *defaultPickUpGeometry);
 
-	gScene->addActor(*(model1->goDynamicActor));
-	addGameobject(model1);
+	// Static actor example
+	Model* platNorm = new Model("assets/models/plattform/plattform_normal.obj", primaryShader);
+	Gameobject* goPlatNorm = new Gameobject(platNorm);
 
-	Model* mod2 = new Model("assets/models/nanosuit/nanosuit.obj", modelShader);
-	Gameobject* model2 = new Gameobject(mod2);
-	model2->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-	model2->goPosition = PxTransform(PxVec3(-5.0f, 50.0f, -5.0f)); // should be geometry.getPos
-	model2->goDynamicActor = PxCreateDynamic(*gPhysics, model2->goPosition, tempBoxGeometry, *(model2->goMaterial), 1.0f);
-
-	gScene->addActor(*(model2->goDynamicActor));
-	addGameobject(model2);
+	addGameobject(goPlatNorm, false, PxVec3(-10.0f, 2.5f, .0f), *defaultPlatGeometry);
 }
 
 void Game::initLevel2() {
 	//1-Creating static plane
 	createGroundPlane();
-	PxBoxGeometry tempBoxGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
-
 
 	// Dynamic model example
 	Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
@@ -138,7 +130,7 @@ void Game::initLevel2() {
 	Model* goal = new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader);
 	Gameobject* goGoal = new Gameobject(goal);
 	PxBoxGeometry goalGeometry(PxVec3(7.5f, 5.f, .5f));
-	goGoal->goMaterial = standardMaterial;
+	goGoal->goMaterial = defaultMaterial;
 	goGoal->goPosition = PxTransform(PxVec3(0.0f, 5.f, -20.0f));
 	goGoal->goActor = PxCreateStatic(*gPhysics, goGoal->goPosition, goalGeometry, *(goGoal->goMaterial));
 
@@ -149,7 +141,7 @@ void Game::initLevel2() {
 	Model* platNorm = new Model("assets/models/plattform/plattform_normal.obj", primaryShader);
 	Gameobject* goPlatNorm = new Gameobject(platNorm);
 	PxBoxGeometry platGeometry(PxVec3(2.f, .5f, 2.f)); 
-	goPlatNorm->goMaterial = standardMaterial;
+	goPlatNorm->goMaterial = defaultMaterial;
 	goPlatNorm->goPosition = PxTransform(PxVec3(-10.0f, 2.5f, .0f));
 	goPlatNorm->goActor = PxCreateStatic(*gPhysics, goPlatNorm->goPosition, platGeometry, *(goPlatNorm->goMaterial));
 
@@ -159,7 +151,7 @@ void Game::initLevel2() {
 	// Static actor example
 	Model* platTorch = new Model("assets/models/plattform/plattform_torch.obj", primaryShader);
 	Gameobject* goPlatTorch = new Gameobject(platTorch);
-	goPlatTorch->goMaterial = standardMaterial;
+	goPlatTorch->goMaterial = defaultMaterial;
 	goPlatTorch->goPosition = PxTransform(PxVec3(-10.0f, 2.5f, -10.0f));
 	goPlatTorch->goActor = PxCreateStatic(*gPhysics, goPlatTorch->goPosition, platGeometry, *(goPlatTorch->goMaterial));
 
@@ -171,7 +163,7 @@ void Game::initLevel3() {
 	//Geometry no longer supported - level 3 is only a placeholder
 	Gameobject* plat1 = new Gameobject(new Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(-3.f, 5.f, 0.f)), Geometry::createCubeGeometry(1.0f, 1.0f, 1.0f), brickTextureMaterial));
 	PxBoxGeometry tempPlatGeometry(PxVec3(.5f, .5f, .5f)); //this->model
-	plat1->goMaterial = standardMaterial;
+	plat1->goMaterial = defaultMaterial;
 	plat1->goPosition = PxTransform(PxVec3(-3.0f, 5.0f, 0.0f)); // should be geometry.getPos
 	plat1->goActor = PxCreateStatic(*gPhysics, plat1->goPosition, tempPlatGeometry, *(plat1->goMaterial));
 	
@@ -195,7 +187,23 @@ void Game::reset() {
 	initLevels();
 }
 
-void Game::addGameobject(Gameobject* gameObject) {
+void Game::addGameobject(Gameobject* gameObject, bool dynamic, PxVec3 position, PxBoxGeometry geometry) {
+	if (!gameObject->goMaterial) {
+		gameObject->goMaterial = defaultMaterial;
+	}
+	
+	gameObject->goPosition = PxTransform(position);
+
+	if (dynamic)
+	{
+		gameObject->goDynamicActor = PxCreateDynamic(*gPhysics, gameObject->goPosition, geometry, *(gameObject->goMaterial), 1.0f);
+		gScene->addActor(*(gameObject->goDynamicActor));
+	}
+	else {
+		gameObject->goActor = PxCreateStatic(*gPhysics, gameObject->goPosition, geometry, *(gameObject->goMaterial));
+		gScene->addActor(*(gameObject->goActor));
+	}
+
 	currentLevel->addGameobject(gameObject);
 }
 
