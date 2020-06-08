@@ -74,6 +74,7 @@ private:
 	void initLevel2();
 	void initLevel3();
 	void addPlatformLine(int length, Direction direction, PxVec3 startingPosition);
+	void addPlatformStairs(int length, Direction direction, PxVec3 startingPosition);
 	void createGroundPlane();
 
 	float platDefaultWidth = 4.f;

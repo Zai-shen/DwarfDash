@@ -91,6 +91,7 @@ void Game::initLevel1() {
 	Gameobject* goCoin = new Gameobject(new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader));
 	addGameobject(goCoin, true, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingBack, *defaultPickUpGeometry);
 
+	addPlatformStairs(5, F, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront);
 }
 
 void Game::addPlatformLine(int length, Direction direction, PxVec3 startingPosition) {
@@ -116,6 +117,33 @@ void Game::addPlatformLine(int length, Direction direction, PxVec3 startingPosit
 		}
 		else {
 			addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)), false, startingPosition + (spacing * (float)i), *defaultPlatGeometry);
+		}
+	}
+}
+
+void Game::addPlatformStairs(int length, Direction direction, PxVec3 startingPosition) {
+	PxVec3 inclination(0.0f, 1.0f, 0.0f);
+
+	if (direction == F) {
+		inclination += platSpacingFront;
+	}
+	if (direction == B) {
+		inclination += platSpacingBack;
+	}
+	if (direction == L) {
+		inclination += platSpacingLeft;
+	}
+	if (direction == R) {
+		inclination += platSpacingRight;
+	}
+
+	for (int i = 0; i < length; i++)
+	{
+		if (i == 0) {
+			addGameobject(new Gameobject(new Model("assets/models/plattform/Platform_Torch.obj", primaryShader)), false, startingPosition + (inclination * (float)i), *defaultPlatGeometry);
+		}
+		else {
+			addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)), false, startingPosition + (inclination * (float)i), *defaultPlatGeometry);
 		}
 	}
 }
@@ -232,6 +260,7 @@ void Game::addGameobject(Gameobject* gameObject, bool dynamic, PxVec3 position, 
 		{
 			gameObject->goDynamicActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 			gameObject->goDynamicActor->setAngularVelocity(PxVec3(0.f, 2.f, 0.f));
+			gameObject->goDynamicActor->setAngularDamping(0.f);
 		}
 
 		gScene->addActor(*(gameObject->goDynamicActor));
