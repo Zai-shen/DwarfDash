@@ -79,19 +79,18 @@ void Game::initLevel1() {
 	//1-Creating static plane
 	createGroundPlane();
 
+	// Static actor example
+	//Gameobject* goPlatNorm = new Gameobject(new Model("assets/models/plattform/Platform_Torch.obj", primaryShader));
+	//addGameobject(goPlatNorm, false, PxVec3(-10.0f, 2.5f, .0f), *defaultPlatGeometry);
+
+	addPlatformLine(5, F, PxVec3(0.f,0.f,0.f));
+	addPlatformLine(3, R, 5 * platSpacingFront);
+	addPlatformLine(2, B, 5 * platSpacingFront + 3 * platSpacingRight);
+
 	// Dynamic model example
 	Gameobject* goCoin = new Gameobject(new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader));
-	
-	addGameobject(goCoin, true, PxVec3(-10.0f, 5.0f, -10.0f), *defaultPickUpGeometry);
+	addGameobject(goCoin, true, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingBack, *defaultPickUpGeometry);
 
-	// Static actor example
-	Gameobject* goPlatNorm = new Gameobject(new Model("assets/models/plattform/Platform_Torch.obj", primaryShader));
-
-	addGameobject(goPlatNorm, false, PxVec3(-10.0f, 2.5f, .0f), *defaultPlatGeometry);
-
-	//addPlatformLine(5, F, PxVec3(0.f,0.f,0.f));
-	//addPlatformLine(3, R, 5 * platSpacingFront);
-	//addPlatformLine(2, B, 5 * platSpacingFront + 3 * platSpacingRight);
 }
 
 void Game::addPlatformLine(int length, Direction direction, PxVec3 startingPosition) {
@@ -113,7 +112,7 @@ void Game::addPlatformLine(int length, Direction direction, PxVec3 startingPosit
 	for (int i = 0; i < length; i++)
 	{
 		if (i == 0) {
-			addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_torch.obj", primaryShader)), false, startingPosition + (spacing * (float)i), *defaultPlatGeometry);
+			addGameobject(new Gameobject(new Model("assets/models/plattform/Platform_Torch.obj", primaryShader)), false, startingPosition + (spacing * (float)i), *defaultPlatGeometry);
 		}
 		else {
 			addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)), false, startingPosition + (spacing * (float)i), *defaultPlatGeometry);

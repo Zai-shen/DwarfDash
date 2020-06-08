@@ -48,7 +48,7 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 void setWindowFPS(GLFWwindow *window,float& t_sum);
 void initPhysX();
 void releasePhysX();
-void stepPhysics();
+void stepPhysics(float deltaTime);
 
 // FPS Camera
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -68,6 +68,8 @@ static bool _strafing = false;
 static float _zoom = 10.0f;
 
 // PhysX
+float mAccumulator = 0.0f;
+float timeStep = 1.0f / 60.0f;
 static PxDefaultErrorCallback gDefaultErrorCallback;
 static PxDefaultAllocator gDefaultAllocatorCallback;
 static PxFoundation* gFoundation = nullptr;
@@ -214,9 +216,8 @@ int main(int argc, char** argv)
 			// Set per-frame uniforms
 			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
 
-
 			//PhysX
-			stepPhysics();
+			stepPhysics(dt);
 
 			// Render
 			game->update();
@@ -265,11 +266,17 @@ int main(int argc, char** argv)
 	return EXIT_SUCCESS;
 }
 
-void stepPhysics()
+void stepPhysics(float deltaTime)
 {
-	float timeStep = 1.0f / 60.0f;
-	gScene->simulate(timeStep);
-	gScene->fetchResults(true);
+	mAccumulator += deltaTime;
+	if (mAccumulator < timeStep) {
+		return;
+	}
+	else {
+		mAccumulator -= timeStep;
+		gScene->simulate(timeStep);
+		gScene->fetchResults(true);
+	}
 }
 
 void initPhysX() {
