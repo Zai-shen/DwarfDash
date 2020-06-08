@@ -32,7 +32,6 @@ void Gameobject::update() {
 	if (this->goActor)	{
 		transform = this->goActor->getGlobalPose();
 	}else if (this->goDynamicActor) {
-		///this->goDynamicActor->setGlobalPose();
 		transform = this->goDynamicActor->getGlobalPose();
 	}else {
 		cout << "Error - no PhysX Actor!" << endl;
@@ -54,7 +53,6 @@ void Gameobject::update() {
 		this->goGeometry->setModelMatrix(glmTransform);
 	}
 	else if (goModel) {
-		///glmTransform = glm::rotate(glmTransform, glm::radians(10.f), glm::vec3(0.f, 1.f, 0.f));
 		this->goModel->_shader->use();
 		this->goModel->setModelMatrix(glmTransform);
 		//this->goModel->_shader->setUniform("modelMatrix", this->goModel->getModelMatrix()); // this should be called right before the draw call 

@@ -226,6 +226,14 @@ void Game::addGameobject(Gameobject* gameObject, bool dynamic, PxVec3 position, 
 	if (dynamic)
 	{
 		gameObject->goDynamicActor = PxCreateDynamic(*gPhysics, gameObject->goPosition, geometry.any(), *(gameObject->goMaterial), 1.0f);
+
+		// Let dynamic spheres (no better way ATM) rotate
+		if (geometry.getType() == defaultPickUpGeometry->getType())
+		{
+			gameObject->goDynamicActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+			gameObject->goDynamicActor->setAngularVelocity(PxVec3(0.f, 2.f, 0.f));
+		}
+
 		gScene->addActor(*(gameObject->goDynamicActor));
 	}
 	else {
