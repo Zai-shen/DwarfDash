@@ -37,4 +37,5 @@ public:
 
 private:
 
+	PxVec3 kineMoveDir = PxVec3(-0.5f,0.f,0.f);
 };

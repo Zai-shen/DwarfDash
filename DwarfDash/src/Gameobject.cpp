@@ -1,4 +1,5 @@
 #include "Gameobject.h"
+#include <glm/gtx/string_cast.hpp>
 
 using namespace std;
 using namespace physx;
@@ -32,6 +33,23 @@ void Gameobject::update() {
 	if (this->goActor)	{
 		transform = this->goActor->getGlobalPose();
 	}else if (this->goDynamicActor) {
+		if (goDynamicActor->getRigidBodyFlags() & PxRigidBodyFlag::eKINEMATIC)
+		{
+			//dirty fix, hurting my eyes.
+			if (goDynamicActor->getGlobalPose().p.x < 6){
+				//x++
+				kineMoveDir = PxVec3(0.1f, 0.f, 0.f);
+				cout << "going right" << endl;
+			}
+			else if (goDynamicActor->getGlobalPose().p.x > 18) {
+				//x--
+				kineMoveDir = PxVec3(-0.1f, 0.f, 0.f);
+				cout << "going left" << endl;
+			}
+			//cout << "p.x: " << goDynamicActor->getGlobalPose().p.x << endl;
+			
+			goDynamicActor->setKinematicTarget(goDynamicActor->getGlobalPose().transform(PxTransform(kineMoveDir)));
+		}
 		transform = this->goDynamicActor->getGlobalPose();
 	}else {
 		cout << "Error - no PhysX Actor!" << endl;
@@ -48,6 +66,7 @@ void Gameobject::update() {
 	glm::vec4 v4 = glm::vec4(c4.x, c4.y, c4.z, c4.w);
 
 	glm::mat4 glmTransform = glm::mat4(v1, v2, v3, v4);
+
 	if (goGeometry)
 	{
 		this->goGeometry->setModelMatrix(glmTransform);

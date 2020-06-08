@@ -106,8 +106,15 @@ void Game::initLevel1() {
 	addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)),
 		false, 19 * platSpacingFront + 3 * platSpacingRight + platCurrentHeight, *defaultPlatGeometry);
 
+	//Moving platform
 	addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)),
-		true, 22 * platSpacingFront + 3 * platSpacingRight + platCurrentHeight, *defaultPlatGeometry);
+		true, 22 * platSpacingFront + 2 * platSpacingRight + platCurrentHeight, *defaultPlatGeometry);
+
+	addPlatformLine(3, R, 24 * platSpacingFront + 2 * platSpacingRight);
+
+	//Goal
+	addGameobject(new Gameobject(new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader)),
+		false, 24 * platSpacingFront + 3 * platSpacingRight + platCurrentHeight + PxVec3(0.f,5.f,0.f), PxBoxGeometry (PxVec3(7.5f, 5.f, .5f)));
 }
 
 void Game::addPlatformLine(int length, Direction direction, PxVec3 startingPosition) {
@@ -279,11 +286,10 @@ void Game::addGameobject(Gameobject* gameObject, bool dynamic, PxVec3 position, 
 			gameObject->goDynamicActor->setAngularVelocity(PxVec3(0.f, 2.f, 0.f));
 			gameObject->goDynamicActor->setAngularDamping(0.f);
 		}
-		// Let dynamic boxes be kinematic actors
+		// Let dynamic boxes be kinematic actors (moving platform)
 		else if (geometry.getType() == defaultPlatGeometry->getType()) {
-		//gameObject->goDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-		gameObject->goDynamicActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-		gameObject->goDynamicActor->setLinearVelocity(PxVec3(4.f, 0.f, 0.f));
+			gameObject->goDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+
 	}
 		gScene->addActor(*(gameObject->goDynamicActor));
 	}
