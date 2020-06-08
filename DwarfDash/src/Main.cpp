@@ -221,10 +221,10 @@ int main(int argc, char** argv)
 		std::vector<PointLight> pointlightArray = std::vector<PointLight>();
 		PointLight pointLight1 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(5.0f, 25.0f, 10.0f), glm::vec3(1.0f, 0.05f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		PointLight pointLight2 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(5.0f, 10.0f, -10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		//PointLight pointLight3 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight3 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(5.0f, 8.0f, -10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		pointlightArray.push_back(pointLight1);
 		pointlightArray.push_back(pointLight2);
-		//pointlightArray.push_back(pointLight3);
+		pointlightArray.push_back(pointLight3);
 
 
 		// Render loop
@@ -568,11 +568,16 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 		string number = std::to_string(i);
 		PointLight& pointLight = pointlightArray[i];
 
-		shader->setUniform("pointL.color", pointLight.color);
-		shader->setUniform("pointL.position", pointLight.position);
-		shader->setUniform("pointL.attenuation", pointLight.attenuation);
+		//shader->setUniform("pointL.color", pointLight.color);
+		//shader->setUniform("pointL.position", pointLight.position);
+		//shader->setUniform("pointL.attenuation", pointLight.attenuation);
 		//std::cout << "pointLights[" + number + "].attenuation" << std::endl;
 		//std::cout << glm::to_string(pointLight.attenuation) << std::endl;
+
+		shader->setUniformArr("pointLights", i, "color", pointLight.color);
+		shader->setUniformArr("pointLights", i, "position", pointLight.position);
+		shader->setUniformArr("pointLights", i, "attenuation", pointLight.attenuation);
+
 	}
 		
 
