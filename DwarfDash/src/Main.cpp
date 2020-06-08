@@ -214,15 +214,21 @@ int main(int argc, char** argv)
 		//PointLight pointL(glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(0.2f, 0.2f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
 		//PointLight pointL(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 
-
 		//DirectionalLight dirL(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.0f, 1.0f, 1.0f));			  // color,  direction;
 		DirectionalLight dirL(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.0f, 0.0f, 0.0f));			  // color,  direction;
 
 		std::vector<PointLight> pointlightArray = std::vector<PointLight>();
-		PointLight pointLight1 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(5.0f, 25.0f, 10.0f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight2 = PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(5.0f, 10.0f, -10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight3 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(5.0f, 8.0f, -10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight4 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(2.0f, 10.0f, -5.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+
+		glm::vec3 boxpos1 = glm::vec3(2.0f, 2.0f, 2.0f); 
+		glm::vec3 boxpos2 = glm::vec3(-2.0f, -2.0f, -2.0f);
+		glm::vec3 boxpos3 = glm::vec3(5.0f, 5.0f, 5.0f);
+		glm::vec3 boxpos4 = glm::vec3(5.0f, 5.0f, -5.0f);
+
+		//PointLight pointLight1 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(boxpos), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight1 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos1), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight2 = PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(boxpos2), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight3 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(boxpos3), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight4 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(boxpos4), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		pointlightArray.push_back(pointLight1);
 		pointlightArray.push_back(pointLight2);
 		pointlightArray.push_back(pointLight3);
@@ -355,12 +361,31 @@ int main(int argc, char** argv)
 			/***********************************/
 			lightCubeShader.use();
 			lightCubeShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(5.0f, 15.0f, 10.0f)); // position of the cube
-			model = glm::scale(model, glm::vec3(0.4f)); // a smaller cube
-			lightCubeShader.setUniform("modelMatrix", model);
-			glBindVertexArray(lightCubeVAO);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+
+			// one cube
+			//glm::mat4 model = glm::mat4(1.0f);
+			//model = glm::translate(model, boxpos); // position of the cube
+			//model = glm::scale(model, glm::vec3(0.4f)); // a smaller cube
+			//lightCubeShader.setUniform("modelMatrix", model);
+			//glBindVertexArray(lightCubeVAO);
+			//glDrawArrays(GL_TRIANGLES, 0, 36);
+			
+			// multiple cubes
+			glm::vec3 cubePositions[] = {
+				glm::vec3(boxpos1),
+				glm::vec3(boxpos2),
+				glm::vec3(boxpos3),
+				glm::vec3(boxpos4)
+			};
+			for (unsigned int i = 0; i < 5; i++)			{
+				// calculate the model matrix for each object and pass it to shader before drawing
+				glm::mat4 model = glm::mat4(1.0f);
+				model = glm::translate(model, cubePositions[i]);
+				model = glm::scale(model, glm::vec3(0.4f));
+				lightCubeShader.setUniform("modelMatrix", model);
+				glBindVertexArray(lightCubeVAO);
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+			}
 			/***********************************/
 
 

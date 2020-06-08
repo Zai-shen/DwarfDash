@@ -65,8 +65,8 @@ void Game::initLevel1() {
 	gScene->addActor(*plane);
 
 
-	//Model* mod1 = new Model("assets/models/plattform/plattform_normal.obj", primaryShader);
-	Model* mod1 = new Model("assets/models/nanosuit/nanosuit.obj", primaryShader);
+	Model* mod1 = new Model("assets/models/plattform/plattform.obj", primaryShader);
+	//Model* mod1 = new Model("assets/models/nanosuit/nanosuit.obj", primaryShader);
 	Gameobject* model1 = new Gameobject(mod1);
 	PxBoxGeometry tempBoxGeometry(PxVec3(2.5f, 2.5f, 2.5f)); //this->model
 	model1->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
@@ -76,7 +76,7 @@ void Game::initLevel1() {
 	gScene->addActor(*(model1->goDynamicActor));
 	addGameobject(model1);
 
-	Model* mod2 = new Model("assets/models/plattform/plattform_brick.obj", primaryShader);
+	Model* mod2 = new Model("assets/models/plattform/plattform_wood.obj", primaryShader);
 	//Model* mod2 = new Model("assets/models/plattform/plattform.obj", primaryShader);
 	Gameobject* model2 = new Gameobject(mod2);
 	model2->goMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
