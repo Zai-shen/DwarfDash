@@ -75,6 +75,13 @@ private:
 	void initLevel3();
 	void addPlatformLine(int length, Direction direction, PxVec3 startingPosition);
 	void createGroundPlane();
+
+	float platDefaultWidth = 4.f;
+	PxVec3 platSpacingFront = PxVec3(0.f, 0.f, -4.f);
+	PxVec3 platSpacingBack = PxVec3(0.f, 0.f, 4.f);
+	PxVec3 platSpacingLeft = PxVec3(-4.f, 0.f, 0.f);
+	PxVec3 platSpacingRight = PxVec3(4.f, 0.f, 0.f);
+
 	PxMaterial* defaultMaterial;
 	PxBoxGeometry* defaultPlatGeometry;
 	PxSphereGeometry* defaultPickUpGeometry;

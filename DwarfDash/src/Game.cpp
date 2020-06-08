@@ -23,7 +23,7 @@ void Game::init() {
 	// Init defaults
 		//static friction, dynamic friction, restitution
 	defaultMaterial = gPhysics->createMaterial(0.5, 0.5, 0.5);
-	defaultPlatGeometry = new PxBoxGeometry(PxVec3(2.f, .5f, 2.f));
+	defaultPlatGeometry = new PxBoxGeometry(PxVec3(platDefaultWidth/2, platDefaultWidth/8, platDefaultWidth/2));
 	defaultPickUpGeometry = new PxSphereGeometry(PxReal(1.5f));
 
 	// Create Geometry
@@ -85,32 +85,39 @@ void Game::initLevel1() {
 	addGameobject(goCoin, true, PxVec3(-10.0f, 5.0f, -10.0f), *defaultPickUpGeometry);
 
 	// Static actor example
-	Gameobject* goPlatNorm = new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader));
+	Gameobject* goPlatNorm = new Gameobject(new Model("assets/models/plattform/Platform_Torch.obj", primaryShader));
 
 	addGameobject(goPlatNorm, false, PxVec3(-10.0f, 2.5f, .0f), *defaultPlatGeometry);
 
-	addPlatformLine(5, F, PxVec3(0.f,0.f,0.f));
-	addPlatformLine(3, L, PxVec3(0.f,0.f,-20.f));
+	//addPlatformLine(5, F, PxVec3(0.f,0.f,0.f));
+	//addPlatformLine(3, R, 5 * platSpacingFront);
+	//addPlatformLine(2, B, 5 * platSpacingFront + 3 * platSpacingRight);
 }
 
 void Game::addPlatformLine(int length, Direction direction, PxVec3 startingPosition) {
+	PxVec3 spacing(0.0f, 0.0f, 0.0f);
+	
+	if (direction == F){
+		spacing = platSpacingFront;
+	}
+	if (direction == B) {
+		spacing = platSpacingBack;
+	}
+	if (direction == L) {
+		spacing = platSpacingLeft;
+	}
+	if (direction == R) {
+		spacing = platSpacingRight;
+	}
+
 	for (int i = 0; i < length; i++)
 	{
-		PxVec3 spacing(0.0f, 0.0f, 0.0f);
-		if (direction == F)
-		{
-			spacing = PxVec3(0.f, 0.f, -4.f);
+		if (i == 0) {
+			addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_torch.obj", primaryShader)), false, startingPosition + (spacing * (float)i), *defaultPlatGeometry);
 		}
-		if (direction == B) {
-			spacing = PxVec3(0.f, 0.f, 4.f);
+		else {
+			addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)), false, startingPosition + (spacing * (float)i), *defaultPlatGeometry);
 		}
-		if (direction == L) {
-			spacing = PxVec3(-4.f, 0.f, 0.f);
-		}
-		if (direction == R) {
-			spacing = PxVec3(4.f, 0.f, 0.f);
-		}
-		addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)), false, startingPosition + (spacing * (float)i), *defaultPlatGeometry);
 	}
 }
 
