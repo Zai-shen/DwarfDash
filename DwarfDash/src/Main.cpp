@@ -219,12 +219,14 @@ int main(int argc, char** argv)
 		DirectionalLight dirL(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.0f, 0.0f, 0.0f));			  // color,  direction;
 
 		std::vector<PointLight> pointlightArray = std::vector<PointLight>();
-		PointLight pointLight1 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(5.0f, 25.0f, 10.0f), glm::vec3(1.0f, 0.05f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight2 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(5.0f, 10.0f, -10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight3 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(5.0f, 8.0f, -10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight1 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(5.0f, 25.0f, 10.0f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight2 = PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(5.0f, 10.0f, -10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight3 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(5.0f, 8.0f, -10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight4 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(2.0f, 10.0f, -5.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		pointlightArray.push_back(pointLight1);
 		pointlightArray.push_back(pointLight2);
 		pointlightArray.push_back(pointLight3);
+		pointlightArray.push_back(pointLight4);
 
 
 		// Render loop
@@ -345,15 +347,9 @@ int main(int argc, char** argv)
 			//setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
 			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointlightArray); // multiple pointlights
 
-
-			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL); // only used for cube
-			//setPerFrameUniforms(game->modelShader.get(), camera, dirL, pointL);
-
 			// Render
 			game->update();
 			game->draw();
-
-			cube.draw();
 
 			// visualize where the pointlight is
 			/***********************************/
@@ -562,17 +558,10 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
 
-	// this "works" but it looks like it only draws the last pointlight
-	
+	// iterate over all the pointlights	
 	for (GLuint i = 0; i < pointlightArray.size(); i++) {
 		string number = std::to_string(i);
 		PointLight& pointLight = pointlightArray[i];
-
-		//shader->setUniform("pointL.color", pointLight.color);
-		//shader->setUniform("pointL.position", pointLight.position);
-		//shader->setUniform("pointL.attenuation", pointLight.attenuation);
-		//std::cout << "pointLights[" + number + "].attenuation" << std::endl;
-		//std::cout << glm::to_string(pointLight.attenuation) << std::endl;
 
 		shader->setUniformArr("pointLights", i, "color", pointLight.color);
 		shader->setUniformArr("pointLights", i, "position", pointLight.position);
@@ -580,18 +569,6 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 
 	}
 		
-
-	//for (GLuint i = 0; i < pointlightArray.size(); i++) {
-	//	string number = std::to_string(i);
-	//	PointLight& pointLight = pointlightArray[i];
-	//
-	//	shader->setUniform(("pointLights[" + number + "].color").c_str(), pointLight.color);
-	//	shader->setUniform(("pointLights[" + number + "].position").c_str(), pointLight.position);
-	//	shader->setUniform(("pointLights[" + number + "].attenuation").c_str(), pointLight.attenuation);
-	//	//std::cout << "pointLights[" + number + "].attenuation" << std::endl;
-	//	//std::cout << glm::to_string(pointLight.attenuation) << std::endl;
-	//}
-
 }
 
 
