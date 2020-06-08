@@ -76,6 +76,7 @@ static PxFoundation* gFoundation = nullptr;
 static PxPhysics* gPhysics = nullptr;
 static PxScene* gScene = nullptr;
 static PxPvd* gPvd = nullptr;
+static PxCudaContextManager* gCudaContextManager = NULL;
 
 // Game
 Game* game = new Game();
@@ -303,12 +304,20 @@ void initPhysX() {
 		exit(1);
 	}
 
-	//Creating scene
+	//Creating scene with GPU support (Only for CUDA->Nvidia)
+	PxCudaContextManagerDesc cudaContextManagerDesc;
+
+	gCudaContextManager = PxCreateCudaContextManager(*gFoundation, cudaContextManagerDesc, PxGetProfilerCallback());
+
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
+	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(4);
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.cudaContextManager = gCudaContextManager;
+
 	sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
+	sceneDesc.flags |= PxSceneFlag::eENABLE_GPU_DYNAMICS;
+	sceneDesc.broadPhaseType = PxBroadPhaseType::eGPU;
 
 	gScene = gPhysics->createScene(sceneDesc);
 

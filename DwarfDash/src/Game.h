@@ -77,6 +77,8 @@ private:
 	void addPlatformStairs(int length, Direction direction, PxVec3 startingPosition);
 	void createGroundPlane();
 
+	PxVec3 platCurrentHeight = PxVec3(0.f,0.f,0.f);
+	PxVec3 inclination = PxVec3(0.f, 1.f, 0.f);
 	float platDefaultWidth = 4.f;
 	PxVec3 platSpacingFront = PxVec3(0.f, 0.f, -4.f);
 	PxVec3 platSpacingBack = PxVec3(0.f, 0.f, 4.f);

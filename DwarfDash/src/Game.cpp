@@ -92,58 +92,75 @@ void Game::initLevel1() {
 	addGameobject(goCoin, true, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingBack, *defaultPickUpGeometry);
 
 	addPlatformStairs(5, F, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront);
+	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft);
+	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft + 1 * platSpacingFront);
+	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft + 2 * platSpacingFront);
+	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft + 3 * platSpacingFront);
+
+	addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)),
+		false, 15 * platSpacingFront + 3 * platSpacingRight + platCurrentHeight, *defaultPlatGeometry);
+
+	addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)),
+		false, 17 * platSpacingFront + 3 * platSpacingRight + platCurrentHeight, *defaultPlatGeometry);
+
+	addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)),
+		false, 19 * platSpacingFront + 3 * platSpacingRight + platCurrentHeight, *defaultPlatGeometry);
+
+	addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)),
+		true, 22 * platSpacingFront + 3 * platSpacingRight + platCurrentHeight, *defaultPlatGeometry);
 }
 
 void Game::addPlatformLine(int length, Direction direction, PxVec3 startingPosition) {
-	PxVec3 spacing(0.0f, 0.0f, 0.0f);
+	PxVec3 spacing = PxVec3(0.f,0.f,0.f);
 	
 	if (direction == F){
-		spacing = platSpacingFront;
+		spacing += platSpacingFront;
 	}
 	if (direction == B) {
-		spacing = platSpacingBack;
+		spacing += platSpacingBack;
 	}
 	if (direction == L) {
-		spacing = platSpacingLeft;
+		spacing += platSpacingLeft;
 	}
 	if (direction == R) {
-		spacing = platSpacingRight;
+		spacing += platSpacingRight;
 	}
 
 	for (int i = 0; i < length; i++)
 	{
 		if (i == 0) {
-			addGameobject(new Gameobject(new Model("assets/models/plattform/Platform_Torch.obj", primaryShader)), false, startingPosition + (spacing * (float)i), *defaultPlatGeometry);
+			addGameobject(new Gameobject(new Model("assets/models/plattform/Platform_Torch.obj", primaryShader)), false, startingPosition + platCurrentHeight + (spacing * (float)i), *defaultPlatGeometry);
 		}
 		else {
-			addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)), false, startingPosition + (spacing * (float)i), *defaultPlatGeometry);
+			addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)), false, startingPosition + platCurrentHeight + (spacing * (float)i), *defaultPlatGeometry);
 		}
 	}
 }
 
 void Game::addPlatformStairs(int length, Direction direction, PxVec3 startingPosition) {
-	PxVec3 inclination(0.0f, 1.0f, 0.0f);
+	PxVec3 spacing = platCurrentHeight;
 
 	if (direction == F) {
-		inclination += platSpacingFront;
+		spacing += platSpacingFront;
 	}
 	if (direction == B) {
-		inclination += platSpacingBack;
+		spacing += platSpacingBack;
 	}
 	if (direction == L) {
-		inclination += platSpacingLeft;
+		spacing += platSpacingLeft;
 	}
 	if (direction == R) {
-		inclination += platSpacingRight;
+		spacing += platSpacingRight;
 	}
 
 	for (int i = 0; i < length; i++)
 	{
 		if (i == 0) {
-			addGameobject(new Gameobject(new Model("assets/models/plattform/Platform_Torch.obj", primaryShader)), false, startingPosition + (inclination * (float)i), *defaultPlatGeometry);
+			addGameobject(new Gameobject(new Model("assets/models/plattform/Platform_Torch.obj", primaryShader)), false, startingPosition + platCurrentHeight + (spacing * (float)i), *defaultPlatGeometry);
 		}
 		else {
-			addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)), false, startingPosition + (inclination * (float)i), *defaultPlatGeometry);
+			platCurrentHeight += inclination;
+			addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)), false, startingPosition + platCurrentHeight + (spacing * (float)i), *defaultPlatGeometry);
 		}
 	}
 }
@@ -262,7 +279,12 @@ void Game::addGameobject(Gameobject* gameObject, bool dynamic, PxVec3 position, 
 			gameObject->goDynamicActor->setAngularVelocity(PxVec3(0.f, 2.f, 0.f));
 			gameObject->goDynamicActor->setAngularDamping(0.f);
 		}
-
+		// Let dynamic boxes be kinematic actors
+		else if (geometry.getType() == defaultPlatGeometry->getType()) {
+		//gameObject->goDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+		gameObject->goDynamicActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+		gameObject->goDynamicActor->setLinearVelocity(PxVec3(4.f, 0.f, 0.f));
+	}
 		gScene->addActor(*(gameObject->goDynamicActor));
 	}
 	else {
