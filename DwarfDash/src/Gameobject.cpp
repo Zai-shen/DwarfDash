@@ -37,14 +37,10 @@ void Gameobject::update() {
 		{
 			//dirty fix, hurting my eyes.
 			if (goDynamicActor->getGlobalPose().p.x < 6){
-				//x++
 				kineMoveDir = PxVec3(0.1f, 0.f, 0.f);
-				cout << "going right" << endl;
 			}
 			else if (goDynamicActor->getGlobalPose().p.x > 18) {
-				//x--
 				kineMoveDir = PxVec3(-0.1f, 0.f, 0.f);
-				cout << "going left" << endl;
 			}
 			//cout << "p.x: " << goDynamicActor->getGlobalPose().p.x << endl;
 			

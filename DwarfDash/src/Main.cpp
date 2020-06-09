@@ -444,10 +444,22 @@ void processInput(GLFWwindow* window, float deltaTime){
 		std::cout << "Camera Position: " + glm::to_string(camera.getPosition()) << std::endl;
 		camera.resetPosition();
 	}
-	
+
+	//Movespeed fix while afloat
+	if (displacement != glm::vec3(0.f,0.f,0.f))
+	{
+		displacement = glm::vec3(displacement.x, 0.f, displacement.z);
+		//cout << glm::to_string(displacement) << endl;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+		cout << "To implement: reset game" << endl;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 		game->player->wantsToJump(deltaTime);
 	}
+
 
 	game->player->jump(deltaTime);
 
