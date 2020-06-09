@@ -55,7 +55,7 @@ Player::Player(PxPhysics* gPhysics, PxScene* gScene) {
 }
 
 Player::~Player() {
-	cout << "destroying player variables" << endl;
+	//cout << "destroying player variables" << endl;
 	gPlayerController->release();
 	gCCTManager->release();
 }

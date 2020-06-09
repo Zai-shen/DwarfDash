@@ -16,7 +16,7 @@ Gameobject::Gameobject(Model* model) {
 }
 
 Gameobject::~Gameobject() {
-	cout << "destroying gameobject variables" << endl;
+	//cout << "destroying gameobject variables" << endl;
 	if (this->goActor && this->goActor->isReleasable()) {
 		goActor->release();
 	}

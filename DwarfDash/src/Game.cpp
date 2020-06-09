@@ -5,7 +5,7 @@ using namespace std;
 Game::Game() {}
 
 Game::~Game() {
-	cout << "destroying game variables" << endl;
+	//cout << "destroying game variables" << endl;
 	player->~Player();
 	currentLevel->~Level();
 }
@@ -81,23 +81,19 @@ void Game::initLevel1() {
 	//1-Creating static plane
 	createGroundPlane();
 
-	// Static actor example
-	//Gameobject* goPlatNorm = new Gameobject(new Model("assets/models/plattform/Platform_Torch.obj", primaryShader));
-	//addGameobject(goPlatNorm, false, PxVec3(-10.0f, 2.5f, .0f), *defaultPlatGeometry);
-
-	//addPlatformLine(5, F, PxVec3(0.f,0.f,0.f));
+	addPlatformLine(5, F, PxVec3(0.f,0.f,0.f));
 	addPlatformLine(3, R, 5 * platSpacingFront);
-	//addPlatformLine(2, B, 5 * platSpacingFront + 3 * platSpacingRight);
+	addPlatformLine(2, B, 5 * platSpacingFront + 3 * platSpacingRight);
 
 	// Dynamic model example
 	Gameobject* goCoin = new Gameobject(new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader));
 	addGameobject(goCoin, true, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingBack, *defaultPickUpGeometry, "coin");
 
-	///addPlatformStairs(5, F, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront);
-	///addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft);
-	///addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft + 1 * platSpacingFront);
-	///addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft + 2 * platSpacingFront);
-	///addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft + 3 * platSpacingFront);
+	addPlatformStairs(5, F, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront);
+	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft);
+	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft + 1 * platSpacingFront);
+	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft + 2 * platSpacingFront);
+	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft + 3 * platSpacingFront);
 
 	addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)),
 		false, 15 * platSpacingFront + 3 * platSpacingRight + platCurrentHeight, *defaultPlatGeometry);
