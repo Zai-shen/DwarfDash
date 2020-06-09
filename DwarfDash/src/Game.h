@@ -46,11 +46,14 @@ public:
 
 	void update();
 
+	Level* nextLevel();
+
 	void draw();
 
 	void reset();
 
-	void addGameobject(Gameobject* gameObject, bool dynamic = false, PxVec3 position = PxVec3(0.f, 0.f, 0.f), PxGeometryHolder geometry = PxBoxGeometry(PxVec3(2.f, 2.f, 2.f)));
+	void addGameobject(Gameobject* gameObject, bool dynamic = false, PxVec3 position = PxVec3(0.f, 0.f, 0.f),
+		PxGeometryHolder geometry = PxBoxGeometry(PxVec3(2.f, 2.f, 2.f)), const char* name = "noName");
 
 	//void addGameobject(Gameobject* gameObject);
 

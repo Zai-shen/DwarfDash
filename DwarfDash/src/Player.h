@@ -12,6 +12,9 @@ class Player {
 
 public:
 
+	static int score;
+	static bool hasWon;
+
 	PxPhysics* gPhysics;
 	PxScene* gScene;
 	PxControllerManager* gCCTManager = nullptr;
@@ -25,6 +28,8 @@ public:
 	~Player();
 
 	void init();
+
+	void setToStartPosition();
 
 	void update();
 

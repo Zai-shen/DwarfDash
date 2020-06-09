@@ -17,10 +17,10 @@ Gameobject::Gameobject(Model* model) {
 
 Gameobject::~Gameobject() {
 	cout << "destroying gameobject variables" << endl;
-	if (this->goActor) {
+	if (this->goActor && this->goActor->isReleasable()) {
 		goActor->release();
 	}
-	else if (this->goDynamicActor) {
+	else if (this->goDynamicActor && this->goDynamicActor->isReleasable()) {
 		goDynamicActor->release();
 	}
 }
@@ -49,6 +49,7 @@ void Gameobject::update() {
 		transform = this->goDynamicActor->getGlobalPose();
 	}else {
 		cout << "Error - no PhysX Actor!" << endl;
+		//this->~Gameobject();
 		return;
 	}
 	PxVec4 c1 = transform.column0;

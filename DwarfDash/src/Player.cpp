@@ -3,9 +3,50 @@
 using namespace std;
 using namespace physx;
 
+int Player::score = 0;
+bool Player::hasWon = false;
+
+class UserControllerHitReport : public PxUserControllerHitReport
+{
+	void onShapeHit(const PxControllerShapeHit &hit)
+	{
+		//std::cout << "player hit a shape at position: " << hit.actor->getGlobalPose().p.x << " " << hit.actor->getGlobalPose().p.y << " " << hit.actor->getGlobalPose().p.z << std::endl;
+		if (hit.actor->getName() == "coin" || hit.actor->getName() == "heart" || hit.actor->getName() == "shield")
+		{
+			//+score
+			if (hit.actor->getName() == "coin")
+			{
+				Player::score += 1;
+			}
+
+			//release actor
+			if (hit.actor->isReleasable()) {
+				hit.actor->setGlobalPose(PxTransform(PxVec3(-150.f,0.f,150.f)),false);
+				//hit.actor->release();
+			}
+		}
+
+		if (hit.actor->getName() == "goal")
+		{
+			//set game to won / next level
+			Player::hasWon = true;
+		}
+	};
+
+	void onControllerHit(const PxControllersHit &hit)
+	{
+		std::cout << "player hit a controller" << std::endl;
+	};
+
+	void onObstacleHit(const PxControllerObstacleHit &hit)
+	{
+		std::cout << "player hit an obstacle" << std::endl;
+	};
+};
+
+UserControllerHitReport controllerHitReport;
 
 Player::Player() {}
-
 
 Player::Player(PxPhysics* gPhysics, PxScene* gScene) {
 	this->gPhysics = gPhysics;
@@ -20,6 +61,8 @@ Player::~Player() {
 }
 
 void Player::init() {
+
+
 	//Creating Character Controller Manager
 	gCCTManager = PxCreateControllerManager(*gScene);
 
@@ -35,8 +78,14 @@ void Player::init() {
 	charDesc.slopeLimit = cosf(glm::radians(45.0f)); // max slope to walk
 	charDesc.upDirection = PxVec3(0.f, 1.f, 0.f); // Specifies the 'up' direction
 	charDesc.material = gPhysics->createMaterial(0.1f, 0.1f, 0.1f);
+	charDesc.reportCallback = &controllerHitReport;
+
 
 	gPlayerController = gCCTManager->createController(charDesc);
+}
+
+void Player::setToStartPosition() {
+	gPlayerController->setPosition(pStartPos);
 }
 
 void Player::update() {
