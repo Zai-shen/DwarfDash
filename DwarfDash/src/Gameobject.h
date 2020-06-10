@@ -12,6 +12,7 @@ class Gameobject {
 public:
 	PxMaterial* goMaterial;
 	PxTransform goPosition;
+	PxTransform goStartPosition;
 	PxRigidStatic* goActor;
 	PxRigidDynamic* goDynamicActor;
 	Geometry* goGeometry;

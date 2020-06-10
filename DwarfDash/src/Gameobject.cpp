@@ -90,4 +90,11 @@ void Gameobject::draw() {
 }
 
 void Gameobject::reset() {
+	if (this->goActor)
+	{
+		this->goActor->setGlobalPose(goStartPosition);
+	}
+	else if (this->goDynamicActor) {
+		this->goDynamicActor->setGlobalPose(goStartPosition);
+	}
 }

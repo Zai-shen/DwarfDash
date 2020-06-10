@@ -449,11 +449,10 @@ void processInput(GLFWwindow* window, float deltaTime){
 	if (displacement != glm::vec3(0.f,0.f,0.f))
 	{
 		displacement = glm::vec3(displacement.x, 0.f, displacement.z);
-		//cout << glm::to_string(displacement) << endl;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-		cout << "To implement: reset game" << endl;
+		game->reset();
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {

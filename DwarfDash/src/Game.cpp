@@ -8,6 +8,7 @@ Game::~Game() {
 	//cout << "destroying game variables" << endl;
 	player->~Player();
 	currentLevel->~Level();
+	ground->release();
 }
 
 void Game::init() {
@@ -65,18 +66,6 @@ void Game::initLevels() {
 	}
 }
 
-void Game::createGroundPlane() {
-	PxTransform planePos = PxTransform(PxVec3(0.0f, 0,
-		0.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
-	PxRigidStatic* plane = gPhysics->createRigidStatic(planePos);
-	PxShape* shape = gPhysics->createShape(PxPlaneGeometry(), *defaultMaterial);
-	shape->setName("ground");
-	plane->setName("ground");
-	plane->attachShape(*shape);
-	gScene->addActor(*plane);
-}
-
-
 void Game::initLevel1() {
 	//1-Creating static plane
 	createGroundPlane();
@@ -117,6 +106,56 @@ void Game::initLevel1() {
 	//Death cloud
 	addGameobject(new Gameobject(new Model("assets/models/cloud/cloud.obj", primaryShader)),
 		true, 5 * platSpacingBack + PxVec3(0,6,0), PxBoxGeometry(PxVec3(50.f, 5.f, 2.5f)), "cloud");
+}
+
+void Game::initLevel2() {
+	// Dynamic model example
+	Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
+	Gameobject* goCoin = new Gameobject(coin);
+	addGameobject(goCoin, true, PxVec3(0.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "coin");
+
+	// Dynamic model example
+	Model* heart = new Model("assets/models/heart/Heart_low_poly_colored.obj", primaryShader);
+	Gameobject* goHeart = new Gameobject(heart);
+	addGameobject(goHeart, true, PxVec3(5.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "heart");
+
+	// Dynamic model example
+	Model* shield = new Model("assets/models/shield/Shield_low_poly_colored.obj", primaryShader);
+	Gameobject* goShield = new Gameobject(shield);
+	addGameobject(goShield, true, PxVec3(-5.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "shield");
+
+	// Static actor example
+	Model* goal = new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader);
+	Gameobject* goGoal = new Gameobject(goal);
+	addGameobject(goGoal, false, PxVec3(0.0f, 5.f, -20.0f), PxBoxGeometry(PxVec3(7.5f, 5.f, .5f)), "goal");
+
+	// Static actor example
+	Model* platNorm = new Model("assets/models/plattform/plattform_normal.obj", primaryShader);
+	Gameobject* goPlatNorm = new Gameobject(platNorm);
+	addGameobject(goPlatNorm, false, PxVec3(-10.0f, 2.5f, .0f), *defaultPlatGeometry, "platformNormal");
+
+	// Static actor example
+	Model* platTorch = new Model("assets/models/plattform/Platform_Torch.obj", primaryShader);
+	Gameobject* goPlatTorch = new Gameobject(platTorch);
+	addGameobject(goPlatTorch, false, PxVec3(-10.0f, 2.5f, -10.0f), *defaultPlatGeometry, "platformTorch");
+}
+
+void Game::initLevel3() {
+	addPlatformLine(50, F, PxVec3(0));
+
+	Gameobject* goGoal = new Gameobject(new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader));
+	addGameobject(goGoal, false, 50 * platSpacingFront, PxBoxGeometry(PxVec3(7.5f, 5.f, .5f)), "goal");
+}
+
+void Game::createGroundPlane() {
+	PxTransform planePos = PxTransform(PxVec3(0.0f, 0,
+		0.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
+	ground = gPhysics->createRigidStatic(planePos);
+	PxShape* shape = gPhysics->createShape(PxPlaneGeometry(), *defaultMaterial);
+	shape->setName("ground");
+	ground->setName("ground");
+	ground->attachShape(*shape);
+	gScene->addActor(*ground);
 }
 
 void Game::addPlatformLine(int length, Direction direction, PxVec3 startingPosition) {
@@ -178,46 +217,6 @@ void Game::addPlatformStairs(int length, Direction direction, PxVec3 startingPos
 	}
 }
 
-void Game::initLevel2() {
-	// Dynamic model example
-	Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
-	Gameobject* goCoin = new Gameobject(coin);
-	addGameobject(goCoin, true, PxVec3(0.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "coin");
-
-	// Dynamic model example
-	Model* heart = new Model("assets/models/heart/Heart_low_poly_colored.obj", primaryShader);
-	Gameobject* goHeart = new Gameobject(heart);
-	addGameobject(goHeart, true, PxVec3(5.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "heart");
-
-	// Dynamic model example
-	Model* shield = new Model("assets/models/shield/Shield_low_poly_colored.obj", primaryShader);
-	Gameobject* goShield = new Gameobject(shield);
-	addGameobject(goShield, true, PxVec3(-5.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "shield");
-
-	// Static actor example
-	Model* goal = new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader);
-	Gameobject* goGoal = new Gameobject(goal);
-	addGameobject(goGoal, false, PxVec3(0.0f, 5.f, -20.0f), PxBoxGeometry(PxVec3(7.5f, 5.f, .5f)), "goal");
-
-	// Static actor example
-	Model* platNorm = new Model("assets/models/plattform/plattform_normal.obj", primaryShader);
-	Gameobject* goPlatNorm = new Gameobject(platNorm);
-	addGameobject(goPlatNorm, false, PxVec3(-10.0f, 2.5f, .0f), *defaultPlatGeometry, "platformNormal");
-
-	// Static actor example
-	Model* platTorch = new Model("assets/models/plattform/Platform_Torch.obj", primaryShader);
-	Gameobject* goPlatTorch = new Gameobject(platTorch);
-	addGameobject(goPlatTorch, false, PxVec3(-10.0f, 2.5f, -10.0f), *defaultPlatGeometry, "platformTorch");
-}
-
-void Game::initLevel3() {
-	addPlatformLine(50, F, PxVec3(0));
-
-	Gameobject* goGoal = new Gameobject(new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader));
-	addGameobject(goGoal, false, 50 * platSpacingFront , PxBoxGeometry(PxVec3(7.5f, 5.f, .5f)), "goal");
-}
-
-
 void Game::update(float dt) {
 	currentLevel->update(dt);
 	player->update(dt);
@@ -247,20 +246,6 @@ void Game::update(float dt) {
 	}
 }
 
-Level* Game::nextLevel() {
-	if (currentLevel == level1)
-	{
-		return level2;
-	}
-	else if (currentLevel = level2) {
-		return level3;
-	}
-	else if (currentLevel = level3){
-		cout << "Congratulations! You won the entire game!" << endl;
-		return level1;
-	}
-}
-
 void Game::draw() {
 	currentLevel->draw();
 	player->draw();
@@ -269,9 +254,9 @@ void Game::draw() {
 void Game::reset() {
 	platCurrentHeight = PxVec3(0.0f);
 	player->reset();
-	currentLevel->~Level();
-	currentLevel = nextLevel(); // should be level 1 but doesnt work
-	initLevels();
+	currentLevel->reset();
+	//currentLevel->~Level();
+	//initLevels();
 }
 
 void Game::addGameobject(Gameobject* gameObject, bool dynamic, PxVec3 position, PxGeometryHolder geometry, const char* name) {
@@ -280,6 +265,7 @@ void Game::addGameobject(Gameobject* gameObject, bool dynamic, PxVec3 position, 
 	}
 	
 	gameObject->goPosition = PxTransform(position);
+	gameObject->goStartPosition = PxTransform(position);
 
 	if (dynamic)
 	{
@@ -316,4 +302,18 @@ void Game::addGameobject(Gameobject* gameObject, bool dynamic, PxVec3 position, 
 
 Level* Game::getCurrentLevel() {
 	return this->currentLevel;
+}
+
+Level* Game::nextLevel() {
+	if (currentLevel == level1)
+	{
+		return level2;
+	}
+	else if (currentLevel = level2) {
+		return level3;
+	}
+	else if (currentLevel = level3) {
+		cout << "Congratulations! You won the entire game!" << endl;
+		return level1;
+	}
 }

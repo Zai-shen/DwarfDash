@@ -36,7 +36,7 @@ public:
 
 	PxPhysics* gPhysics;
 	PxScene* gScene;
-
+	PxRigidStatic* ground;
 	Player* player;
 
 	Game();

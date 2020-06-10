@@ -7,7 +7,6 @@ int Player::score = 0;
 bool Player::hasWon = false;
 bool Player::hasLost = false;
 
-
 class UserControllerHitReport : public PxUserControllerHitReport
 {
 	void onShapeHit(const PxControllerShapeHit &hit)

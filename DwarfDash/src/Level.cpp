@@ -30,10 +30,11 @@ void Level::draw() {
 }
 
 void Level::reset() {
-	//for (std::size_t i = 0; i < this->gameObjects.size(); ++i) {
+	for (std::size_t i = 0; i < this->gameObjects.size(); ++i) {
 	//	this->gameObjects[i]->~Gameobject();
-	//}
-	this->gameObjects.clear();
+		this->gameObjects[i]->reset();
+	}
+	//this->gameObjects.clear();
 }
 
 void Level::addGameobject(Gameobject* gameObject) {
