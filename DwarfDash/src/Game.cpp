@@ -74,9 +74,9 @@ void Game::initLevel1() {
 	addPlatformLine(3, R, 5 * platSpacingFront);
 	addPlatformLine(2, B, 5 * platSpacingFront + 3 * platSpacingRight);
 
-	// Dynamic model example
+	// Coin
 	Gameobject* goCoin = new Gameobject(new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader));
-	addGameobject(goCoin, true, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingBack, *defaultPickUpGeometry, "coin");
+	addGameobject(goCoin, true, PxVec3(0.f,1.5f,0.f) + 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingBack, *defaultPickUpGeometry, "coin");
 
 	addPlatformStairs(5, F, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront);
 	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft);
@@ -109,6 +109,8 @@ void Game::initLevel1() {
 }
 
 void Game::initLevel2() {
+	addPlatformLine(2, F, PxVec3(0.f, 0.f, 0.f));
+
 	// Dynamic model example
 	Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
 	Gameobject* goCoin = new Gameobject(coin);
@@ -148,7 +150,7 @@ void Game::initLevel3() {
 }
 
 void Game::createGroundPlane() {
-	PxTransform planePos = PxTransform(PxVec3(0.0f, 0,
+	PxTransform planePos = PxTransform(PxVec3(0.0f, -5.f,
 		0.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
 	ground = gPhysics->createRigidStatic(planePos);
 	PxShape* shape = gPhysics->createShape(PxPlaneGeometry(), *defaultMaterial);
