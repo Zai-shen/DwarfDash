@@ -27,14 +27,13 @@ public:
 
 	void init();
 
-	void update();
+	void update(float dt);
 
 	void draw();
 
 	void reset();
 
-	void setAsDynamicActor(PxPhysics* gPhysics);
-
 private:
 
+	PxVec3 kineMoveDir = PxVec3(-2.f,0.f,0.f);
 };

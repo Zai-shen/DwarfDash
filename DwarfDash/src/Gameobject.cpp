@@ -1,4 +1,5 @@
 #include "Gameobject.h"
+#include <glm/gtx/string_cast.hpp>
 
 using namespace std;
 using namespace physx;
@@ -15,11 +16,10 @@ Gameobject::Gameobject(Model* model) {
 }
 
 Gameobject::~Gameobject() {
-	cout << "destroying gameobject variables" << endl;
-	if (this->goActor) {
+	//cout << "destroying gameobject variables" << endl;
+	if (this->goActor && this->goActor->isReleasable()) {
 		goActor->release();
-	}
-	else if (this->goDynamicActor) {
+	}else if (this->goDynamicActor && this->goDynamicActor->isReleasable()) {
 		goDynamicActor->release();
 	}
 }
@@ -27,14 +27,30 @@ Gameobject::~Gameobject() {
 void Gameobject::init() {
 }
 
-void Gameobject::update() {
+void Gameobject::update(float dt) {
 	PxMat44 transform;
 	if (this->goActor)	{
 		transform = this->goActor->getGlobalPose();
 	}else if (this->goDynamicActor) {
+		if (goDynamicActor->getName() == "platformMoving")
+		{
+			//dirty fix, hurting my eyes.
+			if (goDynamicActor->getGlobalPose().p.x < 6){
+				kineMoveDir = PxVec3(3.f * dt, 0.f, 0.f);
+			}
+			else if (goDynamicActor->getGlobalPose().p.x > 18) {
+				kineMoveDir = PxVec3(-3.f * dt, 0.f, 0.f);
+			}
+			//cout << "p.x: " << goDynamicActor->getGlobalPose().p.x << endl;
+			goDynamicActor->setKinematicTarget(goDynamicActor->getGlobalPose().transform(PxTransform(kineMoveDir)));
+		}else if (goDynamicActor->getName() == "cloud")
+		{
+			goDynamicActor->setKinematicTarget(goDynamicActor->getGlobalPose().transform(PxTransform(PxVec3(0.f,0.f,-4.f * dt))));
+		}
 		transform = this->goDynamicActor->getGlobalPose();
 	}else {
 		cout << "Error - no PhysX Actor!" << endl;
+		//this->~Gameobject();
 		return;
 	}
 	PxVec4 c1 = transform.column0;
@@ -48,6 +64,7 @@ void Gameobject::update() {
 	glm::vec4 v4 = glm::vec4(c4.x, c4.y, c4.z, c4.w);
 
 	glm::mat4 glmTransform = glm::mat4(v1, v2, v3, v4);
+
 	if (goGeometry)
 	{
 		this->goGeometry->setModelMatrix(glmTransform);

@@ -15,7 +15,7 @@ public:
 
 	void init();
 
-	void update();
+	void update(float dt);
 
 	void draw();
 

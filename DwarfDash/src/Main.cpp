@@ -48,7 +48,7 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 void setWindowFPS(GLFWwindow *window,float& t_sum);
 void initPhysX();
 void releasePhysX();
-void stepPhysics();
+void stepPhysics(float deltaTime);
 
 // FPS Camera
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -68,12 +68,15 @@ static bool _strafing = false;
 static float _zoom = 10.0f;
 
 // PhysX
+float mAccumulator = 0.0f;
+float timeStep = 1.0f / 60.0f;
 static PxDefaultErrorCallback gDefaultErrorCallback;
 static PxDefaultAllocator gDefaultAllocatorCallback;
 static PxFoundation* gFoundation = nullptr;
 static PxPhysics* gPhysics = nullptr;
 static PxScene* gScene = nullptr;
 static PxPvd* gPvd = nullptr;
+static PxCudaContextManager* gCudaContextManager = NULL;
 
 // Game
 Game* game = new Game();
@@ -167,7 +170,7 @@ int main(int argc, char** argv)
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// set GL defaults
-	glClearColor(0.5, 0.5, 0.5, 1);
+	glClearColor(0.0, 0.0, 0.0, 1);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
@@ -214,12 +217,11 @@ int main(int argc, char** argv)
 			// Set per-frame uniforms
 			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
 
-
 			//PhysX
-			stepPhysics();
+			stepPhysics(dt);
 
 			// Render
-			game->update();
+			game->update(dt);
 			game->draw();
 
 			// Compute frame time
@@ -265,11 +267,17 @@ int main(int argc, char** argv)
 	return EXIT_SUCCESS;
 }
 
-void stepPhysics()
+void stepPhysics(float deltaTime)
 {
-	float timeStep = 1.0f / 60.0f;
-	gScene->simulate(timeStep);
-	gScene->fetchResults(true);
+	mAccumulator += deltaTime;
+	if (mAccumulator < timeStep) {
+		return;
+	}
+	else {
+		mAccumulator -= timeStep;
+		gScene->simulate(timeStep);
+		gScene->fetchResults(true);
+	}
 }
 
 void initPhysX() {
@@ -296,12 +304,20 @@ void initPhysX() {
 		exit(1);
 	}
 
-	//Creating scene
+	//Creating scene with GPU support (Only for CUDA->Nvidia)
+	PxCudaContextManagerDesc cudaContextManagerDesc;
+
+	gCudaContextManager = PxCreateCudaContextManager(*gFoundation, cudaContextManagerDesc, PxGetProfilerCallback());
+
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
+	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(4);
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.cudaContextManager = gCudaContextManager;
+
 	sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
+	sceneDesc.flags |= PxSceneFlag::eENABLE_GPU_DYNAMICS;
+	sceneDesc.broadPhaseType = PxBroadPhaseType::eGPU;
 
 	gScene = gPhysics->createScene(sceneDesc);
 
@@ -428,10 +444,22 @@ void processInput(GLFWwindow* window, float deltaTime){
 		std::cout << "Camera Position: " + glm::to_string(camera.getPosition()) << std::endl;
 		camera.resetPosition();
 	}
-	
+
+	//Movespeed fix while afloat
+	if (displacement != glm::vec3(0.f,0.f,0.f))
+	{
+		displacement = glm::vec3(displacement.x, 0.f, displacement.z);
+		//cout << glm::to_string(displacement) << endl;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+		cout << "To implement: reset game" << endl;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 		game->player->wantsToJump(deltaTime);
 	}
+
 
 	game->player->jump(deltaTime);
 

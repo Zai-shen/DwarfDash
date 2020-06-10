@@ -28,7 +28,7 @@ FPSCamera::FPSCamera(float posX, float posY, float posZ, float upX, float upY, f
 
 FPSCamera::FPSCamera(double fov, double aspect, double nearC, double farC) {
 
-	Position = glm::vec3(0.0f, 0.0f, 10.0f);
+	Position = glm::vec3(0.0f, 1.0f, 0.0f);
 	WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	perspective = glm::perspective(glm::radians(fov), aspect, nearC, farC);
 
@@ -37,6 +37,7 @@ FPSCamera::FPSCamera(double fov, double aspect, double nearC, double farC) {
 	Yaw = YAW;
 	Pitch = PITCH;
 	Zoom = ZOOM;
+	updateCameraVectors();
 }
 
 FPSCamera::~FPSCamera() {
