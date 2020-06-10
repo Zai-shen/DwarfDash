@@ -24,6 +24,7 @@
 
 //Game
 #include "Game.h"
+#include <stb_image.h>
 
 //Namespaces
 using namespace physx;
@@ -55,6 +56,8 @@ void processInput(GLFWwindow* window);
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray);
 
+unsigned int loadTexture(const char *path);
+unsigned int loadCubemap(vector<std::string> faces);
 
 
 /* --------------------------------------------- */
@@ -204,22 +207,16 @@ int main(int argc, char** argv)
 		//DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
 
 		Shader lightCubeShader("light_cube.vert", "light_cube.frag");
+		Shader skyboxShader("skybox.vert", "skybox.frag");
 
 		std::shared_ptr<Shader> textureShader = std::make_shared<Shader>("texture.vert", "texture.frag");
 		std::shared_ptr<Texture> woodTexture = std::make_shared<Texture>("wood_texture.dds");
 		std::shared_ptr<Material> woodTextureMaterial = std::make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.1f), 2.0f, woodTexture);
 		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), woodTextureMaterial);
 
-
-		//PointLight pointL(glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(0.2f, 0.2f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
-		//PointLight pointL(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(1.0f, 0.01f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-
-		//DirectionalLight dirL(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.0f, 1.0f, 1.0f));			  // color,  direction;
 		DirectionalLight dirL(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.0f, 0.0f, 0.0f));			  // color,  direction;
-
 		std::vector<PointLight> pointlightArray = std::vector<PointLight>();
-
-		glm::vec3 boxpos1 = glm::vec3(2.0f, 2.0f, 2.0f); 
+		glm::vec3 boxpos1 = glm::vec3(2.0f, 2.0f, 2.0f);
 		glm::vec3 boxpos2 = glm::vec3(-2.0f, -2.0f, -2.0f);
 		glm::vec3 boxpos3 = glm::vec3(5.0f, 5.0f, 5.0f);
 		glm::vec3 boxpos4 = glm::vec3(5.0f, 5.0f, -5.0f);
@@ -227,8 +224,8 @@ int main(int argc, char** argv)
 		//PointLight pointLight1 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(boxpos), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		PointLight pointLight1 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos1), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		PointLight pointLight2 = PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(boxpos2), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight3 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(boxpos3), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight4 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(boxpos4), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight3 = PointLight(glm::vec3(0.2f, 1.0f, 0.2f), glm::vec3(boxpos3), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight4 = PointLight(glm::vec3(0.2f, 0.2f, 1.0f), glm::vec3(boxpos4), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		pointlightArray.push_back(pointLight1);
 		pointlightArray.push_back(pointLight2);
 		pointlightArray.push_back(pointLight3);
@@ -249,8 +246,8 @@ int main(int argc, char** argv)
 
 		/*****************************************************************/
 
-			// set up vertex data (and buffer(s)) and configure vertex attributes
-			// ------------------------------------------------------------------
+		// set up vertex data (and buffer(s)) and configure vertex attributes
+		// ------------------------------------------------------------------
 		float vertices[] = {
 			-0.5f, -0.5f, -0.5f,
 			 0.5f, -0.5f, -0.5f,
@@ -295,6 +292,51 @@ int main(int argc, char** argv)
 			-0.5f,  0.5f, -0.5f,
 		};
 
+		float skyboxVertices[] = {
+			// positions          
+			-1.0f,  1.0f, -1.0f,
+			-1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			-1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f
+		};
+
 		// first, configure the cube's VAO (and VBO)
 		unsigned int VBO, cubeVAO;
 		glGenVertexArrays(1, &cubeVAO);
@@ -320,9 +362,28 @@ int main(int argc, char** argv)
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
 
+		// skybox VAO
+		unsigned int skyboxVAO, skyboxVBO;
+		glGenVertexArrays(1, &skyboxVAO);
+		glGenBuffers(1, &skyboxVBO);
+		glBindVertexArray(skyboxVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
+		// load textures
+		// -------------
 
-		//textureShader.get() -> setUniform("texture_diffuse", 0);
+		vector<std::string> faces{
+			("assets/models/skybox/right.jpg"),
+			("assets/models/skybox/left.jpg"),
+			("assets/models/skybox/top.jpg"),
+			("assets/models/skybox/bottom.jpg"),
+			("assets/models/skybox/front.jpg"),
+			("assets/models/skybox/back.jpg")
+		};
+		unsigned int cubemapTexture = loadCubemap(faces);
 
 
 		while (!glfwWindowShouldClose(window)) {
@@ -369,7 +430,7 @@ int main(int argc, char** argv)
 			//lightCubeShader.setUniform("modelMatrix", model);
 			//glBindVertexArray(lightCubeVAO);
 			//glDrawArrays(GL_TRIANGLES, 0, 36);
-			
+
 			// multiple cubes
 			glm::vec3 cubePositions[] = {
 				glm::vec3(boxpos1),
@@ -377,7 +438,7 @@ int main(int argc, char** argv)
 				glm::vec3(boxpos3),
 				glm::vec3(boxpos4)
 			};
-			for (unsigned int i = 0; i < 5; i++)			{
+			for (unsigned int i = 0; i < 5; i++) {
 				// calculate the model matrix for each object and pass it to shader before drawing
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, cubePositions[i]);
@@ -593,9 +654,46 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 		shader->setUniformArr("pointLights", i, "attenuation", pointLight.attenuation);
 
 	}
-		
+
 }
 
+// loads a cubemap texture from 6 individual texture faces
+// order:
+// +X (right)
+// -X (left)
+// +Y (top)
+// -Y (bottom)
+// +Z (front) 
+// -Z (back)
+// -------------------------------------------------------
+unsigned int loadCubemap(vector<std::string> faces){
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
