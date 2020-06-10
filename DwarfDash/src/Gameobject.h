@@ -27,7 +27,7 @@ public:
 
 	void init();
 
-	void update();
+	void update(float dt);
 
 	void draw();
 
@@ -35,5 +35,5 @@ public:
 
 private:
 
-	PxVec3 kineMoveDir = PxVec3(-0.5f,0.f,0.f);
+	PxVec3 kineMoveDir = PxVec3(-2.f,0.f,0.f);
 };

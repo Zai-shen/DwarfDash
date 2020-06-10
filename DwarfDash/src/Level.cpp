@@ -9,15 +9,16 @@ Level::~Level() {
 	for (std::size_t i = 0; i < this->gameObjects.size(); ++i) {
 		this->gameObjects[i]->~Gameobject();
 	}
+	//this->gameObjects.clear();
 }
 
 void Level::init() {
 }
 
-void Level::update() {
+void Level::update(float dt) {
 	// Using a for loop with index
 	for (std::size_t i = 0; i < this->gameObjects.size(); ++i) {
-		this->gameObjects[i]->update();
+		this->gameObjects[i]->update(dt);
 	}
 }
 
@@ -29,6 +30,9 @@ void Level::draw() {
 }
 
 void Level::reset() {
+	//for (std::size_t i = 0; i < this->gameObjects.size(); ++i) {
+	//	this->gameObjects[i]->~Gameobject();
+	//}
 	this->gameObjects.clear();
 }
 

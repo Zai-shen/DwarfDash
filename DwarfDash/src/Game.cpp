@@ -113,6 +113,10 @@ void Game::initLevel1() {
 	//Goal
 	addGameobject(new Gameobject(new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader)),
 		false, 24 * platSpacingFront + 3 * platSpacingRight + platCurrentHeight + PxVec3(0.f,5.f,0.f), PxBoxGeometry (PxVec3(7.5f, 5.f, .5f)), "goal");
+
+	//Death cloud
+	addGameobject(new Gameobject(new Model("assets/models/cloud/cloud.obj", primaryShader)),
+		true, 5 * platSpacingBack + PxVec3(0,6,0), PxBoxGeometry(PxVec3(50.f, 5.f, 2.5f)), "cloud");
 }
 
 void Game::addPlatformLine(int length, Direction direction, PxVec3 startingPosition) {
@@ -214,20 +218,32 @@ void Game::initLevel3() {
 }
 
 
-void Game::update() {
-	currentLevel->update();
-	player->update();
+void Game::update(float dt) {
+	currentLevel->update(dt);
+	player->update(dt);
+
+	if (player->hasLost)
+	{
+		player->hasLost = false;
+
+		cout << "You lost!" << endl;
+		cout << "Score: " << player->score << endl;
+
+		reset();
+	}
 
 	if (player->hasWon)
 	{
 		player->hasWon = false;
+		platCurrentHeight = PxVec3(0.0f);
+		player->setToStartPosition();
+
 		cout << "You win!" << endl;
 		cout << "Score: " << player->score << endl;
-		//Level nextLevelToLoad = nextLevel();
+
 		currentLevel->~Level();
 		currentLevel = nextLevel();
 		initLevels();
-		player->setToStartPosition();
 	}
 }
 
@@ -251,8 +267,10 @@ void Game::draw() {
 }
 
 void Game::reset() {
-	currentLevel->reset();
+	platCurrentHeight = PxVec3(0.0f);
 	player->reset();
+	currentLevel->~Level();
+	currentLevel = nextLevel(); // should be level 1 but doesnt work
 	initLevels();
 }
 
@@ -268,23 +286,28 @@ void Game::addGameobject(Gameobject* gameObject, bool dynamic, PxVec3 position, 
 		gameObject->goDynamicActor = PxCreateDynamic(*gPhysics, gameObject->goPosition, geometry.any(), *(gameObject->goMaterial), 1.0f);
 		gameObject->goDynamicActor->setName(name);
 
-		// Let dynamic spheres (no better way ATM) rotate
-		if (geometry.getType() == defaultPickUpGeometry->getType())
+		// Let powerups rotate
+		if (name == "coin" || name == "heart" || name == "shield")
 		{
 			gameObject->goDynamicActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 			gameObject->goDynamicActor->setAngularVelocity(PxVec3(0.f, 2.f, 0.f));
 			gameObject->goDynamicActor->setAngularDamping(0.f);
 		}
-		// Let dynamic boxes be kinematic actors (moving platform)
-		else if (geometry.getType() == defaultPlatGeometry->getType()) {
+		// Let moving platforms be kinematic actors
+		else if (name == "platformMoving") {
 			gameObject->goDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-
-	}
+		}
+		// Let the death cloud move towards the player
+		else if (name == "cloud") {
+			gameObject->goDynamicActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+			gameObject->goDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+		}
 		gScene->addActor(*(gameObject->goDynamicActor));
 	}
 	else {
 		gameObject->goActor = PxCreateStatic(*gPhysics, gameObject->goPosition, geometry.any(), *(gameObject->goMaterial));
 		gameObject->goActor->setName(name);
+
 		gScene->addActor(*(gameObject->goActor));
 	}
 

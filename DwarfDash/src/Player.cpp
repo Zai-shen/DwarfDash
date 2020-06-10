@@ -5,6 +5,8 @@ using namespace physx;
 
 int Player::score = 0;
 bool Player::hasWon = false;
+bool Player::hasLost = false;
+
 
 class UserControllerHitReport : public PxUserControllerHitReport
 {
@@ -13,13 +15,13 @@ class UserControllerHitReport : public PxUserControllerHitReport
 		//std::cout << "player hit a shape at position: " << hit.actor->getGlobalPose().p.x << " " << hit.actor->getGlobalPose().p.y << " " << hit.actor->getGlobalPose().p.z << std::endl;
 		if (hit.actor->getName() == "coin" || hit.actor->getName() == "heart" || hit.actor->getName() == "shield")
 		{
-			//+score
+			// + score
 			if (hit.actor->getName() == "coin")
 			{
 				Player::score += 1;
 			}
 
-			//release actor
+			// release actor
 			if (hit.actor->isReleasable()) {
 				hit.actor->setGlobalPose(PxTransform(PxVec3(-150.f,0.f,150.f)),false);
 				//hit.actor->release();
@@ -31,16 +33,22 @@ class UserControllerHitReport : public PxUserControllerHitReport
 			//set game to won / next level
 			Player::hasWon = true;
 		}
+
+		if (hit.actor->getName() == "cloud" || hit.actor->getName() == "ground")
+		{
+			//set game to lost / first level
+			Player::hasLost = true;
+		}
 	};
 
 	void onControllerHit(const PxControllersHit &hit)
 	{
-		std::cout << "player hit a controller" << std::endl;
+		//std::cout << "player hit a controller" << std::endl;
 	};
 
 	void onObstacleHit(const PxControllerObstacleHit &hit)
 	{
-		std::cout << "player hit an obstacle" << std::endl;
+		//std::cout << "player hit an obstacle" << std::endl;
 	};
 };
 
@@ -88,7 +96,7 @@ void Player::setToStartPosition() {
 	gPlayerController->setPosition(pStartPos);
 }
 
-void Player::update() {
+void Player::update(float dt) {
 }
 
 void Player::draw() {
@@ -97,7 +105,10 @@ void Player::draw() {
 }
 
 void Player::reset() {
-
+	score = 0;
+	hasWon = false;
+	hasLost = false;
+	setToStartPosition();
 }
 
 void Player::moveChar(glm::vec3 displacement, float deltaTime, PxControllerFilters filter) {

@@ -170,7 +170,7 @@ int main(int argc, char** argv)
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// set GL defaults
-	glClearColor(0.5, 0.5, 0.5, 1);
+	glClearColor(0.0, 0.0, 0.0, 1);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
@@ -221,7 +221,7 @@ int main(int argc, char** argv)
 			stepPhysics(dt);
 
 			// Render
-			game->update();
+			game->update(dt);
 			game->draw();
 
 			// Compute frame time

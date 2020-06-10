@@ -19,8 +19,7 @@ Gameobject::~Gameobject() {
 	//cout << "destroying gameobject variables" << endl;
 	if (this->goActor && this->goActor->isReleasable()) {
 		goActor->release();
-	}
-	else if (this->goDynamicActor && this->goDynamicActor->isReleasable()) {
+	}else if (this->goDynamicActor && this->goDynamicActor->isReleasable()) {
 		goDynamicActor->release();
 	}
 }
@@ -28,23 +27,25 @@ Gameobject::~Gameobject() {
 void Gameobject::init() {
 }
 
-void Gameobject::update() {
+void Gameobject::update(float dt) {
 	PxMat44 transform;
 	if (this->goActor)	{
 		transform = this->goActor->getGlobalPose();
 	}else if (this->goDynamicActor) {
-		if (goDynamicActor->getRigidBodyFlags() & PxRigidBodyFlag::eKINEMATIC)
+		if (goDynamicActor->getName() == "platformMoving")
 		{
 			//dirty fix, hurting my eyes.
 			if (goDynamicActor->getGlobalPose().p.x < 6){
-				kineMoveDir = PxVec3(0.1f, 0.f, 0.f);
+				kineMoveDir = PxVec3(3.f * dt, 0.f, 0.f);
 			}
 			else if (goDynamicActor->getGlobalPose().p.x > 18) {
-				kineMoveDir = PxVec3(-0.1f, 0.f, 0.f);
+				kineMoveDir = PxVec3(-3.f * dt, 0.f, 0.f);
 			}
 			//cout << "p.x: " << goDynamicActor->getGlobalPose().p.x << endl;
-			
 			goDynamicActor->setKinematicTarget(goDynamicActor->getGlobalPose().transform(PxTransform(kineMoveDir)));
+		}else if (goDynamicActor->getName() == "cloud")
+		{
+			goDynamicActor->setKinematicTarget(goDynamicActor->getGlobalPose().transform(PxTransform(PxVec3(0.f,0.f,-4.f * dt))));
 		}
 		transform = this->goDynamicActor->getGlobalPose();
 	}else {
