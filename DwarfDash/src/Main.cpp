@@ -1,11 +1,8 @@
-/*
-* Copyright 2018 Vienna University of Technology.
-* Institute of Computer Graphics and Algorithms.
-* This file is part of the ECG Lab Framework and must not be redistributed.
-*/
-
-
 #include "Utils.h"
+
+//Config
+#include "Configuration.h"
+
 #include <sstream>
 #include "Camera.h"
 #include "Shader.h"
@@ -14,6 +11,29 @@
 #include "Light.h"
 #include "Texture.h"
 
+//PhysX
+#include "physxInclude/PxPhysicsAPI.h"
+#include "physxInclude/pvd/PxPvd.h"
+#include "physxInclude/pvd/PxPvdSceneClient.h"
+#include "physxInclude/pvd/PxPvdTransport.h"
+
+
+
+// Model loading
+#include "Model.h"
+
+// Camera
+#include "FPSCamera.h"
+
+//Game
+#include "Game.h"
+
+//Namespaces
+using namespace physx;
+using namespace std;
+
+//Temp
+#include <glm/gtx/string_cast.hpp>
 
 /* --------------------------------------------- */
 // Prototypes
@@ -25,40 +45,54 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
+void setWindowFPS(GLFWwindow *window,float& t_sum);
+void initPhysX();
+void releasePhysX();
+void stepPhysics(float deltaTime);
 
+// FPS Camera
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void processInput(GLFWwindow* window, float deltaTime);
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
 
 /* --------------------------------------------- */
 // Global variables
 /* --------------------------------------------- */
 
-static bool _wireframe = false;
-static bool _culling = true;
+// settings.ini
+Configuration config = Configuration("assets/settings.ini");
+
+// camera
 static bool _dragging = false;
 static bool _strafing = false;
-static float _zoom = 6.0f;
+static float _zoom = 10.0f;
 
+// PhysX
+float mAccumulator = 0.0f;
+float timeStep = 1.0f / 60.0f;
+static PxDefaultErrorCallback gDefaultErrorCallback;
+static PxDefaultAllocator gDefaultAllocatorCallback;
+static PxFoundation* gFoundation = nullptr;
+static PxPhysics* gPhysics = nullptr;
+static PxScene* gScene = nullptr;
+static PxPvd* gPvd = nullptr;
+static PxCudaContextManager* gCudaContextManager = NULL;
+
+// Game
+Game* game = new Game();
+
+int frames = 0;
+// fps camera settings
+float lastX = config.width / 2.0f;
+float lastY = config.height / 2.0f;
+bool firstMouse = true;
+FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ); // new constructor
 
 /* --------------------------------------------- */
 // Main
 /* --------------------------------------------- */
-
 int main(int argc, char** argv)
 {
-	/* --------------------------------------------- */
-	// Load settings.ini
-	/* --------------------------------------------- */
-
-	INIReader reader("assets/settings.ini");
-
-	int window_width = reader.GetInteger("window", "width", 800);
-	int window_height = reader.GetInteger("window", "height", 800);
-	int refresh_rate = reader.GetInteger("window", "refresh_rate", 60);
-	bool fullscreen = reader.GetBoolean("window", "fullscreen", false);
-	std::string window_title = reader.Get("window", "title", "ECG");
-	float fov = float(reader.GetReal("camera", "fov", 60.0f));
-	float nearZ = float(reader.GetReal("camera", "near", 0.1f));
-	float farZ = float(reader.GetReal("camera", "far", 100.0f));
-
 	/* --------------------------------------------- */
 	// Create context
 	/* --------------------------------------------- */
@@ -71,7 +105,7 @@ int main(int argc, char** argv)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Request core profile
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);  // Create an OpenGL debug context 
-	glfwWindowHint(GLFW_REFRESH_RATE, refresh_rate); // Set refresh rate
+	glfwWindowHint(GLFW_REFRESH_RATE, config.refresh_rate); // Set refresh rate
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	// Enable antialiasing (4xMSAA)
@@ -80,18 +114,22 @@ int main(int argc, char** argv)
 	// Open window
 	GLFWmonitor* monitor = nullptr;
 
-	if (fullscreen)
+	if (config.fullscreen)
 		monitor = glfwGetPrimaryMonitor();
 
-	GLFWwindow* window = glfwCreateWindow(window_width, window_height, window_title.c_str(), monitor, nullptr);
+	GLFWwindow* window = glfwCreateWindow(config.width, config.height, config.title.c_str(), monitor, nullptr);
 
 	if (!window) {
 		glfwTerminate();
 		EXIT_WITH_ERROR("Failed to create window")
 	}
 
+	//Set gamma for monitor =/= window
+	glfwSetGamma(glfwGetPrimaryMonitor(), config.brightness);
+
 	// This function makes the context of the specified window current on the calling thread. 
 	glfwMakeContextCurrent(window);
+
 
 	// Initialize GLEW
 	glewExperimental = true;
@@ -123,42 +161,40 @@ int main(int argc, char** argv)
 	}
 
 	// set callbacks
+	//glfwSetMouseButtonCallback(window, mouse_button_callback); // not needed in fps
+	//glfwSetScrollCallback(window, scroll_callback);  // not needed in fps
 	glfwSetKeyCallback(window, key_callback);
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
-	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+
+	// tell GLFW to capture our mouse
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// set GL defaults
-	glClearColor(1, 1, 1, 1);
+	glClearColor(0.0, 0.0, 0.0, 1);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-
 
 	/* --------------------------------------------- */
 	// Initialize scene and render loop
 	/* --------------------------------------------- */
 	{
-		// Load shader(s)
-		std::shared_ptr<Shader> textureShader = std::make_shared<Shader>("texture.vert", "texture.frag");
+		// Init PhysX
+		initPhysX();
 
-		// Create textures
-		std::shared_ptr<Texture> woodTexture = std::make_shared<Texture>("wood_texture.dds");
-		std::shared_ptr<Texture> brickTexture = std::make_shared<Texture>("bricks_diffuse.dds");
-
-		// Create materials
-		std::shared_ptr<Material> woodTextureMaterial = std::make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.1f), 2.0f, woodTexture);
-		std::shared_ptr<Material> brickTextureMaterial = std::make_shared<TextureMaterial>(textureShader, glm::vec3(0.1f, 0.7f, 0.3f), 8.0f, brickTexture);
-
-		// Create geometry
-		Geometry cube = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, 0.0f)), Geometry::createCubeGeometry(1.5f, 1.5f, 1.5f), woodTextureMaterial);
-		Geometry cylinder = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, -1.0f, 0.0f)), Geometry::createCylinderGeometry(32, 1.3f, 1.0f), brickTextureMaterial);
-		Geometry sphere = Geometry(glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, -1.0f, 0.0f)), Geometry::createSphereGeometry(64, 32, 1.0f), brickTextureMaterial);
+		// Init game
+		game->gPhysics = gPhysics;
+		game->gScene = gScene;
+		game->init();
 
 		// Initialize camera
-		Camera camera(fov, float(window_width) / float(window_height), nearZ, farZ);
+		//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
 		// Initialize lights
-		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f));
-		PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f));
+		//PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
+		//DirectionalLight dirL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));			  // color,  direction;
+
+		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
+		PointLight pointL(glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(0.2f, 0.2f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
 
 		// Render loop
 		float t = float(glfwGetTime());
@@ -172,24 +208,30 @@ int main(int argc, char** argv)
 
 			// Poll events
 			glfwPollEvents();
+			processInput(window, dt);
 
-			// Update camera
-			glfwGetCursorPos(window, &mouse_x, &mouse_y);
-			camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
+			// Update old camera
+			//glfwGetCursorPos(window, &mouse_x, &mouse_y);
+			//camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			setPerFrameUniforms(textureShader.get(), camera, dirL, pointL);
+			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
+
+			//PhysX
+			stepPhysics(dt);
 
 			// Render
-			cube.draw();
-			cylinder.draw();
-			sphere.draw();
+			game->update(dt);
+			game->draw();
 
 			// Compute frame time
 			dt = t;
 			t = float(glfwGetTime());
 			dt = t - dt;
 			t_sum += dt;
+			frames++;
+
+			setWindowFPS(window,t_sum);
 
 			// Swap buffers
 			glfwSwapBuffers(window);
@@ -205,6 +247,18 @@ int main(int argc, char** argv)
 
 
 	/* --------------------------------------------- */
+	// Destroy Game
+	/* --------------------------------------------- */
+
+	game->~Game();
+
+	/* --------------------------------------------- */
+	// Destroy PhysX
+	/* --------------------------------------------- */
+
+	releasePhysX();
+
+	/* --------------------------------------------- */
 	// Destroy context and exit
 	/* --------------------------------------------- */
 
@@ -213,6 +267,126 @@ int main(int argc, char** argv)
 	return EXIT_SUCCESS;
 }
 
+void stepPhysics(float deltaTime)
+{
+	mAccumulator += deltaTime;
+	if (mAccumulator < timeStep) {
+		return;
+	}
+	else {
+		mAccumulator -= timeStep;
+		gScene->simulate(timeStep);
+		gScene->fetchResults(true);
+	}
+}
+
+void initPhysX() {
+	//Creating foundation for PhysX
+	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback, gDefaultErrorCallback);
+	if (!gFoundation)
+	{
+		cerr << "Error creating PhysX3 foundation, Exiting..." << endl;
+		exit(1);
+	}
+
+	bool recordMemoryAllocations = true;
+
+	gPvd = PxCreatePvd(*gFoundation);
+	const char* gPvdHostIP = "127.0.0.1"; // IP of local PC machine PVD
+	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(gPvdHostIP, 5425, 10);
+	gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
+
+	//Creating instance of PhysX SDK
+	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
+	if (gPhysics == NULL)
+	{
+		cerr << "Error creating PhysX3 device, Exiting..." << endl;
+		exit(1);
+	}
+
+	//Creating scene with GPU support (Only for CUDA->Nvidia)
+	PxCudaContextManagerDesc cudaContextManagerDesc;
+
+	gCudaContextManager = PxCreateCudaContextManager(*gFoundation, cudaContextManagerDesc, PxGetProfilerCallback());
+
+	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
+	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(4);
+	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.cudaContextManager = gCudaContextManager;
+
+	sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
+	sceneDesc.flags |= PxSceneFlag::eENABLE_GPU_DYNAMICS;
+	sceneDesc.broadPhaseType = PxBroadPhaseType::eGPU;
+
+	gScene = gPhysics->createScene(sceneDesc);
+
+	//Pvd Client
+	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
+	if (pvdClient)
+	{
+		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
+		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
+		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
+	}
+}
+
+PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
+	PxFilterObjectAttributes attributes1, PxFilterData filterData1,
+	PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
+{
+	PX_UNUSED(attributes0);
+	PX_UNUSED(attributes1);
+	PX_UNUSED(filterData0);
+	PX_UNUSED(filterData1);
+	PX_UNUSED(constantBlockSize);
+	PX_UNUSED(constantBlock);
+
+	// all initial and persisting reports for everything, with per-point data
+	pairFlags = PxPairFlag::eSOLVE_CONTACT | PxPairFlag::eDETECT_DISCRETE_CONTACT
+		| PxPairFlag::eNOTIFY_TOUCH_FOUND
+		| PxPairFlag::eNOTIFY_TOUCH_PERSISTS
+		| PxPairFlag::eNOTIFY_CONTACT_POINTS | PxPairFlag::eTRIGGER_DEFAULT;
+	pairFlags |= PxPairFlag::eDETECT_CCD_CONTACT;
+
+	return  PxFilterFlag::eDEFAULT;
+}
+
+void releasePhysX()
+{
+	gScene->release();
+	gPhysics->release();
+	PxPvdTransport* transport = gPvd->getTransport();
+	gPvd->release();
+	transport->release();
+	gFoundation->release();
+}
+
+void setWindowFPS(GLFWwindow *window, float& t_sum)
+{
+	//Every second print frametime and frames per second window title
+	if (t_sum >= 1.0f) {
+		stringstream title;
+		title << config.title << " [" << to_string(1000.0f / double(frames)) + "ms/frame | " + to_string(frames) + " FPS]";
+		glfwSetWindowTitle(window, title.str().c_str());
+		t_sum -= 1.0f;
+		frames = 0;
+	}
+}
+
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL){
+
+	shader->use();
+	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+	shader->setUniform("camera_world", camera.getPosition());
+
+	shader->setUniform("dirL.color", dirL.color);
+	shader->setUniform("dirL.direction", dirL.direction);
+
+	shader->setUniform("pointL.color", pointL.color);
+	shader->setUniform("pointL.position", pointL.position);
+	shader->setUniform("pointL.attenuation", pointL.attenuation);
+}
 
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL)
 {
@@ -222,11 +396,11 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
+
 	shader->setUniform("pointL.color", pointL.color);
 	shader->setUniform("pointL.position", pointL.position);
 	shader->setUniform("pointL.attenuation", pointL.attenuation);
 }
-
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
@@ -240,6 +414,84 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		_strafing = false;
 	}
 }
+
+// FPS Camera & Player input processing
+void processInput(GLFWwindow* window, float deltaTime){
+	
+	glm::vec3 displacement = glm::vec3(0.f);
+
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		displacement += camera.ProcessKeyboard(FORWARD, deltaTime);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		displacement += camera.ProcessKeyboard(BACKWARD, deltaTime);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		displacement += camera.ProcessKeyboard(LEFT, deltaTime);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		displacement += camera.ProcessKeyboard(RIGHT, deltaTime);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+		std::cout << "Camera Position: " + glm::to_string(camera.getPosition()) << std::endl;
+		camera.resetPosition();
+	}
+
+	//Movespeed fix while afloat
+	if (displacement != glm::vec3(0.f,0.f,0.f))
+	{
+		displacement = glm::vec3(displacement.x, 0.f, displacement.z);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+		game->reset();
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		game->player->wantsToJump(deltaTime);
+	}
+
+
+	game->player->jump(deltaTime);
+
+	game->player->moveChar(displacement, deltaTime);
+
+	camera.setPosition(glm::vec3(
+		game->player->gPlayerController->getPosition().x,
+		game->player->gPlayerController->getPosition().y,
+		game->player->gPlayerController->getPosition().z));
+}
+
+// glfw: whenever the mouse moves, this callback is called
+// -------------------------------------------------------
+void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+	
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+	lastX = xpos;
+	lastY = ypos;
+
+	camera.ProcessMouseMovement(xoffset, yoffset);
+	
+}
+
+
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
@@ -260,12 +512,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			glfwSetWindowShouldClose(window, true);
 			break;
 		case GLFW_KEY_F1:
-			_wireframe = !_wireframe;
-			glPolygonMode(GL_FRONT_AND_BACK, _wireframe ? GL_LINE : GL_FILL);
+			config.wireframe = !config.wireframe;
+			glPolygonMode(GL_FRONT_AND_BACK, config.wireframe ? GL_LINE : GL_FILL);
 			break;
 		case GLFW_KEY_F2:
-			_culling = !_culling;
-			if (_culling) glEnable(GL_CULL_FACE);
+			config.culling = !config.culling;
+			if (config.culling) glEnable(GL_CULL_FACE);
 			else glDisable(GL_CULL_FACE);
 			break;
 	}
@@ -273,15 +525,15 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 static void APIENTRY DebugCallbackDefault(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
 	if (id == 131185 || id == 131218) return; // ignore performance warnings from nvidia
-	std::string error = FormatDebugOutput(source, type, id, severity, message);
-	std::cout << error << std::endl;
+	string error = FormatDebugOutput(source, type, id, severity, message);
+	cout << error << endl;
 }
 
-static std::string FormatDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, const char* msg) {
-	std::stringstream stringStream;
-	std::string sourceString;
-	std::string typeString;
-	std::string severityString;
+static string FormatDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, const char* msg) {
+	stringstream stringStream;
+	string sourceString;
+	string typeString;
+	string severityString;
 
 	// The AMD variant of this extension provides a less detailed classification of the error,
 	// which is why some arguments might be "Unknown".

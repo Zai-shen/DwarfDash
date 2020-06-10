@@ -32,7 +32,7 @@ By pressing the green run button, the game will compile in debug mode. Congratul
 
 ## Deployment
 
-You can also simply run the compiled .exe file, as soon as you've compiled once in debug mode. You can find this file under: DwarfDash\bin\Release
+You can also simply run the compiled .exe file, as soon as you've compiled once in debug mode. You can find this file under: DwarfDash\bin\Release or \Debug. **Don't forget to get the assets directory and copy into Release/Debug.**
 
 ## Built With
 
