@@ -95,8 +95,8 @@ bool firstMouse = true;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
-FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
-//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
+//FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
+Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
 /* --------------------------------------------- */
 // Main
@@ -410,7 +410,7 @@ int main(int argc, char** argv)
 
 			// Update camera
 			glfwGetCursorPos(window, &mouse_x, &mouse_y);
-			//camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
+			camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
 			//setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
@@ -717,7 +717,7 @@ void processInput(GLFWwindow* window) {
 
 	glm::vec3 pos = camera.getPosition();
 	//std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
-	
+	/*
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		std::cout << "Pressed ESC" << std::endl;
 		glfwSetWindowShouldClose(window, true);
@@ -748,13 +748,13 @@ void processInput(GLFWwindow* window) {
 		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.resetPosition();
 	}
-	
+	*/
 }
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-	
+	/*
 	if (firstMouse)
 	{
 		lastX = xpos;
@@ -769,7 +769,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	lastY = ypos;
 
 	camera.ProcessMouseMovement(xoffset, yoffset);
-	
+	*/
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)

@@ -42,6 +42,14 @@ public:
 	 */
 	glm::mat4 getViewProjectionMatrix();
 
+	glm::mat4 getViewMatrix() {
+		return _viewMatrix;
+	}
+
+	glm::mat4 getProjectionMatrix() {
+		return _projMatrix;
+	}
+
 	/*!
 	 * Updates the camera's position and view matrix according to the input
 	 * @param x: current mouse x position
