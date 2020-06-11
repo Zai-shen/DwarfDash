@@ -53,7 +53,8 @@ void stepPhysics();
 // FPS Camera
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow* window);
-void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
+//void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray);
 void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray);
 
 unsigned int loadTexture(const char *path);
@@ -94,8 +95,8 @@ bool firstMouse = true;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
-//FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
-Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
+FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
+//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
 /* --------------------------------------------- */
 // Main
@@ -177,7 +178,7 @@ int main(int argc, char** argv)
 	glfwSetCursorPosCallback(window, mouse_callback); // only needed in fps
 
 	// tell GLFW to capture our mouse
-	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// set GL defaults
 	glClearColor(0.5, 0.5, 0.5, 1);
@@ -385,6 +386,8 @@ int main(int argc, char** argv)
 		};
 		unsigned int cubemapTexture = loadCubemap(faces);
 
+		skyboxShader.use();
+		skyboxShader.setUniform("skybox", 0);
 
 		while (!glfwWindowShouldClose(window)) {
 
@@ -408,7 +411,7 @@ int main(int argc, char** argv)
 
 			// Update camera
 			glfwGetCursorPos(window, &mouse_x, &mouse_y);
-			camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
+			//camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
 			//setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
@@ -423,14 +426,6 @@ int main(int argc, char** argv)
 			lightCubeShader.use();
 			lightCubeShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 
-			// one cube
-			//glm::mat4 model = glm::mat4(1.0f);
-			//model = glm::translate(model, boxpos); // position of the cube
-			//model = glm::scale(model, glm::vec3(0.4f)); // a smaller cube
-			//lightCubeShader.setUniform("modelMatrix", model);
-			//glBindVertexArray(lightCubeVAO);
-			//glDrawArrays(GL_TRIANGLES, 0, 36);
-
 			// multiple cubes
 			glm::vec3 cubePositions[] = {
 				glm::vec3(boxpos1),
@@ -439,7 +434,7 @@ int main(int argc, char** argv)
 				glm::vec3(boxpos4)
 			};
 			for (unsigned int i = 0; i < 5; i++) {
-				// calculate the model matrix for each object and pass it to shader before drawing
+				// calculate the model matrix for each cube and pass it to shader before drawing
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, cubePositions[i]);
 				model = glm::scale(model, glm::vec3(0.4f));
@@ -447,6 +442,22 @@ int main(int argc, char** argv)
 				glBindVertexArray(lightCubeVAO);
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 			}
+			/***********************************/
+
+			/***********************************/
+			// draw skybox as last
+			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+			skyboxShader.use();
+			//skyboxShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+			glm::mat4 view = glm::mat3(camera.getViewProjectionMatrix()); // remove translation from the view matrix
+			skyboxShader.setUniform("viewProjMatrix", view);
+			// skybox cube
+			glBindVertexArray(skyboxVAO);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glBindVertexArray(0);
+			glDepthFunc(GL_LESS); // set depth function back to default
 			/***********************************/
 
 
@@ -597,7 +608,7 @@ void setWindowFPS(GLFWwindow *window, float& t_sum)
 	}
 }
 
-void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL) {
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray) {
 
 	shader->use();
 	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
@@ -606,32 +617,16 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
 
-	shader->setUniform("pointL.color", pointL.color);
-	shader->setUniform("pointL.position", pointL.position);
-	shader->setUniform("pointL.attenuation", pointL.attenuation);
+	// iterate over all the pointlights	
+	for (GLuint i = 0; i < pointlightArray.size(); i++) {
+		string number = std::to_string(i);
+		PointLight& pointLight = pointlightArray[i];
 
-	for (GLuint i = 0; i < 4; i++) {
-		string number = to_string(i);
-
+		shader->setUniformArr("pointLights", i, "color", pointLight.color);
+		shader->setUniformArr("pointLights", i, "position", pointLight.position);
+		shader->setUniformArr("pointLights", i, "attenuation", pointLight.attenuation);
 
 	}
-
-
-}
-
-void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL)
-{
-	shader->use();
-	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-	shader->setUniform("camera_world", camera.getPosition());
-
-	shader->setUniform("dirL.color", dirL.color);
-	shader->setUniform("dirL.direction", dirL.direction);
-
-	shader->setUniform("pointL.color", pointL.color);
-	shader->setUniform("pointL.position", pointL.position);
-	shader->setUniform("pointL.attenuation", pointL.attenuation);
-
 }
 
 // for multiple pointlights
@@ -658,15 +653,17 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 }
 
 // loads a cubemap texture from 6 individual texture faces
-// order:
-// +X (right)
-// -X (left)
-// +Y (top)
-// -Y (bottom)
-// +Z (front) 
-// -Z (back)
 // -------------------------------------------------------
 unsigned int loadCubemap(vector<std::string> faces){
+
+	// order:
+	// +X (right)
+	// -X (left)
+	// +Y (top)
+	// -Y (bottom)
+	// +Z (front) 
+	// -Z (back)
+
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
@@ -686,6 +683,7 @@ unsigned int loadCubemap(vector<std::string> faces){
 			stbi_image_free(data);
 		}
 	}
+
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -718,7 +716,7 @@ void processInput(GLFWwindow* window) {
 
 	glm::vec3 pos = camera.getPosition();
 	//std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
-	/*
+	
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		std::cout << "Pressed ESC" << std::endl;
 		glfwSetWindowShouldClose(window, true);
@@ -749,13 +747,13 @@ void processInput(GLFWwindow* window) {
 		std::cout << "Camera Position: " + glm::to_string(pos) << std::endl;
 		camera.resetPosition();
 	}
-	*/
+	
 }
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-	/*
+	
 	if (firstMouse)
 	{
 		lastX = xpos;
@@ -770,7 +768,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	lastY = ypos;
 
 	camera.ProcessMouseMovement(xoffset, yoffset);
-	*/
+	
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
