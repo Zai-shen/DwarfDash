@@ -217,15 +217,15 @@ int main(int argc, char** argv)
 
 		DirectionalLight dirL(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.0f, 0.0f, 0.0f));			  // color,  direction;
 		std::vector<PointLight> pointlightArray = std::vector<PointLight>();
-		glm::vec3 boxpos1 = glm::vec3(2.0f, 2.0f, 2.0f);
-		glm::vec3 boxpos2 = glm::vec3(-2.0f, -2.0f, -2.0f);
+		glm::vec3 boxpos1 = glm::vec3(5.0f, 0.0f, 4.0f);
+		glm::vec3 boxpos2 = glm::vec3(6.3f, 0.0f, -4.0f);
 		glm::vec3 boxpos3 = glm::vec3(5.0f, 5.0f, 5.0f);
 		glm::vec3 boxpos4 = glm::vec3(5.0f, 5.0f, -5.0f);
 
 		//PointLight pointLight1 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(boxpos), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		PointLight pointLight1 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos1), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight2 = PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(boxpos2), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight3 = PointLight(glm::vec3(0.2f, 1.0f, 0.2f), glm::vec3(boxpos3), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight2 = PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(boxpos2), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight3 = PointLight(glm::vec3(0.2f, 1.0f, 0.2f), glm::vec3(boxpos3), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		PointLight pointLight4 = PointLight(glm::vec3(0.2f, 0.2f, 1.0f), glm::vec3(boxpos4), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		pointlightArray.push_back(pointLight1);
 		pointlightArray.push_back(pointLight2);
@@ -375,7 +375,6 @@ int main(int argc, char** argv)
 
 		// load textures
 		// -------------
-
 		vector<std::string> faces{
 			("assets/models/skybox/right.jpg"),
 			("assets/models/skybox/left.jpg"),
@@ -448,9 +447,11 @@ int main(int argc, char** argv)
 			// draw skybox as last
 			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 			skyboxShader.use();
-			//skyboxShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-			glm::mat4 view = glm::mat3(camera.getViewProjectionMatrix()); // remove translation from the view matrix
-			skyboxShader.setUniform("viewProjMatrix", view);
+			glm::mat4 view = glm::mat4(glm::mat3(camera.getViewMatrix())); // remove translation from the view matrix
+			glm::mat4 projection = glm::mat4(camera.getProjectionMatrix());
+			skyboxShader.setUniform("view", view);
+			skyboxShader.setUniform("projection", projection);
+
 			// skybox cube
 			glBindVertexArray(skyboxVAO);
 			glActiveTexture(GL_TEXTURE0);
