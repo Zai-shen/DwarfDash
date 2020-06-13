@@ -49,7 +49,7 @@ vec3 phong(vec3 n, vec3 l, vec3 v, vec3 diffuseC, float diffuseF, vec3 specularC
 
 void main() {	
 
-	vec3 n = normalize(vert.normal_world); // ecg framework
+	vec3 n = normalize(vert.normal_world); // ecg framework (used if normapping is false)
 		
 	if(normalMapping) {
 	    n = texture(texture_normal1, vert.uv).rgb;	   // obtain normal from normal map in range [0, 1]
