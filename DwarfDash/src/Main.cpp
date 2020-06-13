@@ -71,6 +71,7 @@ Configuration config = Configuration("assets/settings.ini");
 // camera
 static bool _dragging = false;
 static bool _strafing = false;
+static int normalMapping = true;
 static float _zoom = 10.0f;
 
 // PhysX
@@ -224,9 +225,9 @@ int main(int argc, char** argv)
 
 		//PointLight pointLight1 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(boxpos), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		PointLight pointLight1 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos1), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight2 = PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(boxpos2), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight3 = PointLight(glm::vec3(0.2f, 1.0f, 0.2f), glm::vec3(boxpos3), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight4 = PointLight(glm::vec3(0.2f, 0.2f, 1.0f), glm::vec3(boxpos4), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight2 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos2), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight3 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos3), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight4 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos4), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		pointlightArray.push_back(pointLight1);
 		pointlightArray.push_back(pointLight2);
 		pointlightArray.push_back(pointLight3);
@@ -618,6 +619,8 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
 
+	shader->setUniform("normalMapping", normalMapping);
+
 	// iterate over all the pointlights	
 	for (GLuint i = 0; i < pointlightArray.size(); i++) {
 		string number = std::to_string(i);
@@ -639,6 +642,9 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
+
+	shader->setUniform("normalMapping", normalMapping);
+	//std::cout << "set normalMapping to: " << normalMapping << std::endl;
 
 	// iterate over all the pointlights	
 	for (GLuint i = 0; i < pointlightArray.size(); i++) {
@@ -782,6 +788,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	// F1 - Wireframe
 	// F2 - Culling
 	// Esc - Exit
+	// F4 - Normal Mapping
 
 	if (action != GLFW_RELEASE) return;
 
@@ -798,6 +805,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		config.culling = !config.culling;
 		if (config.culling) glEnable(GL_CULL_FACE);
 		else glDisable(GL_CULL_FACE);
+		break;
+	case GLFW_KEY_F4:
+		normalMapping = !normalMapping;
+		std::cout << "set normalMapping to: " << normalMapping << std::endl;
 		break;
 	}
 }

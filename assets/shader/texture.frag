@@ -23,6 +23,8 @@ uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1; 
 uniform sampler2D texture_normal1; 
 
+uniform bool normalMapping;
+
 uniform struct DirectionalLight {
 	vec3 color;
 	vec3 direction;
@@ -46,11 +48,24 @@ vec3 phong(vec3 n, vec3 l, vec3 v, vec3 diffuseC, float diffuseF, vec3 specularC
 }
 
 void main() {	
-	vec3 n = normalize(vert.normal_world);
-	vec3 v = normalize(camera_world - vert.position_world);
-	
-	vec3 texColor = texture(texture_diffuse1, vert.uv).rgb;
 
+
+	//vec3 n = normalize(vert.normal_world); // ecg framework
+	
+	vec3 n = texture(texture_normal1, vert.uv).rgb; // obtain normal from normal map in range [0,1]
+	n = normalize(n * 2.0 - 1.0);					// transform normal vector to range [-1,1]
+
+	if(normalMapping) {
+	    vec3 n = texture(texture_normal1, vert.uv).rgb;
+		n = normalize(n * 2.0 - 1.0);  
+	} else {
+		vec3 n = normalize(vert.normal_world);
+	}
+
+
+
+	vec3 v = normalize(camera_world - vert.position_world);
+	vec3 texColor = texture(texture_diffuse1, vert.uv).rgb;
 	color = vec4(texColor * materialCoefficients.x, 1); // ambient
 	
 	// add directional light contribution
