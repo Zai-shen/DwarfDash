@@ -58,6 +58,7 @@ void main() {
 	if(normalMapping) {
 	    n = texture(texture_normal1, vert.uv).rgb;	   // obtain normal from normal map in range [0, 1]
 		n = normalize(n * 2.0 - 1.0);  				   // transform normal vector to range [-1,1]
+		//n = normalize(n);  				   // transform normal vector to range [-1,1]
 	} 
 
 	vec3 v = normalize(camera_world - vert.position_world); // ecg framework

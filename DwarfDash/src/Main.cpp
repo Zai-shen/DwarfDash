@@ -75,7 +75,7 @@ static bool _strafing = false;
 static float _zoom = 10.0f;
 
 // normal mapping
-static int normalMapping = true;
+static int normalMapping = false;
 
 // PhysX
 float mAccumulator = 0.0f;
@@ -207,15 +207,14 @@ int main(int argc, char** argv)
 		PointLight pointL(glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(0.2f, 0.2f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
 
 		std::vector<PointLight> pointlightArray = std::vector<PointLight>(); // pointlight array filled with pointlights for each level
-		PointLight pointLight1 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.56f, 1.8f, 1.6f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight2 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.64f, 1.8f, -18.46f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight3 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(10.41f, 1.8f, -18.34f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight4 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(10.41f, 1.8f, -22.48f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-
-		PointLight pointLight5 = PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(2.40f, 5.8f, -42.40f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight6 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(2.41f, 5.8f, -46.37f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight7 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(2.59f, 5.8f, -50.55f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight8 = PointLight(glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(2.40f, 5.8f, -51.52f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight1 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.56f, 2.8f, 1.6f),    glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight2 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.64f, 2.8f, -18.46f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight3 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(10.41f, 2.8f, -18.34f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight4 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(10.41f, 2.8f, -22.48f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)																												 
+		PointLight pointLight5 = PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(2.40f,  6.8f, -42.40f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight6 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(2.41f,  6.8f, -46.37f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight7 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(2.59f,  6.8f, -50.55f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight8 = PointLight(glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(2.40f,  6.8f, -51.52f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		pointlightArray.push_back(pointLight1);
 		pointlightArray.push_back(pointLight2);
 		pointlightArray.push_back(pointLight3);
