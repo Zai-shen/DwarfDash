@@ -40,6 +40,8 @@ void Game::init() {
 void Game::initShaders() {
 	primaryShader = make_shared<Shader>("texture.vert", "texture.frag");
 	modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
+	//Shader skyboxShader("skybox.vert", "skybox.frag");
+	skyboxShader = make_shared<Shader>("skybox.vert", "skybox.frag");
 }
 
 void Game::initTextures() {

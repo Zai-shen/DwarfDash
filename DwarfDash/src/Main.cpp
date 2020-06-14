@@ -27,6 +27,7 @@
 
 //Game
 #include "Game.h"
+#include <stb_image.h>
 
 //Namespaces
 using namespace physx;
@@ -44,7 +45,6 @@ static std::string FormatDebugOutput(GLenum source, GLenum type, GLuint id, GLen
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
 void setWindowFPS(GLFWwindow *window,float& t_sum);
 void initPhysX();
 void releasePhysX();
@@ -53,7 +53,14 @@ void stepPhysics(float deltaTime);
 // FPS Camera
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow* window, float deltaTime);
-void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
+
+//void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
+//void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray);
+
+// Skybox
+unsigned int loadTexture(const char *path);
+unsigned int loadCubemap(vector<std::string> faces);
 
 /* --------------------------------------------- */
 // Global variables
@@ -66,6 +73,9 @@ Configuration config = Configuration("assets/settings.ini");
 static bool _dragging = false;
 static bool _strafing = false;
 static float _zoom = 10.0f;
+
+// normal mapping
+static int normalMapping = true;
 
 // PhysX
 float mAccumulator = 0.0f;
@@ -196,6 +206,95 @@ int main(int argc, char** argv)
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
 		PointLight pointL(glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(0.2f, 0.2f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
 
+		std::vector<PointLight> pointlightArray = std::vector<PointLight>(); // pointlight array filled with pointlights for each level
+		PointLight pointLight1 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.56f, 1.8f, 1.6f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight2 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.64f, 1.8f, -18.46f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight3 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(10.41f, 1.8f, -18.34f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight4 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(10.41f, 1.8f, -22.48f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+
+		PointLight pointLight5 = PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(2.40f, 5.8f, -42.40f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight6 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(2.41f, 5.8f, -46.37f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight7 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(2.59f, 5.8f, -50.55f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight8 = PointLight(glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(2.40f, 5.8f, -51.52f), glm::vec3(1.0f, 0.04f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		pointlightArray.push_back(pointLight1);
+		pointlightArray.push_back(pointLight2);
+		pointlightArray.push_back(pointLight3);
+		pointlightArray.push_back(pointLight4);
+		pointlightArray.push_back(pointLight5);
+		pointlightArray.push_back(pointLight6);
+		pointlightArray.push_back(pointLight7);
+		pointlightArray.push_back(pointLight8);
+
+		float skyboxVertices[] = {
+			// positions          
+			-1.0f,  1.0f, -1.0f,
+			-1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			-1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f
+		};
+
+		// skybox VAO
+		unsigned int skyboxVAO, skyboxVBO;
+		glGenVertexArrays(1, &skyboxVAO);
+		glGenBuffers(1, &skyboxVBO);
+		glBindVertexArray(skyboxVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+		// load textures for skybox
+		vector<std::string> faces{
+			("assets/models/skybox/right.jpg"),
+			("assets/models/skybox/left.jpg"),
+			("assets/models/skybox/top.jpg"),
+			("assets/models/skybox/bottom.jpg"),
+			("assets/models/skybox/front.jpg"),
+			("assets/models/skybox/back.jpg")
+		};
+		unsigned int cubemapTexture = loadCubemap(faces);
+
+		// set skybox
+		game->skyboxShader->use();
+		game->skyboxShader->setUniform("skybox", 0);
+
 		// Render loop
 		float t = float(glfwGetTime());
 		float dt = 0.0f;
@@ -215,7 +314,8 @@ int main(int argc, char** argv)
 			//camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
 
 			// Set per-frame uniforms
-			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
+			//setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
+			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointlightArray); // multiple pointlights
 
 			//PhysX
 			stepPhysics(dt);
@@ -223,6 +323,22 @@ int main(int argc, char** argv)
 			// Render
 			game->update(dt);
 			game->draw();
+
+			// draw skybox as last
+			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+			game->skyboxShader->use();
+			glm::mat4 view = glm::mat4(glm::mat3(camera.getViewMatrix())); // remove translation from the view matrix
+			glm::mat4 projection = glm::mat4(camera.getProjectionMatrix());
+			game->skyboxShader->setUniform("view", view);
+			game->skyboxShader->setUniform("projection", projection);
+
+			// skybox cube
+			glBindVertexArray(skyboxVAO);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glBindVertexArray(0);
+			glDepthFunc(GL_LESS); // set depth function back to default
 
 			// Compute frame time
 			dt = t;
@@ -373,7 +489,7 @@ void setWindowFPS(GLFWwindow *window, float& t_sum)
 		frames = 0;
 	}
 }
-
+/*
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL){
 
 	shader->use();
@@ -387,8 +503,10 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 	shader->setUniform("pointL.position", pointL.position);
 	shader->setUniform("pointL.attenuation", pointL.attenuation);
 }
+*/
 
-void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL)
+// for multiple pointlights
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray)
 {
 	shader->use();
 	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
@@ -397,9 +515,20 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 	shader->setUniform("dirL.color", dirL.color);
 	shader->setUniform("dirL.direction", dirL.direction);
 
-	shader->setUniform("pointL.color", pointL.color);
-	shader->setUniform("pointL.position", pointL.position);
-	shader->setUniform("pointL.attenuation", pointL.attenuation);
+	shader->setUniform("normalMapping", normalMapping);
+	//std::cout << "set normalMapping to: " << normalMapping << std::endl;
+
+
+	// TODO: check for level and add pointlights accordingly
+	// iterate over all the pointlights	
+	for (GLuint i = 0; i < pointlightArray.size(); i++) {
+		string number = std::to_string(i);
+		PointLight& pointLight = pointlightArray[i];
+
+		shader->setUniformArr("pointLights", i, "color", pointLight.color);
+		shader->setUniformArr("pointLights", i, "position", pointLight.position);
+		shader->setUniformArr("pointLights", i, "attenuation", pointLight.attenuation);
+	}
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -414,6 +543,47 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		_strafing = false;
 	}
 }
+
+// loads a cubemap texture from 6 individual texture faces
+unsigned int loadCubemap(vector<std::string> faces) {
+
+	// order:
+	// +X (right)
+	// -X (left)
+	// +Y (top)
+	// -Y (bottom)
+	// +Z (front) 
+	// -Z (back)
+
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
+
 
 // FPS Camera & Player input processing
 void processInput(GLFWwindow* window, float deltaTime){
@@ -520,7 +690,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			if (config.culling) glEnable(GL_CULL_FACE);
 			else glDisable(GL_CULL_FACE);
 			break;
+		case GLFW_KEY_F4:
+			normalMapping = !normalMapping;
+			std::cout << "set normalMapping to: " << (normalMapping ? "true" : "false") << std::endl;
+			break;
 	}
+	
 }
 
 static void APIENTRY DebugCallbackDefault(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
