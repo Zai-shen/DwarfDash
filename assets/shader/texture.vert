@@ -9,11 +9,11 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 uv;
 
-layout(location = 3) in vec2 tangent;
-layout(location = 4) in vec2 bitangent;
+layout(location = 3) in vec3 tangent;
+layout(location = 4) in vec3 bitangent;
 
 out VertexData {
-	vec3 position_world;
+	vec3 position_world; // fragpos
 	vec3 normal_world;
 	vec2 uv;
 } vert;
@@ -22,10 +22,8 @@ uniform mat4 modelMatrix;
 uniform mat4 viewProjMatrix;
 uniform mat3 normalMatrix;
 
-uniform vec3 lightPos; // position of the light
-uniform vec3 viewPos; // position of the camera
-
 void main() {
+	// normal mapping without tangent/bitangent
 	vert.normal_world = normalMatrix * normal;
 	vert.uv = uv;
 	
@@ -33,7 +31,4 @@ void main() {
 	vert.position_world = position_world_.xyz;
 	
 	gl_Position = viewProjMatrix * position_world_;
-
-
-
 }

@@ -377,12 +377,12 @@ int main(int argc, char** argv)
 		// load textures
 		// -------------
 		vector<std::string> faces{
-			("assets/models/skybox/right.jpg"),
-			("assets/models/skybox/left.jpg"),
-			("assets/models/skybox/top.jpg"),
-			("assets/models/skybox/bottom.jpg"),
-			("assets/models/skybox/front.jpg"),
-			("assets/models/skybox/back.jpg")
+			("assets/models/skybox3/right.png"),
+			("assets/models/skybox3/left.png"),
+			("assets/models/skybox3/top.png"),
+			("assets/models/skybox3/bottom.png"),
+			("assets/models/skybox3/front.png"),
+			("assets/models/skybox3/back.png")
 		};
 		unsigned int cubemapTexture = loadCubemap(faces);
 
@@ -654,9 +654,7 @@ void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL,
 		shader->setUniformArr("pointLights", i, "color", pointLight.color);
 		shader->setUniformArr("pointLights", i, "position", pointLight.position);
 		shader->setUniformArr("pointLights", i, "attenuation", pointLight.attenuation);
-
 	}
-
 }
 
 // loads a cubemap texture from 6 individual texture faces

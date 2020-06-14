@@ -9,6 +9,10 @@ in VertexData {
 	vec3 position_world;
 	vec3 normal_world;
 	vec2 uv;
+
+	vec3 TangentLightPos;
+    vec3 TangentViewPos;
+    vec3 TangentFragPos;
 } vert;
 
 out vec4 color;
@@ -49,14 +53,17 @@ vec3 phong(vec3 n, vec3 l, vec3 v, vec3 diffuseC, float diffuseF, vec3 specularC
 
 void main() {	
 
-	vec3 n = normalize(vert.normal_world); // ecg framework (used if normapping is false)
+	vec3 n = normalize(vert.normal_world); // ecg framework (used if normapping is disabled)
 		
 	if(normalMapping) {
 	    n = texture(texture_normal1, vert.uv).rgb;	   // obtain normal from normal map in range [0, 1]
 		n = normalize(n * 2.0 - 1.0);  				   // transform normal vector to range [-1,1]
 	} 
 
-	vec3 v = normalize(camera_world - vert.position_world);
+	vec3 v = normalize(camera_world - vert.position_world); // ecg framework
+
+	//vec3 v = normalize(vert.TangentLightPos - vert.TangentFragPos); // used for tangent/bitangent normal mapping
+
 	vec3 texColor = texture(texture_diffuse1, vert.uv).rgb;
 	color = vec4(texColor * materialCoefficients.x, 1); // ambient
 	
