@@ -17,8 +17,6 @@
 #include "physxInclude/pvd/PxPvdSceneClient.h"
 #include "physxInclude/pvd/PxPvdTransport.h"
 
-
-
 // Model loading
 #include "Model.h"
 
@@ -35,6 +33,9 @@ using namespace std;
 
 //Temp
 #include <glm/gtx/string_cast.hpp>
+
+// TextRendering
+#include "TextRendering.h"
 
 /* --------------------------------------------- */
 // Prototypes
@@ -184,6 +185,10 @@ int main(int argc, char** argv)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
+	// needed for text rendering
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	/* --------------------------------------------- */
 	// Initialize scene and render loop
 	/* --------------------------------------------- */
@@ -200,22 +205,23 @@ int main(int argc, char** argv)
 		//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
 		Shader lightCubeShader("light_cube.vert", "light_cube.frag");
+		Shader textShader("textRendering.vert", "textRendering.frag");
+
+		TextRendering textRenderer(textShader, float(config.width), float(config.height));
 
 		//DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(1.0f, 1.4f, 1.0f)); // color,  direction;
 
 		glm::vec3 boxpos1 = glm::vec3(0.61f, 2.8f, -19.8f);
 		glm::vec3 boxpos2 = glm::vec3(12.27f, 2.8f, -19.8f);
-		//glm::vec3 boxpos3 = glm::vec3(12.56f, 6.8f, -50.0f);
 		glm::vec3 boxpos3 = glm::vec3(12.5f, 6.8f, -50.0f );
 		glm::vec3 boxpos4 = glm::vec3(11.47f, 6.8f, -88.0f);
 
 		std::vector<PointLight> pointlightArray = std::vector<PointLight>(); // pointlight array filled with pointlights for each level
 		PointLight pointLight1 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos1), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
 		PointLight pointLight2 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos2), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		//PointLight pointLight3 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos3), glm::vec3(1.0f, 0.1f, 0.01f)); // plattform in the middle
 		PointLight pointLight3 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos3), glm::vec3(1.0f, 0.1f, 0.01f)); // plattform in the middle
-		PointLight pointLight4 = PointLight(glm::vec3(1.0f, 0.0f, 0.f), glm::vec3(boxpos4), glm::vec3(1.0f, 0.4f, 0.1f));   // plattform right before the goal
+		PointLight pointLight4 = PointLight(glm::vec3(1.0f, 0.0f, 0.f),  glm::vec3(boxpos4), glm::vec3(1.0f, 0.4f, 0.1f));   // plattform right before the goal
 
 		pointlightArray.push_back(pointLight1);
 		pointlightArray.push_back(pointLight2);
@@ -391,6 +397,8 @@ int main(int argc, char** argv)
 			game->update(dt);
 			game->draw();
 
+
+
 			// light visualization
 			lightCubeShader.use();
 			lightCubeShader.setUniform("view", camera.getViewMatrix());
@@ -430,6 +438,9 @@ int main(int argc, char** argv)
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 			glBindVertexArray(0);
 			glDepthFunc(GL_LESS); // set depth function back to default
+
+			// render text
+			textRenderer.renderText("current points:   " + to_string(game->player->score), 25.0f, 25.0f, 1.0f, glm::vec3(0.6f, 1.0f, 0.5f));
 
 			// Compute frame time
 			dt = t;
@@ -610,7 +621,6 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 	shader->setUniform("normalMapping", normalMapping);
 	//std::cout << "set normalMapping to: " << normalMapping << std::endl;
 
-
 	// TODO: check for level and add pointlights accordingly
 	// iterate over all the pointlights	
 	for (GLuint i = 0; i < pointlightArray.size(); i++) {
@@ -675,7 +685,6 @@ unsigned int loadCubemap(vector<std::string> faces) {
 
 	return textureID;
 }
-
 
 // FPS Camera & Player input processing
 void processInput(GLFWwindow* window, float deltaTime){
