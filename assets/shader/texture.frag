@@ -40,7 +40,7 @@ uniform struct PointLight {
 	vec3 attenuation;
 } pointL;
 
-uniform PointLight pointLights[8];
+uniform PointLight pointLights[4];
 
 vec3 phong(vec3 n, vec3 l, vec3 v, vec3 diffuseC, float diffuseF, vec3 specularC, vec3 specularF, float alpha, bool attenuate, vec3 attenuation) {
 	float d = length(l);
@@ -58,11 +58,9 @@ void main() {
 	if(normalMapping) {
 	    n = texture(texture_normal1, vert.uv).rgb;	   // obtain normal from normal map in range [0, 1]
 		n = normalize(n * 2.0 - 1.0);  				   // transform normal vector to range [-1,1]
-		//n = normalize(n);  				   // transform normal vector to range [-1,1]
 	} 
 
-	vec3 v = normalize(camera_world - vert.position_world); // ecg framework
-
+	vec3 v = normalize(camera_world - vert.position_world); // ecg framework (viewDirection)
 	//vec3 v = normalize(vert.TangentLightPos - vert.TangentFragPos); // used for tangent/bitangent normal mapping
 
 	vec3 texColor = texture(texture_diffuse1, vert.uv).rgb;

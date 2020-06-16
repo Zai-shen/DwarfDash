@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\FPSCamera.cpp" />
@@ -6,6 +6,7 @@
     <ClCompile Include="src\Geometry.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\TextRendering.cpp" />
     <ClInclude Include="src\FPSCamera.h" />
     <ClInclude Include="src\Gameobject.h" />
     <ClInclude Include="src\Material.h" />
@@ -24,6 +25,7 @@
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\TextRendering.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Utils.h" />
   </ItemGroup>

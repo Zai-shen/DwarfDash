@@ -24,6 +24,7 @@ uniform mat3 normalMatrix;
 
 void main() {
 	// normal mapping without tangent/bitangent
+
 	vert.normal_world = normalMatrix * normal;
 	vert.uv = uv;
 	

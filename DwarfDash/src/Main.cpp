@@ -190,7 +190,7 @@ int main(int argc, char** argv)
 	{
 		// Init PhysX
 		initPhysX();
-
+		 
 		// Init game
 		game->gPhysics = gPhysics;
 		game->gScene = gScene;
@@ -199,30 +199,73 @@ int main(int argc, char** argv)
 		// Initialize camera
 		//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
-		// Initialize lights
-		//PointLight pointL(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(1.0f, 0.4f, 0.1f)); // color, position, attenuation
-		//DirectionalLight dirL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));			  // color,  direction;
+		Shader lightCubeShader("light_cube.vert", "light_cube.frag");
 
-		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
-		PointLight pointL(glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(5.0f, 15.0f, 10.0f), glm::vec3(0.2f, 0.2f, 0.1f)); // color, position, attenuation (constant, linear, quadratic)
+		//DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
+		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(1.0f, 1.4f, 1.0f)); // color,  direction;
+
+		glm::vec3 boxpos1 = glm::vec3(0.61f, 2.8f, -19.8f);
+		glm::vec3 boxpos2 = glm::vec3(12.27f, 2.8f, -19.8f);
+		//glm::vec3 boxpos3 = glm::vec3(12.56f, 6.8f, -50.0f);
+		glm::vec3 boxpos3 = glm::vec3(12.5f, 6.8f, -50.0f );
+		glm::vec3 boxpos4 = glm::vec3(11.47f, 6.8f, -88.0f);
 
 		std::vector<PointLight> pointlightArray = std::vector<PointLight>(); // pointlight array filled with pointlights for each level
-		PointLight pointLight1 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.56f, 2.8f, 1.6f),    glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight2 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.64f, 2.8f, -18.46f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight3 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(10.41f, 2.8f, -18.34f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight4 = PointLight(glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(10.41f, 2.8f, -22.48f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)																												 
-		PointLight pointLight5 = PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(2.40f,  6.8f, -42.40f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight6 = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(2.41f,  6.8f, -46.37f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight7 = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(2.59f,  6.8f, -50.55f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight8 = PointLight(glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(2.40f,  6.8f, -51.52f), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight1 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos1), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		PointLight pointLight2 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos2), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
+		//PointLight pointLight3 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos3), glm::vec3(1.0f, 0.1f, 0.01f)); // plattform in the middle
+		PointLight pointLight3 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos3), glm::vec3(1.0f, 0.1f, 0.01f)); // plattform in the middle
+		PointLight pointLight4 = PointLight(glm::vec3(1.0f, 0.0f, 0.f), glm::vec3(boxpos4), glm::vec3(1.0f, 0.4f, 0.1f));   // plattform right before the goal
+
 		pointlightArray.push_back(pointLight1);
 		pointlightArray.push_back(pointLight2);
 		pointlightArray.push_back(pointLight3);
 		pointlightArray.push_back(pointLight4);
-		pointlightArray.push_back(pointLight5);
-		pointlightArray.push_back(pointLight6);
-		pointlightArray.push_back(pointLight7);
-		pointlightArray.push_back(pointLight8);
+
+		// visualization cube
+		float vertices[] = {
+			-0.5f, -0.5f, -0.5f,
+			 0.5f, -0.5f, -0.5f,
+			 0.5f,  0.5f, -0.5f,
+			 0.5f,  0.5f, -0.5f,
+			-0.5f,  0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f,
+
+			-0.5f, -0.5f,  0.5f,
+			 0.5f, -0.5f,  0.5f,
+			 0.5f,  0.5f,  0.5f,
+			 0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f,  0.5f,
+			-0.5f, -0.5f,  0.5f,
+
+			-0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f,
+			-0.5f, -0.5f,  0.5f,
+			-0.5f,  0.5f,  0.5f,
+
+			 0.5f,  0.5f,  0.5f,
+			 0.5f,  0.5f, -0.5f,
+			 0.5f, -0.5f, -0.5f,
+			 0.5f, -0.5f, -0.5f,
+			 0.5f, -0.5f,  0.5f,
+			 0.5f,  0.5f,  0.5f,
+
+			-0.5f, -0.5f, -0.5f,
+			 0.5f, -0.5f, -0.5f,
+			 0.5f, -0.5f,  0.5f,
+			 0.5f, -0.5f,  0.5f,
+			-0.5f, -0.5f,  0.5f,
+			-0.5f, -0.5f, -0.5f,
+
+			-0.5f,  0.5f, -0.5f,
+			 0.5f,  0.5f, -0.5f,
+			 0.5f,  0.5f,  0.5f,
+			 0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f, -0.5f,
+		};
 
 		float skyboxVertices[] = {
 			// positions          
@@ -268,6 +311,31 @@ int main(int argc, char** argv)
 			-1.0f, -1.0f,  1.0f,
 			 1.0f, -1.0f,  1.0f
 		};
+
+		// first, configure the cube's VAO (and VBO)
+		unsigned int VBO, cubeVAO;
+		glGenVertexArrays(1, &cubeVAO);
+		glGenBuffers(1, &VBO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glBindVertexArray(cubeVAO);
+
+		// position attribute
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
+		unsigned int lightCubeVAO;
+		glGenVertexArrays(1, &lightCubeVAO);
+		glBindVertexArray(lightCubeVAO);
+
+		// we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
 
 		// skybox VAO
 		unsigned int skyboxVAO, skyboxVBO;
@@ -322,6 +390,30 @@ int main(int argc, char** argv)
 			// Render
 			game->update(dt);
 			game->draw();
+
+			// light visualization
+			lightCubeShader.use();
+			lightCubeShader.setUniform("view", camera.getViewMatrix());
+			lightCubeShader.setUniform("projection", camera.getProjectionMatrix());
+			lightCubeShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+
+			// multiple cubes
+			glm::vec3 cubePositions[] = {
+				glm::vec3(boxpos1),
+				glm::vec3(boxpos2),
+				glm::vec3(boxpos3),
+				glm::vec3(boxpos4)
+			};
+
+			for (unsigned int i = 0; i <= 4; i++) {
+				// calculate the model matrix for each cube and pass it to shader before drawing
+				glm::mat4 model = glm::mat4(1.0f);
+				model = glm::translate(model, cubePositions[i]);
+				model = glm::scale(model, glm::vec3(0.4f));
+				lightCubeShader.setUniform("modelMatrix", model);
+				glBindVertexArray(lightCubeVAO);
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+			}
 
 			// draw skybox as last
 			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
@@ -488,6 +580,7 @@ void setWindowFPS(GLFWwindow *window, float& t_sum)
 		frames = 0;
 	}
 }
+
 /*
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL){
 
@@ -659,7 +752,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
 	camera.ProcessMouseMovement(xoffset, yoffset);
 	
 }
-
 
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)

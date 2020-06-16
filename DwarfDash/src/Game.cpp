@@ -40,7 +40,6 @@ void Game::init() {
 void Game::initShaders() {
 	primaryShader = make_shared<Shader>("texture.vert", "texture.frag");
 	modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
-	//Shader skyboxShader("skybox.vert", "skybox.frag");
 	skyboxShader = make_shared<Shader>("skybox.vert", "skybox.frag");
 }
 
@@ -113,17 +112,17 @@ void Game::initLevel1() {
 void Game::initLevel2() {
 	addPlatformLine(2, F, PxVec3(0.f, 0.f, 0.f));
 
-	// Dynamic model example
+	// Dynamic coin example
 	Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
 	Gameobject* goCoin = new Gameobject(coin);
 	addGameobject(goCoin, true, PxVec3(0.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "coin");
 
-	// Dynamic model example
+	// Dynamic heart example
 	Model* heart = new Model("assets/models/heart/Heart_low_poly_colored.obj", primaryShader);
 	Gameobject* goHeart = new Gameobject(heart);
 	addGameobject(goHeart, true, PxVec3(5.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "heart");
 
-	// Dynamic model example
+	// Dynamic shield example
 	Model* shield = new Model("assets/models/shield/Shield_low_poly_colored.obj", primaryShader);
 	Gameobject* goShield = new Gameobject(shield);
 	addGameobject(goShield, true, PxVec3(-5.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "shield");
