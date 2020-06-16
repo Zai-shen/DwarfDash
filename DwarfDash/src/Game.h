@@ -9,6 +9,7 @@
 #include "Model.h"
 #include <PxPhysicsAPI.h>
 #include "Player.h"
+#include "ParticleSystem.h"
 
 enum Direction {
 	F,
@@ -32,6 +33,7 @@ public:
 	shared_ptr<Shader> primaryShader;
 	shared_ptr<Shader> modelShader;
 	shared_ptr<Shader> skyboxShader;
+	shared_ptr<Shader> particleShader;
 	shared_ptr<Material> woodTextureMaterial;
 	shared_ptr<Material> brickTextureMaterial;
 
@@ -39,6 +41,8 @@ public:
 	PxScene* gScene;
 	PxRigidStatic* ground;
 	Player* player;
+	ParticleSystem *particleSystem;
+
 
 	Game();
 	~Game();
