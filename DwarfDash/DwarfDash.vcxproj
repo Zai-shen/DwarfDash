@@ -1,16 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\Gameobject.cpp" />
     <ClCompile Include="src\Geometry.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\ParticleSystem.cpp" />
     <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\TextRendering.cpp" />
     <ClInclude Include="src\FPSCamera.h" />
     <ClInclude Include="src\Gameobject.h" />
     <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\ParticleSystem.h" />
     <ClInclude Include="src\Player.h" />
-    <ClInclude Include="src\Shader_.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Configuration.h" />
     <ClInclude Include="src\Game.h" />
@@ -24,6 +26,7 @@
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\TextRendering.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Utils.h" />
   </ItemGroup>
@@ -95,7 +98,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)external\libDebug;$(SolutionDir)external\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32s.lib;glfw3.lib;assimp-vc141-mtd.lib;ECG_Library_Debug.lib;LowLevel_static_32.lib;LowLevelAABB_static_32.lib;LowLevelDynamics_static_32.lib;PhysX_32.lib;PhysXCharacterKinematic_static_32.lib;PhysXCommon_32.lib;PhysXCooking_32.lib;PhysXExtensions_static_32.lib;PhysXFoundation_32.lib;PhysXPvdSDK_static_32.lib;PhysXTask_static_32.lib;SceneQuery_static_32.lib;SimulationController_static_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32s.lib;glfw3.lib;assimp-vc141-mtd.lib;ECG_Library_Debug.lib;LowLevel_static_32.lib;LowLevelAABB_static_32.lib;LowLevelDynamics_static_32.lib;PhysX_32.lib;PhysXCharacterKinematic_static_32.lib;PhysXCommon_32.lib;PhysXCooking_32.lib;PhysXExtensions_static_32.lib;PhysXFoundation_32.lib;PhysXPvdSDK_static_32.lib;PhysXTask_static_32.lib;SceneQuery_static_32.lib;SimulationController_static_32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>MSVCRTD;LIBCMT</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
@@ -125,7 +128,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)external\libRelease;$(SolutionDir)external\lib;%(AdditionalLibraryDirectories);$(SolutionDir)external/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32s.lib;glfw3.lib;assimp-vc141-mtd.lib;ECG_Library_Release.lib;LowLevel_static_32.lib;LowLevelAABB_static_32.lib;LowLevelDynamics_static_32.lib;PhysX_32.lib;PhysXCharacterKinematic_static_32.lib;PhysXCommon_32.lib;PhysXCooking_32.lib;PhysXExtensions_static_32.lib;PhysXFoundation_32.lib;PhysXPvdSDK_static_32.lib;PhysXTask_static_32.lib;SceneQuery_static_32.lib;SimulationController_static_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32s.lib;glfw3.lib;assimp-vc141-mtd.lib;ECG_Library_Release.lib;LowLevel_static_32.lib;LowLevelAABB_static_32.lib;LowLevelDynamics_static_32.lib;PhysX_32.lib;PhysXCharacterKinematic_static_32.lib;PhysXCommon_32.lib;PhysXCooking_32.lib;PhysXExtensions_static_32.lib;PhysXFoundation_32.lib;PhysXPvdSDK_static_32.lib;PhysXTask_static_32.lib;SceneQuery_static_32.lib;SimulationController_static_32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <ForceFileOutput>

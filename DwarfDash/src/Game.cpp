@@ -33,6 +33,9 @@ void Game::init() {
 	// Create & init Player
 	player = new Player(gPhysics, gScene);
 
+	// Create & init particle system
+	particleSystem = new ParticleSystem(particleShader, 100);
+
 	// Start game
 	currentGameState = GAME_STATE_ACTIVE;
 }
@@ -40,6 +43,8 @@ void Game::init() {
 void Game::initShaders() {
 	primaryShader = make_shared<Shader>("texture.vert", "texture.frag");
 	modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
+	skyboxShader = make_shared<Shader>("skybox.vert", "skybox.frag");
+	particleShader = make_shared<Shader>("particles.vert", "particles.frag");
 }
 
 void Game::initTextures() {
@@ -76,7 +81,7 @@ void Game::initLevel1() {
 
 	// Coin
 	Gameobject* goCoin = new Gameobject(new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader));
-	addGameobject(goCoin, true, PxVec3(0.f,1.5f,0.f) + 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingBack, *defaultPickUpGeometry, "coin");
+	addGameobject(goCoin, true, PxVec3(0.f,1.8f,0.f) + 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingBack, *defaultPickUpGeometry, "coin");
 
 	addPlatformStairs(5, F, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront);
 	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft);
@@ -109,19 +114,20 @@ void Game::initLevel1() {
 }
 
 void Game::initLevel2() {
-	addPlatformLine(2, F, PxVec3(0.f, 0.f, 0.f));
+	createGroundPlane();
+	addPlatformLine(5, F, PxVec3(0.f, 0.f, 0.f));
 
-	// Dynamic model example
+	// Dynamic coin example
 	Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
 	Gameobject* goCoin = new Gameobject(coin);
 	addGameobject(goCoin, true, PxVec3(0.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "coin");
 
-	// Dynamic model example
+	// Dynamic heart example
 	Model* heart = new Model("assets/models/heart/Heart_low_poly_colored.obj", primaryShader);
 	Gameobject* goHeart = new Gameobject(heart);
 	addGameobject(goHeart, true, PxVec3(5.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "heart");
 
-	// Dynamic model example
+	// Dynamic shield example
 	Model* shield = new Model("assets/models/shield/Shield_low_poly_colored.obj", primaryShader);
 	Gameobject* goShield = new Gameobject(shield);
 	addGameobject(goShield, true, PxVec3(-5.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "shield");
@@ -143,6 +149,7 @@ void Game::initLevel2() {
 }
 
 void Game::initLevel3() {
+	createGroundPlane();
 	addPlatformLine(50, F, PxVec3(0));
 
 	Gameobject* goGoal = new Gameobject(new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader));
@@ -222,6 +229,7 @@ void Game::addPlatformStairs(int length, Direction direction, PxVec3 startingPos
 void Game::update(float dt) {
 	currentLevel->update(dt);
 	player->update(dt);
+	particleSystem->Update(dt, glm::vec3(0.f,1.f,0.f), 2, glm::vec3(0.f,0.f,0.f));
 
 	if (player->hasLost)
 	{
@@ -242,6 +250,7 @@ void Game::update(float dt) {
 		cout << "You win!" << endl;
 		cout << "Score: " << player->score << endl;
 
+		ground->release();
 		currentLevel->~Level();
 		currentLevel = nextLevel();
 		initLevels();
@@ -251,6 +260,7 @@ void Game::update(float dt) {
 void Game::draw() {
 	currentLevel->draw();
 	player->draw();
+	particleSystem->Draw(camPointer->getViewProjectionMatrix(), camPointer->getPosition());
 }
 
 void Game::reset() {
@@ -317,5 +327,17 @@ Level* Game::nextLevel() {
 	else if (currentLevel = level3) {
 		cout << "Congratulations! You won the entire game!" << endl;
 		return level1;
+	}
+}
+
+std::string Game::getLevelString() {
+	if (currentLevel == level1) {
+		return "level1";
+	}
+	else if (currentLevel == level2) {
+		return "level2";
+	}
+	else {
+		return "level3";
 	}
 }

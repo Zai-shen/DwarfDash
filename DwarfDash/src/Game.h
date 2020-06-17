@@ -9,6 +9,8 @@
 #include "Model.h"
 #include <PxPhysicsAPI.h>
 #include "Player.h"
+#include "ParticleSystem.h"
+#include "FPSCamera.h"
 
 enum Direction {
 	F,
@@ -31,6 +33,8 @@ public:
 
 	shared_ptr<Shader> primaryShader;
 	shared_ptr<Shader> modelShader;
+	shared_ptr<Shader> skyboxShader;
+	shared_ptr<Shader> particleShader;
 	shared_ptr<Material> woodTextureMaterial;
 	shared_ptr<Material> brickTextureMaterial;
 
@@ -38,6 +42,9 @@ public:
 	PxScene* gScene;
 	PxRigidStatic* ground;
 	Player* player;
+	ParticleSystem *particleSystem;
+	FPSCamera* camPointer;
+
 
 	Game();
 	~Game();
@@ -65,6 +72,7 @@ private:
 	Level* level2 = new Level();
 	Level* level3 = new Level();
 	Level* currentLevel = level1;
+	//Level* currentLevel = level2;
 
 	shared_ptr<Texture> woodTexture;
 	shared_ptr<Texture> brickTexture;
@@ -79,6 +87,8 @@ private:
 	void addPlatformLine(int length, Direction direction, PxVec3 startingPosition);
 	void addPlatformStairs(int length, Direction direction, PxVec3 startingPosition);
 	void createGroundPlane();
+
+	std::string getLevelString();
 
 	PxVec3 platCurrentHeight = PxVec3(0.f,0.f,0.f);
 	PxVec3 inclination = PxVec3(0.f, 1.f, 0.f);
