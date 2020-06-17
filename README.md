@@ -37,7 +37,7 @@ This game aims to be *fun and fast paced*, while at the same time _fullfilling t
 
 ### Effects
 [x] Environment Map (8 Points)
-[x] Simple Normal Mapping (4 Points)
+[x] Simple Normal Mapping (4 Points) (turn on/off with F4)
 
 ### Optional
 [x] Specular Map (4 Points)
