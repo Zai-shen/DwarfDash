@@ -114,6 +114,7 @@ void Game::initLevel1() {
 }
 
 void Game::initLevel2() {
+	createGroundPlane();
 	addPlatformLine(2, F, PxVec3(0.f, 0.f, 0.f));
 
 	// Dynamic coin example
@@ -148,6 +149,7 @@ void Game::initLevel2() {
 }
 
 void Game::initLevel3() {
+	createGroundPlane();
 	addPlatformLine(50, F, PxVec3(0));
 
 	Gameobject* goGoal = new Gameobject(new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader));
@@ -227,7 +229,7 @@ void Game::addPlatformStairs(int length, Direction direction, PxVec3 startingPos
 void Game::update(float dt) {
 	currentLevel->update(dt);
 	player->update(dt);
-	particleSystem->Update(dt, glm::vec2(1.f,1.f), 2, glm::vec2(3.f,1.5f));
+	particleSystem->Update(dt, glm::vec2(5.f,.5f), 2, glm::vec2(6.f,3.f));
 
 	if (player->hasLost)
 	{
@@ -248,6 +250,7 @@ void Game::update(float dt) {
 		cout << "You win!" << endl;
 		cout << "Score: " << player->score << endl;
 
+		ground->release();
 		currentLevel->~Level();
 		currentLevel = nextLevel();
 		initLevels();
