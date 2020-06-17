@@ -24,7 +24,7 @@ void ParticleSystem::Update(float dt, glm::vec3 position, unsigned int newPartic
 		p.Life -= dt; // reduce life
 		if (p.Life > 0.0f)
 		{	// particle is alive, thus update
-			p.Position -= p.Velocity * dt;
+			p.Position += p.Velocity * dt;
 			p.Color.a -= dt * 2.5f;
 			//std::cout << glm::to_string(p.Position) << " <pos color> " << glm::to_string(p.Color) << std::endl;
 		}
@@ -59,13 +59,13 @@ void ParticleSystem::init()
 	// set up mesh and attribute properties
 	unsigned int VBO;
 	float particle_quad[] = {
-		0.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.5f, 0.0f, 0.5f,
+		0.5f, 0.0f, 0.5f, 0.0f,
 		0.0f, 0.0f, 0.0f, 0.0f,
 
-		0.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 0.0f
+		0.0f, 0.5f, 0.0f, 0.5f,
+		0.5f, 0.5f, 0.5f, 0.5f,
+		0.5f, 0.0f, 0.5f, 0.0f
 	};
 	glGenVertexArrays(1, &this->VAO);
 	glGenBuffers(1, &VBO);
@@ -111,7 +111,8 @@ void ParticleSystem::respawnParticle(Particle &particle, glm::vec3 pos, glm::vec
 	float random = ((rand() % 100) - 50) / 10.0f;
 	float rColor = 0.5f + ((rand() % 100) / 100.0f);
 	particle.Position = pos + random + offset;
-	particle.Color = glm::vec4(rColor, rColor, rColor, 1.0f);
-	particle.Life = 1.0f;
-	particle.Velocity = glm::vec3(0.1f,1.f,-0.1f);
+	//particle.Color = glm::vec4(rColor, rColor, rColor, 1.0f);
+	particle.Color = glm::vec4(rColor, 0.f, 0.f, 1.0f);
+	particle.Life = 5.0f;
+	//particle.Velocity = glm::vec3(0.1f,1.f,-0.1f);
 }

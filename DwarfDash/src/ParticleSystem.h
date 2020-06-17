@@ -11,7 +11,7 @@ struct Particle {
 	glm::vec4 Color;
 	float     Life;
 
-	Particle() : Position(0.0f), Velocity(0.0f), Color(1.f), Life(0.0f) { }
+	Particle() : Position(0.0f), Velocity(0.0f,1.0f,0.0f), Color(1.0f,0.f,0.f,1.f), Life(0.0f) { }
 };
 
 class ParticleSystem

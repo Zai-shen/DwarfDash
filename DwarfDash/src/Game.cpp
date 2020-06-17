@@ -34,7 +34,7 @@ void Game::init() {
 	player = new Player(gPhysics, gScene);
 
 	// Create & init particle system
-	particleSystem = new ParticleSystem(particleShader, 500);
+	particleSystem = new ParticleSystem(particleShader, 100);
 
 	// Start game
 	currentGameState = GAME_STATE_ACTIVE;
@@ -229,7 +229,7 @@ void Game::addPlatformStairs(int length, Direction direction, PxVec3 startingPos
 void Game::update(float dt) {
 	currentLevel->update(dt);
 	player->update(dt);
-	particleSystem->Update(dt, glm::vec3(2.f,2.f,-2.f), 2, glm::vec3(2.f,3.f,1.f));
+	particleSystem->Update(dt, glm::vec3(0.f,1.f,0.f), 2, glm::vec3(0.f,0.f,0.f));
 
 	if (player->hasLost)
 	{
