@@ -13,7 +13,7 @@ This game aims to be *fun and fast paced*, while at the same time _fullfilling t
 [x] Min. 60 FPS and Framerate Independence (3 Points)
 	Also insured by Nvidia PhysX
 [x] Win/Lose Condition (3 Points)
-	Getting to the finish line / falling of platforms | getting catched by the cloud of death
+	Getting to the finish line / falling of platforms | getting caught by the cloud of death
 [x] Intuitive Controls (2 Points)
 	W/A/S/D /R for reset
 [x] Intuitive Camera (2 Points)
@@ -33,7 +33,14 @@ This game aims to be *fun and fast paced*, while at the same time _fullfilling t
 	Nvidia PhysX
 [] Scripting Language Integration (6 Points)
 [] View-Frustum Culling (6 Points)
-[] Heads-Up Display (4 Points)
+[x] Heads-Up Display (4 Points)
+
+### Effects
+[x] Environment Map (8 Points)
+[x] Simple Normal Mapping (4 Points)
+
+### Optional
+[x] Specular Map (4 Points)
 
 
 ## Getting Started
