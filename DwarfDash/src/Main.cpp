@@ -55,8 +55,6 @@ void stepPhysics(float deltaTime);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow* window, float deltaTime);
 
-//void setPerFrameUniforms(Shader* shader, Camera& camera, DirectionalLight& dirL, PointLight& pointL);
-//void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL);
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray);
 
 // Skybox
@@ -202,7 +200,6 @@ int main(int argc, char** argv)
 
 		TextRendering textRenderer(textShader, float(config.width), float(config.height));
 
-		//DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(0.0f, -1.0f, -1.0f)); // color,  direction;
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(1.0f, 1.4f, 1.0f)); // color,  direction;
 
 		glm::vec3 boxpos1 = glm::vec3(0.61f, 2.8f, -19.8f);
@@ -385,13 +382,13 @@ int main(int argc, char** argv)
 			game->update(dt);
 			game->draw();
 
+			/*
 			// light visualization
+			// only needed for visual debugging
 			lightCubeShader.use();
 			lightCubeShader.setUniform("view", camera.getViewMatrix());
 			lightCubeShader.setUniform("projection", camera.getProjectionMatrix());
 			lightCubeShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-
-			// only needed for visual debugging
 
 			// multiple cubes
 			glm::vec3 cubePositions[] = {
@@ -410,6 +407,7 @@ int main(int argc, char** argv)
 				glBindVertexArray(lightCubeVAO);
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 			}
+			*/
 
 			// draw skybox as last
 			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
