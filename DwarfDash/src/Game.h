@@ -9,6 +9,8 @@
 #include "Model.h"
 #include <PxPhysicsAPI.h>
 #include "Player.h"
+#include "ParticleSystem.h"
+#include "FPSCamera.h"
 
 enum Direction {
 	F,
@@ -32,6 +34,7 @@ public:
 	shared_ptr<Shader> primaryShader;
 	shared_ptr<Shader> modelShader;
 	shared_ptr<Shader> skyboxShader;
+	shared_ptr<Shader> particleShader;
 	shared_ptr<Material> woodTextureMaterial;
 	shared_ptr<Material> brickTextureMaterial;
 
@@ -39,6 +42,9 @@ public:
 	PxScene* gScene;
 	PxRigidStatic* ground;
 	Player* player;
+	ParticleSystem *particleSystem;
+	FPSCamera* camPointer;
+
 
 	Game();
 	~Game();
@@ -65,8 +71,8 @@ private:
 	Level* level1 = new Level();
 	Level* level2 = new Level();
 	Level* level3 = new Level();
-	Level* currentLevel = level1;
-	//Level* currentLevel = level2;
+	//Level* currentLevel = level1;
+	Level* currentLevel = level2;
 
 	shared_ptr<Texture> woodTexture;
 	shared_ptr<Texture> brickTexture;
