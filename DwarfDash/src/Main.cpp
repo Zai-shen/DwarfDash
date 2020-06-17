@@ -192,6 +192,7 @@ int main(int argc, char** argv)
 		initPhysX();
 		 
 		// Init game
+		game->camPointer = &camera;
 		game->gPhysics = gPhysics;
 		game->gScene = gScene;
 		game->init();

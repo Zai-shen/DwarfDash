@@ -10,6 +10,7 @@
 #include <PxPhysicsAPI.h>
 #include "Player.h"
 #include "ParticleSystem.h"
+#include "FPSCamera.h"
 
 enum Direction {
 	F,
@@ -42,6 +43,7 @@ public:
 	PxRigidStatic* ground;
 	Player* player;
 	ParticleSystem *particleSystem;
+	FPSCamera* camPointer;
 
 
 	Game();

@@ -1,4 +1,5 @@
 #include "ParticleSystem.h"
+#include <glm/gtx/string_cast.hpp>
 
 ParticleSystem::ParticleSystem(std::shared_ptr<Shader> shader, unsigned int amount)
 	: amount(amount)
@@ -7,7 +8,7 @@ ParticleSystem::ParticleSystem(std::shared_ptr<Shader> shader, unsigned int amou
 	this->init();
 }
 
-void ParticleSystem::Update(float dt, glm::vec2 position, unsigned int newParticles, glm::vec2 offset)
+void ParticleSystem::Update(float dt, glm::vec3 position, unsigned int newParticles, glm::vec3 offset)
 {
 	// add new particles 
 	for (unsigned int i = 0; i < newParticles; ++i)
@@ -15,6 +16,7 @@ void ParticleSystem::Update(float dt, glm::vec2 position, unsigned int newPartic
 		int unusedParticle = this->firstUnusedParticle();
 		this->respawnParticle(this->particles[unusedParticle], position, offset);
 	}
+
 	// update all particles
 	for (unsigned int i = 0; i < this->amount; ++i)
 	{
@@ -24,12 +26,13 @@ void ParticleSystem::Update(float dt, glm::vec2 position, unsigned int newPartic
 		{	// particle is alive, thus update
 			p.Position -= p.Velocity * dt;
 			p.Color.a -= dt * 2.5f;
+			//std::cout << glm::to_string(p.Position) << " <pos color> " << glm::to_string(p.Color) << std::endl;
 		}
 	}
 }
 
 // render all particles
-void ParticleSystem::Draw()
+void ParticleSystem::Draw(glm::mat4 viewProjM, glm::vec3 camPosV)
 {
 	// use additive blending to give it a 'glow' effect
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -38,6 +41,8 @@ void ParticleSystem::Draw()
 	{
 		if (particle.Life > 0.0f)
 		{
+			this->shader->setUniform("viewProjMatrix", viewProjM);
+			//this->shader->setUniform("camera_world", camera.getPosition());
 			this->shader->setUniform("offset", particle.Position);
 			this->shader->setUniform("color", particle.Color);
 			glBindVertexArray(this->VAO);
@@ -101,12 +106,12 @@ unsigned int ParticleSystem::firstUnusedParticle()
 	return 0;
 }
 
-void ParticleSystem::respawnParticle(Particle &particle, glm::vec2 pos, glm::vec2 offset)
+void ParticleSystem::respawnParticle(Particle &particle, glm::vec3 pos, glm::vec3 offset)
 {
 	float random = ((rand() % 100) - 50) / 10.0f;
 	float rColor = 0.5f + ((rand() % 100) / 100.0f);
 	particle.Position = pos + random + offset;
 	particle.Color = glm::vec4(rColor, rColor, rColor, 1.0f);
 	particle.Life = 1.0f;
-	particle.Velocity = glm::vec2(0.1f,1.f);
+	particle.Velocity = glm::vec3(0.1f,1.f,-0.1f);
 }
