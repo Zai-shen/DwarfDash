@@ -81,7 +81,7 @@ void Game::initLevel1() {
 
 	// Coin
 	Gameobject* goCoin = new Gameobject(new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader));
-	addGameobject(goCoin, true, PxVec3(0.f,1.6f,0.f) + 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingBack, *defaultPickUpGeometry, "coin");
+	addGameobject(goCoin, true, PxVec3(0.f,1.8f,0.f) + 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingBack, *defaultPickUpGeometry, "coin");
 
 	addPlatformStairs(5, F, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront);
 	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft);
