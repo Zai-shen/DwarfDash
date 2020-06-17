@@ -354,13 +354,22 @@ int main(int argc, char** argv)
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 		// load textures for skybox
+		//vector<std::string> faces{
+		//	("assets/models/skybox/right.jpg"),
+		//	("assets/models/skybox/left.jpg"),
+		//	("assets/models/skybox/top.jpg"),
+		//	("assets/models/skybox/bottom.jpg"),
+		//	("assets/models/skybox/front.jpg"),
+		//	("assets/models/skybox/back.jpg")
+		//};
+		// cave skybox
 		vector<std::string> faces{
-			("assets/models/skybox/right.jpg"),
-			("assets/models/skybox/left.jpg"),
-			("assets/models/skybox/top.jpg"),
-			("assets/models/skybox/bottom.jpg"),
-			("assets/models/skybox/front.jpg"),
-			("assets/models/skybox/back.jpg")
+			("assets/models/skybox/cave/right.png"),
+			("assets/models/skybox/cave/left.png"),
+			("assets/models/skybox/cave/top.png"),
+			("assets/models/skybox/cave/bottom.png"),
+			("assets/models/skybox/cave/front.png"),
+			("assets/models/skybox/cave/back.png")
 		};
 		unsigned int cubemapTexture = loadCubemap(faces);
 
