@@ -320,3 +320,15 @@ Level* Game::nextLevel() {
 		return level1;
 	}
 }
+
+std::string Game::getLevelString() {
+	if (currentLevel == level1) {
+		return "level1";
+	}
+	else if (currentLevel == level2) {
+		return "level2";
+	}
+	else {
+		return "level3";
+	}
+}

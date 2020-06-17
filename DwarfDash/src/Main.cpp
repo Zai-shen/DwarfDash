@@ -60,7 +60,6 @@ void processInput(GLFWwindow* window, float deltaTime);
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray);
 
 // Skybox
-unsigned int loadTexture(const char *path);
 unsigned int loadCubemap(vector<std::string> faces);
 
 /* --------------------------------------------- */
@@ -141,7 +140,6 @@ int main(int argc, char** argv)
 	// This function makes the context of the specified window current on the calling thread. 
 	glfwMakeContextCurrent(window);
 
-
 	// Initialize GLEW
 	glewExperimental = true;
 	GLenum err = glewInit();
@@ -172,8 +170,6 @@ int main(int argc, char** argv)
 	}
 
 	// set callbacks
-	//glfwSetMouseButtonCallback(window, mouse_button_callback); // not needed in fps
-	//glfwSetScrollCallback(window, scroll_callback);  // not needed in fps
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 
@@ -200,9 +196,6 @@ int main(int argc, char** argv)
 		game->gPhysics = gPhysics;
 		game->gScene = gScene;
 		game->init();
-
-		// Initialize camera
-		//Camera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ);
 
 		Shader lightCubeShader("light_cube.vert", "light_cube.frag");
 		Shader textShader("textRendering.vert", "textRendering.frag");
@@ -353,15 +346,6 @@ int main(int argc, char** argv)
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-		// load textures for skybox
-		//vector<std::string> faces{
-		//	("assets/models/skybox/right.jpg"),
-		//	("assets/models/skybox/left.jpg"),
-		//	("assets/models/skybox/top.jpg"),
-		//	("assets/models/skybox/bottom.jpg"),
-		//	("assets/models/skybox/front.jpg"),
-		//	("assets/models/skybox/back.jpg")
-		//};
 		// cave skybox
 		vector<std::string> faces{
 			("assets/models/skybox/cave/right.png"),
@@ -391,12 +375,7 @@ int main(int argc, char** argv)
 			glfwPollEvents();
 			processInput(window, dt);
 
-			// Update old camera
-			//glfwGetCursorPos(window, &mouse_x, &mouse_y);
-			//camera.update(int(mouse_x), int(mouse_y), _zoom, _dragging, _strafing);
-
 			// Set per-frame uniforms
-			//setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointL);
 			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointlightArray); // multiple pointlights
 
 			//PhysX
@@ -406,13 +385,13 @@ int main(int argc, char** argv)
 			game->update(dt);
 			game->draw();
 
-
-
 			// light visualization
 			lightCubeShader.use();
 			lightCubeShader.setUniform("view", camera.getViewMatrix());
 			lightCubeShader.setUniform("projection", camera.getProjectionMatrix());
 			lightCubeShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+
+			// only needed for visual debugging
 
 			// multiple cubes
 			glm::vec3 cubePositions[] = {
@@ -601,22 +580,6 @@ void setWindowFPS(GLFWwindow *window, float& t_sum)
 	}
 }
 
-/*
-void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, PointLight& pointL){
-
-	shader->use();
-	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-	shader->setUniform("camera_world", camera.getPosition());
-
-	shader->setUniform("dirL.color", dirL.color);
-	shader->setUniform("dirL.direction", dirL.direction);
-
-	shader->setUniform("pointL.color", pointL.color);
-	shader->setUniform("pointL.position", pointL.position);
-	shader->setUniform("pointL.attenuation", pointL.attenuation);
-}
-*/
-
 // for multiple pointlights
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray)
 {
@@ -751,7 +714,6 @@ void processInput(GLFWwindow* window, float deltaTime){
 }
 
 // glfw: whenever the mouse moves, this callback is called
-// -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos){
 	
 	if (firstMouse)
@@ -769,12 +731,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
 
 	camera.ProcessMouseMovement(xoffset, yoffset);
 	
-}
-
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-	_zoom -= float(yoffset) * 0.5f;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
