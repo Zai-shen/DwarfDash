@@ -7,7 +7,6 @@
     <ClCompile Include="src\Geometry.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\ParticleGenerator.cpp" />
-    <ClCompile Include="src\ParticleSystem.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\TextRendering.cpp" />
     <ClInclude Include="src\DDSLoader.h" />
@@ -15,7 +14,6 @@
     <ClInclude Include="src\Gameobject.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\ParticleGenerator.h" />
-    <ClInclude Include="src\ParticleSystem.h" />
     <ClInclude Include="src\Player.h" />
     <ClInclude Include="src\Shader_.h" />
     <ClInclude Include="src\Camera.h" />
