@@ -34,7 +34,8 @@ void Game::init() {
 	player = new Player(gPhysics, gScene);
 
 	// Create & init particle system
-	particleSystem = new ParticleSystem(particleShader, 100);
+	//particleSystem = new ParticleSystem(particleShader, 50);
+	particleGenerator = new ParticleGenerator(particleShader, camPointer, 1000, glm::vec3(-1.5f, 2.f, 1.5f));
 
 	// Start game
 	currentGameState = GAME_STATE_ACTIVE;
@@ -44,7 +45,8 @@ void Game::initShaders() {
 	primaryShader = make_shared<Shader>("texture.vert", "texture.frag");
 	modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
 	skyboxShader = make_shared<Shader>("skybox.vert", "skybox.frag");
-	particleShader = make_shared<Shader>("particles.vert", "particles.frag");
+	//particleShader = make_shared<Shader>("particles.vert", "particles.frag");
+	particleShader = make_shared<Shader>("particlesInstanced.vert", "particlesInstanced.frag");
 }
 
 void Game::initTextures() {
@@ -229,7 +231,8 @@ void Game::addPlatformStairs(int length, Direction direction, PxVec3 startingPos
 void Game::update(float dt) {
 	currentLevel->update(dt);
 	player->update(dt);
-	particleSystem->Update(dt, glm::vec3(0.f,1.f,0.f), 2, glm::vec3(0.f,0.f,0.f));
+	//particleSystem->Update(dt, glm::vec3(0.f,1.f,0.f), 2, glm::vec3(0.f,0.f,0.f));
+	particleGenerator->update(dt);
 
 	if (player->hasLost)
 	{
@@ -260,7 +263,9 @@ void Game::update(float dt) {
 void Game::draw() {
 	currentLevel->draw();
 	player->draw();
-	particleSystem->Draw(camPointer->getViewProjectionMatrix(), camPointer->getPosition());
+	//particleSystem->Draw(camPointer->getViewProjectionMatrix(), camPointer->getPosition());
+	particleGenerator->draw();
+
 }
 
 void Game::reset() {

@@ -9,7 +9,8 @@
 #include "Model.h"
 #include <PxPhysicsAPI.h>
 #include "Player.h"
-#include "ParticleSystem.h"
+//#include "ParticleSystem.h"
+#include "ParticleGenerator.h"
 #include "FPSCamera.h"
 
 enum Direction {
@@ -42,7 +43,8 @@ public:
 	PxScene* gScene;
 	PxRigidStatic* ground;
 	Player* player;
-	ParticleSystem *particleSystem;
+	//ParticleSystem *particleSystem;
+	ParticleGenerator *particleGenerator;
 	FPSCamera* camPointer;
 
 

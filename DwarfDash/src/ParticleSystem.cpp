@@ -108,9 +108,11 @@ unsigned int ParticleSystem::firstUnusedParticle()
 
 void ParticleSystem::respawnParticle(Particle &particle, glm::vec3 pos, glm::vec3 offset)
 {
-	float random = ((rand() % 100) - 50) / 10.0f;
+	float random = ((rand() % 100) - 50) / 10.0f; // -5 to 5
 	float rColor = 0.5f + ((rand() % 100) / 100.0f);
-	particle.Position = pos + random + offset;
+	//particle.Position.x = pos.x + random + offset.x;
+	particle.Position.y = pos.y + random + offset.y;
+	//particle.Position = pos + random + offset;
 	//particle.Color = glm::vec4(rColor, rColor, rColor, 1.0f);
 	particle.Color = glm::vec4(rColor, 0.f, 0.f, 1.0f);
 	particle.Life = 5.0f;

@@ -1,16 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="src\DDSLoader.cpp" />
     <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\Gameobject.cpp" />
     <ClCompile Include="src\Geometry.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\ParticleGenerator.cpp" />
     <ClCompile Include="src\ParticleSystem.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\TextRendering.cpp" />
+    <ClInclude Include="src\DDSLoader.h" />
     <ClInclude Include="src\FPSCamera.h" />
     <ClInclude Include="src\Gameobject.h" />
     <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\ParticleGenerator.h" />
     <ClInclude Include="src\ParticleSystem.h" />
     <ClInclude Include="src\Player.h" />
     <ClInclude Include="src\Shader_.h" />

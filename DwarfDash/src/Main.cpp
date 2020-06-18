@@ -388,6 +388,22 @@ int main(int argc, char** argv)
 			//PhysX
 			stepPhysics(dt);
 
+			// draw skybox before opaque particle shader, to give information about background
+			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+			game->skyboxShader->use();
+			glm::mat4 view = glm::mat4(glm::mat3(camera.getViewMatrix())); // remove translation from the view matrix
+			glm::mat4 projection = glm::mat4(camera.getProjectionMatrix());
+			game->skyboxShader->setUniform("view", view);
+			game->skyboxShader->setUniform("projection", projection);
+
+			// skybox cube
+			glBindVertexArray(skyboxVAO);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glBindVertexArray(0);
+			glDepthFunc(GL_LESS); // set depth function back to default
+
 			// Render
 			game->update(dt);
 			game->draw();
@@ -416,21 +432,7 @@ int main(int argc, char** argv)
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 			}
 
-			// draw skybox as last
-			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-			game->skyboxShader->use();
-			glm::mat4 view = glm::mat4(glm::mat3(camera.getViewMatrix())); // remove translation from the view matrix
-			glm::mat4 projection = glm::mat4(camera.getProjectionMatrix());
-			game->skyboxShader->setUniform("view", view);
-			game->skyboxShader->setUniform("projection", projection);
 
-			// skybox cube
-			glBindVertexArray(skyboxVAO);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-			glBindVertexArray(0);
-			glDepthFunc(GL_LESS); // set depth function back to default
 
 			// Compute frame time
 			dt = t;
