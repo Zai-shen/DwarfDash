@@ -33,9 +33,6 @@ void Game::init() {
 	// Create & init Player
 	player = new Player(gPhysics, gScene);
 
-	// Create & init particle system
-	particleGenerator = new ParticleGenerator(particleShader, camPointer, 1000, glm::vec3(-1.5f, 2.f, 1.5f));
-
 	// Start game
 	currentGameState = GAME_STATE_ACTIVE;
 }
@@ -185,13 +182,16 @@ void Game::addPlatformLine(int length, Direction direction, PxVec3 startingPosit
 
 	for (int i = 0; i < length; i++)
 	{
+		PxVec3 pos = startingPosition + platCurrentHeight + (spacing * (float)i);
 		if (i == 0) {
 			addGameobject(new Gameobject(new Model("assets/models/plattform/Platform_Torch.obj", primaryShader)), false,
-				startingPosition + platCurrentHeight + (spacing * (float)i), *defaultPlatGeometry, "platformTorch");
+				pos, *defaultPlatGeometry, "platformTorch");
+			// Create & init particle system
+			this->particleSystem.push_back(new ParticleGenerator(particleShader, camPointer, 200, glm::vec3(pos.x,pos.y,pos.z) + glm::vec3(-1.5f, 2.f, 1.5f)));
 		}
 		else {
 			addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)), false,
-				startingPosition + platCurrentHeight + (spacing * (float)i), *defaultPlatGeometry, "platformNormal");
+				pos, *defaultPlatGeometry, "platformNormal");
 		}
 	}
 }
@@ -214,14 +214,16 @@ void Game::addPlatformStairs(int length, Direction direction, PxVec3 startingPos
 
 	for (int i = 0; i < length; i++)
 	{
+		PxVec3 pos = startingPosition + platCurrentHeight + (spacing * (float)i);
 		if (i == 0) {
 			addGameobject(new Gameobject(new Model("assets/models/plattform/Platform_Torch.obj", primaryShader)), false,
-				startingPosition + platCurrentHeight + (spacing * (float)i), *defaultPlatGeometry, "platformTorch");
+				pos, *defaultPlatGeometry, "platformTorch");
+			this->particleSystem.push_back(new ParticleGenerator(particleShader, camPointer, 200, glm::vec3(pos.x, pos.y, pos.z) + glm::vec3(-1.5f, 2.f, 1.5f)));
 		}
 		else {
 			platCurrentHeight += inclination;
 			addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)), false,
-				startingPosition + platCurrentHeight + (spacing * (float)i), *defaultPlatGeometry, "platformNormal");
+				pos, *defaultPlatGeometry, "platformNormal");
 		}
 	}
 }
@@ -229,7 +231,9 @@ void Game::addPlatformStairs(int length, Direction direction, PxVec3 startingPos
 void Game::update(float dt) {
 	currentLevel->update(dt);
 	player->update(dt);
-	particleGenerator->update(dt);
+	for (std::size_t i = 0; i < particleSystem.size(); ++i) {
+		particleSystem[i]->update(dt);
+	}
 
 	if (player->hasLost)
 	{
@@ -253,6 +257,8 @@ void Game::update(float dt) {
 		ground->release();
 		currentLevel->~Level();
 		currentLevel = nextLevel();
+		particleSystem.~vector();
+
 		initLevels();
 	}
 }
@@ -260,7 +266,9 @@ void Game::update(float dt) {
 void Game::draw() {
 	currentLevel->draw();
 	player->draw();
-	particleGenerator->draw();
+	for (std::size_t i = 0; i < particleSystem.size(); ++i) {
+		particleSystem[i]->draw();
+	}
 
 }
 

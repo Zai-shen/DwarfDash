@@ -45,8 +45,8 @@ private:
 
 	// amount of particles
 	int maxParticles;
-	//std::vector<Particle> ParticlesContainer;
-	Particle ParticlesContainer[1000];
+	//std::vector<Particle> ParticlesContainer(10,particle);
+	Particle ParticlesContainer[200];
 
 	// render state
 	std::shared_ptr<Shader> shader;
