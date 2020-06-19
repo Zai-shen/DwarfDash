@@ -64,6 +64,8 @@ public:
 
 	Level* getCurrentLevel();
 
+	std::string getLevelString();
+
 private:
 
 	Level* level1 = new Level();
@@ -86,7 +88,7 @@ private:
 	void addPlatformStairs(int length, Direction direction, PxVec3 startingPosition);
 	void createGroundPlane();
 
-	std::string getLevelString();
+
 
 	PxVec3 platCurrentHeight = PxVec3(0.f,0.f,0.f);
 	PxVec3 inclination = PxVec3(0.f, 1.f, 0.f);
