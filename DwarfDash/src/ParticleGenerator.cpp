@@ -1,11 +1,10 @@
+//with help from: http://www.opengl-tutorial.org/intermediate-tutorials/billboards-particles/particles-instancing/
+
 #include "ParticleGenerator.h"
 #include <glm/gtx/string_cast.hpp>
 #include <random>
 
 using namespace glm;
-
-//with help from: http://www.opengl-tutorial.org/intermediate-tutorials/billboards-particles/particles-instancing/
-
 
 ParticleGenerator::ParticleGenerator(std::shared_ptr<Shader> shader, FPSCamera* camera, int maxParticles, glm::vec3 position)
 	: maxParticles(maxParticles), position(position), camera(camera)
@@ -13,7 +12,6 @@ ParticleGenerator::ParticleGenerator(std::shared_ptr<Shader> shader, FPSCamera* 
 	this->shader = shader;
 	this->init();
 }
-
 
 ParticleGenerator::~ParticleGenerator()
 {
@@ -28,24 +26,21 @@ ParticleGenerator::~ParticleGenerator()
 	glDeleteVertexArrays(1, &VAO);
 }
 
-
-
-
-int LastUsedParticle = 0;
+int lastUsedParticle = 0;
 // Finds a Particle in ParticlesContainer which isn't used yet.
 // (i.e. life < 0);
 int ParticleGenerator::firstUnusedParticle() {
 
-	for (int i = LastUsedParticle; i < maxParticles; i++) {
+	for (int i = lastUsedParticle; i < maxParticles; i++) {
 		if (ParticlesContainer[i].life < 0) {
-			LastUsedParticle = i;
+			lastUsedParticle = i;
 			return i;
 		}
 	}
 
-	for (int i = 0; i < LastUsedParticle; i++) {
+	for (int i = 0; i < lastUsedParticle; i++) {
 		if (ParticlesContainer[i].life < 0) {
-			LastUsedParticle = i;
+			lastUsedParticle = i;
 			return i;
 		}
 	}
@@ -53,7 +48,7 @@ int ParticleGenerator::firstUnusedParticle() {
 	return 0; // All particles are taken, override the first one
 }
 
-void ParticleGenerator::SortParticles() {
+void ParticleGenerator::sortParticles() {
 	std::sort(&ParticlesContainer[0], &ParticlesContainer[maxParticles]);
 }
 
@@ -67,13 +62,13 @@ void ParticleGenerator::init() {
 		//std::cout << i << " of " << maxParticles << std::endl;
 		this->ParticlesContainer.push_back(Particle());
 	}*/
-	
+
 	for (int i = 0; i < maxParticles; i++) {
 		Particle& p = ParticlesContainer[i];
 		p.life = -1.0f;
-		p.cameradistance = -1.0f;
+		p.cameraDistance = -1.0f;
 	}
-	
+
 	//Texture = loadDDSint("particle.DDS");
 	Texture = loadDDSint("assets/textures/particle.DDS");
 
@@ -86,6 +81,7 @@ void ParticleGenerator::init() {
 		  0.5f,  0.5f, 0.0f,
 	};
 
+	// The VBO containing vertex data
 	glGenBuffers(1, &billboard_vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
@@ -101,25 +97,12 @@ void ParticleGenerator::init() {
 	glBindBuffer(GL_ARRAY_BUFFER, particles_color_buffer);
 	// Initialize with empty (NULL) buffer : it will be updated later, each frame.
 	glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
-
-
 }
 
 void ParticleGenerator::update(float dt) {
-
-	
-	//glm::mat4 ProjectionMatrix = camera->getProjectionMatrix();
-	//glm::mat4 ViewMatrix = camera->getViewMatrix();
-
 	// We will need the camera's position in order to sort the particles
 	// w.r.t the camera's distance.
-	// There should be a getCameraPosition() function in common/controls.cpp, 
-	// but this works too.
-	//glm::vec3 CameraPosition(glm::inverse(ViewMatrix)[3]);
-	glm::vec3 CameraPosition = camera->getPosition();
-
-	//glm::mat4 ViewProjectionMatrix = ProjectionMatrix * ViewMatrix;
-	glm::mat4 ViewProjectionMatrix = camera->getViewProjectionMatrix();
+	glm::vec3 cameraPosition = camera->getPosition();
 
 	// Generate 5 new particule each millisecond,
 	// but limit this to 16 ms (60 fps), or if you have 1 long frame (1sec),
@@ -127,13 +110,12 @@ void ParticleGenerator::update(float dt) {
 	int newparticles = (int)(dt*5000.0);
 	if (newparticles > (int)(0.016f*5000.0))
 		newparticles = (int)(0.016f*5000.0);
-
 	///std::cout << "new particles: " << newparticles << std::endl;
 
 	for (int i = 0; i < newparticles; i++) {
 		int particleIndex = firstUnusedParticle();
 		Particle& p = ParticlesContainer[particleIndex]; // shortcut
-		float randPointFive = (rand() % 100)/200.f;
+		float randPointFive = (rand() % 100) / 200.f;
 		p.life = 1.0f + randPointFive; // 1.f : 1 second
 		p.pos = this->position;
 
@@ -150,7 +132,6 @@ void ParticleGenerator::update(float dt) {
 
 		p.speed = maindir + randomdir * spread;
 
-
 		// Very bad way to generate a random color
 		p.r = 0;// rand() % 256;
 		p.g = 0;//rand() % 256;
@@ -160,9 +141,8 @@ void ParticleGenerator::update(float dt) {
 		p.size = (rand() % 1000) / 6000.0f + 0.001f;
 	}
 
-
 	// Update all particles
-	ParticlesCount = 0;
+	particlesCount = 0;
 	for (int i = 0; i < maxParticles; i++) {
 
 		Particle& p = ParticlesContainer[i]; // shortcut
@@ -173,6 +153,7 @@ void ParticleGenerator::update(float dt) {
 			p.life -= dt;
 			if (p.life > 0.0f) {
 
+				// Changing colors from blue to red, could be done better but this will suffice
 				if (p.b > 0)
 				{
 					p.b -= 300 * dt;
@@ -186,29 +167,28 @@ void ParticleGenerator::update(float dt) {
 				// Simulate simple physics : gravity only, no collisions
 				p.speed += glm::vec3(0.0f, -9.81f, 0.0f) * (float)dt * 0.25f;
 				p.pos += p.speed * (float)dt;
-				p.cameradistance = glm::length2(p.pos - CameraPosition);
+				p.cameraDistance = glm::length2(p.pos - cameraPosition);
 
 				// Fill the GPU buffer
-				g_particule_position_size_data[4 * ParticlesCount + 0] = p.pos.x;
-				g_particule_position_size_data[4 * ParticlesCount + 1] = p.pos.y;
-				g_particule_position_size_data[4 * ParticlesCount + 2] = p.pos.z;
+				g_particule_position_size_data[4 * particlesCount + 0] = p.pos.x;
+				g_particule_position_size_data[4 * particlesCount + 1] = p.pos.y;
+				g_particule_position_size_data[4 * particlesCount + 2] = p.pos.z;
 
-				g_particule_position_size_data[4 * ParticlesCount + 3] = p.size;
+				g_particule_position_size_data[4 * particlesCount + 3] = p.size;
 
-				g_particule_color_data[4 * ParticlesCount + 0] = p.r;
-				g_particule_color_data[4 * ParticlesCount + 1] = p.g;
-				g_particule_color_data[4 * ParticlesCount + 2] = p.b;
-				g_particule_color_data[4 * ParticlesCount + 3] = p.a;
-
+				g_particule_color_data[4 * particlesCount + 0] = p.r;
+				g_particule_color_data[4 * particlesCount + 1] = p.g;
+				g_particule_color_data[4 * particlesCount + 2] = p.b;
+				g_particule_color_data[4 * particlesCount + 3] = p.a;
 			}
 			else {
-				// Particles that just died will be put at the end of the buffer in SortParticles();
-				p.cameradistance = -1.0f;
+				// Particles that just died will be put at the end of the buffer in sortParticles();
+				p.cameraDistance = -1.0f;
 			}
-			ParticlesCount++;
+			particlesCount++;
 		}
 	}
-	SortParticles();
+	sortParticles();
 }
 
 void ParticleGenerator::draw() {
@@ -220,11 +200,11 @@ void ParticleGenerator::draw() {
 	// http://www.opengl.org/wiki/Buffer_Object_Streaming
 	glBindBuffer(GL_ARRAY_BUFFER, particles_position_buffer);
 	glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
-	glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLfloat) * 4, g_particule_position_size_data);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, particlesCount * sizeof(GLfloat) * 4, g_particule_position_size_data);
 
 	glBindBuffer(GL_ARRAY_BUFFER, particles_color_buffer);
 	glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
-	glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLubyte) * 4, g_particule_color_data);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, particlesCount * sizeof(GLubyte) * 4, g_particule_color_data);
 
 	// Transparency
 	glEnable(GL_BLEND);
@@ -239,9 +219,10 @@ void ParticleGenerator::draw() {
 	// Set our textureSampler sampler to use Texture Unit 0
 	shader->setUniform("textureSampler", 0);
 
+	glm::mat4 VM = camera->getViewMatrix();
 	// Same as the billboards tutorial
-	shader->setUniform("CameraRight_worldspace", glm::vec3(camera->getViewMatrix()[0][0], camera->getViewMatrix()[1][0], camera->getViewMatrix()[2][0]));
-	shader->setUniform("CameraUp_worldspace", glm::vec3(camera->getViewMatrix()[0][1], camera->getViewMatrix()[1][1], camera->getViewMatrix()[2][1]));
+	shader->setUniform("CameraRight_worldspace", glm::vec3(VM[0][0], VM[1][0], VM[2][0]));
+	shader->setUniform("CameraUp_worldspace", glm::vec3(VM[0][1], VM[1][1], VM[2][1]));
 	shader->setUniform("VP", camera->getViewProjectionMatrix());
 
 	// 1rst attribute buffer : vertices
@@ -289,11 +270,10 @@ void ParticleGenerator::draw() {
 	glVertexAttribDivisor(2, 1); // color : one per quad                                  -> 1
 
 	// Draw the particules !
-	// This draws many times a small triangle_strip (which looks like a quad).
 	// This is equivalent to :
-	// for(i in ParticlesCount) : glDrawArrays(GL_TRIANGLE_STRIP, 0, 4), 
+	// for(i in particlesCount) : glDrawArrays(GL_TRIANGLE_STRIP, 0, 4), 
 	// but faster.
-	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, ParticlesCount);
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particlesCount);
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);

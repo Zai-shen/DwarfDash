@@ -15,13 +15,13 @@ struct Particle {
 	unsigned char r, g, b, a; // Color
 	float size, angle, weight;
 	float life; // Remaining life of the particle. if <0 : dead and unused.
-	float cameradistance; // *Squared* distance to the camera. if dead : -1.0f
+	float cameraDistance; // *Squared* distance to the camera. if dead : -1.0f
 
-	Particle() : pos(0.0f), speed(0.0f, 0.0f, 0.0f), life(-1.0f), cameradistance(-1.f) { }
+	Particle() : pos(0.0f), speed(0.0f, 0.0f, 0.0f), life(-1.0f), cameraDistance(-1.f) { }
 
 	bool operator<(const Particle& that) const {
 		// Sort in reverse order : far particles drawn first.
-		return this->cameradistance > that.cameradistance;
+		return this->cameraDistance > that.cameraDistance;
 	}
 };
 
@@ -55,7 +55,7 @@ private:
 	GLuint billboard_vertex_buffer;
 	GLuint particles_position_buffer;
 	GLuint particles_color_buffer;
-	int ParticlesCount;
+	int particlesCount;
 
 	// TBA
 	GLfloat* g_particule_position_size_data = new GLfloat[maxParticles * 4];
@@ -68,5 +68,5 @@ private:
 	int firstUnusedParticle();
 
 	// sort particles
-	void SortParticles();
+	void sortParticles();
 };
