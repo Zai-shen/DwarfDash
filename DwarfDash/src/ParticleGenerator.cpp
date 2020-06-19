@@ -156,11 +156,11 @@ void ParticleGenerator::update(float dt) {
 				// Changing colors from blue to red, could be done better but this will suffice
 				if (p.b > 0)
 				{
-					p.b -= 300 * dt;
+					p.b -= 300.f * dt;
 				}
 				if (p.r < 256)
 				{
-					p.r += 400 * dt;
+					p.r += 400.f * dt;
 				}
 				///std::cout << "particle number: " << i << " with position: " << to_string(p.pos) << std::endl;
 
