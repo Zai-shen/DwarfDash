@@ -335,6 +335,7 @@ Level* Game::nextLevel() {
 	}
 	else if (currentLevel == level3) {
 		cout << "Congratulations! You won the entire game!" << endl;
+		player->score = 0;
 		return level1;
 	}
 }
