@@ -35,10 +35,10 @@ void Gameobject::update(float dt) {
 		if (goDynamicActor->getName() == "platformMoving")
 		{
 			//dirty fix, hurting my eyes.
-			if (goDynamicActor->getGlobalPose().p.x < 6){
+			if (goDynamicActor->getGlobalPose().p.x < 6.f){
 				kineMoveDir = PxVec3(3.f * dt, 0.f, 0.f);
 			}
-			else if (goDynamicActor->getGlobalPose().p.x > 18) {
+			else if (goDynamicActor->getGlobalPose().p.x > 18.f) {
 				kineMoveDir = PxVec3(-3.f * dt, 0.f, 0.f);
 			}
 			//cout << "p.x: " << goDynamicActor->getGlobalPose().p.x << endl;

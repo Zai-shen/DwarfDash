@@ -55,7 +55,10 @@ void stepPhysics(float deltaTime);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow* window, float deltaTime);
 
-void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray);
+// Lightning
+//void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray);
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight*>& pointlightArrayLevel1, std::vector<PointLight*>& pointlightArrayLevel2, std::vector<PointLight*>& pointlightArrayLevel3);
+void fillPointlightArrays(std::vector<PointLight*>& pointlightArrayLevel1, std::vector<PointLight*>& pointlightArrayLevel2, std::vector<PointLight*>& pointlightArrayLevel3);
 
 // Skybox
 unsigned int loadCubemap(vector<std::string> faces);
@@ -203,21 +206,11 @@ int main(int argc, char** argv)
 
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(1.0f, 1.4f, 1.0f)); // color,  direction;
 
-		glm::vec3 boxpos1 = glm::vec3(0.61f, 2.8f, -19.8f);
-		glm::vec3 boxpos2 = glm::vec3(12.27f, 2.8f, -19.8f);
-		glm::vec3 boxpos3 = glm::vec3(12.5f, 6.8f, -50.0f );
-		glm::vec3 boxpos4 = glm::vec3(11.47f, 6.8f, -88.0f);
-
-		std::vector<PointLight> pointlightArray = std::vector<PointLight>(); // pointlight array filled with pointlights for each level
-		PointLight pointLight1 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos1), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight2 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos2), glm::vec3(1.0f, 0.1f, 0.01f)); // color, position, attenuation (constant, linear, quadratic)
-		PointLight pointLight3 = PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(boxpos3), glm::vec3(1.0f, 0.1f, 0.01f)); // plattform in the middle
-		PointLight pointLight4 = PointLight(glm::vec3(1.0f, 0.0f, 0.f),  glm::vec3(boxpos4), glm::vec3(1.0f, 0.4f, 0.1f));   // plattform right before the goal
-
-		pointlightArray.push_back(pointLight1);
-		pointlightArray.push_back(pointLight2);
-		pointlightArray.push_back(pointLight3);
-		pointlightArray.push_back(pointLight4);
+		// pointlight arrays filled with pointlights for each level
+		std::vector<PointLight*> pointlightArrayLevel1 = std::vector<PointLight*>(); 
+		std::vector<PointLight*> pointlightArrayLevel2 = std::vector<PointLight*>(); 
+		std::vector<PointLight*> pointlightArrayLevel3 = std::vector<PointLight*>(); 
+		fillPointlightArrays(pointlightArrayLevel1, pointlightArrayLevel2, pointlightArrayLevel3);
 
 		// visualization cube
 		float vertices[] = {
@@ -374,10 +367,27 @@ int main(int argc, char** argv)
 			processInput(window, dt);
 
 			// Set per-frame uniforms
-			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointlightArray); // multiple pointlights
+			//setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointlightArray); // multiple pointlights
+			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointlightArrayLevel1, pointlightArrayLevel2, pointlightArrayLevel3); // multiple pointlights
 
 			//PhysX
 			stepPhysics(dt);
+
+			// draw skybox before opaque particle shader, to give information about background
+			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+			game->skyboxShader->use();
+			glm::mat4 view = glm::mat4(glm::mat3(camera.getViewMatrix())); // remove translation from the view matrix
+			glm::mat4 projection = glm::mat4(camera.getProjectionMatrix());
+			game->skyboxShader->setUniform("view", view);
+			game->skyboxShader->setUniform("projection", projection);
+
+			// skybox cube
+			glBindVertexArray(skyboxVAO);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glBindVertexArray(0);
+			glDepthFunc(GL_LESS); // set depth function back to default
 
 			// Render
 			game->update(dt);
@@ -410,21 +420,7 @@ int main(int argc, char** argv)
 			}
 			*/
 
-			// draw skybox as last
-			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-			game->skyboxShader->use();
-			glm::mat4 view = glm::mat4(glm::mat3(camera.getViewMatrix())); // remove translation from the view matrix
-			glm::mat4 projection = glm::mat4(camera.getProjectionMatrix());
-			game->skyboxShader->setUniform("view", view);
-			game->skyboxShader->setUniform("projection", projection);
 
-			// skybox cube
-			glBindVertexArray(skyboxVAO);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-			glBindVertexArray(0);
-			glDepthFunc(GL_LESS); // set depth function back to default
 
 			// render text
 			textRenderer.renderText("current points:   " + to_string(game->player->score), 25.0f, 25.0f, 1.0f, glm::vec3(0.6f, 1.0f, 0.5f));
@@ -576,6 +572,84 @@ void setWindowFPS(GLFWwindow *window, float& t_sum)
 		glfwSetWindowTitle(window, title.str().c_str());
 		t_sum -= 1.0f;
 		frames = 0;
+	}
+}
+
+
+void fillPointlightArrays(std::vector<PointLight*>& pointlightArrayLevel1, std::vector<PointLight*>& pointlightArrayLevel2, std::vector<PointLight*>& pointlightArrayLevel3) {
+
+	PointLight* pointLightLevel1_1 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.61f, 2.8f, -19.8f), glm::vec3(1.0f, 0.1f, 0.01f));  // color, position, attenuation (constant, linear, quadratic)
+	PointLight* pointLightLevel1_2 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(12.27f, 2.8f, -19.8f), glm::vec3(1.0f, 0.1f, 0.01f));  // color, position, attenuation (constant, linear, quadratic)
+	PointLight* pointLightLevel1_3 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(12.5f, 6.8f, -50.0f), glm::vec3(1.0f, 0.1f, 0.01f));  // plattform in the middle
+	PointLight* pointLightLevel1_4 = new PointLight(glm::vec3(1.0f, 0.0f, 0.f), glm::vec3(11.47f, 6.8f, -88.0f), glm::vec3(1.0f, 0.4f, 0.1f));   // plattform right before the goal
+
+	PointLight* pointLightLevel2_1 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-0.064f, 2.8f, -3.9f), glm::vec3(1.0f, 0.1f, 0.01f));
+	PointLight* pointLightLevel2_2 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-9.8f, 5.3f, 0.2f), glm::vec3(1.0f, 0.1f, 0.01f));
+	PointLight* pointLightLevel2_3 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-10.2f, 5.3f, -10.1f), glm::vec3(1.0f, 0.1f, 0.01f));
+	PointLight* pointLightLevel2_4 = new PointLight(glm::vec3(1.0f, 0.0f, 0.f), glm::vec3(-0.28f, 3.1f, -14.8f), glm::vec3(1.0f, 0.4f, 0.1f));
+
+	PointLight* pointLightLevel3_1 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.41f, 2.8f, -19.4f), glm::vec3(1.0f, 0.1f, 0.01f));
+	PointLight* pointLightLevel3_2 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.3f, 2.8f, -50.0f), glm::vec3(1.0f, 0.1f, 0.01f));
+	PointLight* pointLightLevel3_3 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-0.65f, 2.8f, -94.0f), glm::vec3(1.0f, 0.1f, 0.01f));
+	PointLight* pointLightLevel3_4 = new PointLight(glm::vec3(1.0f, 0.0f, 0.f), glm::vec3(-0.92f, 2.8f, -147.0f), glm::vec3(1.0f, 0.4f, 0.1f));
+
+	pointlightArrayLevel1.push_back(pointLightLevel1_1);
+	pointlightArrayLevel1.push_back(pointLightLevel1_2);
+	pointlightArrayLevel1.push_back(pointLightLevel1_3);
+	pointlightArrayLevel1.push_back(pointLightLevel1_4);
+
+	pointlightArrayLevel2.push_back(pointLightLevel2_1);
+	pointlightArrayLevel2.push_back(pointLightLevel2_2);
+	pointlightArrayLevel2.push_back(pointLightLevel2_3);
+	pointlightArrayLevel2.push_back(pointLightLevel2_4);
+
+	pointlightArrayLevel3.push_back(pointLightLevel3_1);
+	pointlightArrayLevel3.push_back(pointLightLevel3_2);
+	pointlightArrayLevel3.push_back(pointLightLevel3_3);
+	pointlightArrayLevel3.push_back(pointLightLevel3_4);
+}
+
+void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight*>& pointlightArrayLevel1, std::vector<PointLight*>& pointlightArrayLevel2, std::vector<PointLight*>& pointlightArrayLevel3) {
+	shader->use();
+	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+	shader->setUniform("camera_world", camera.getPosition());
+
+	shader->setUniform("dirL.color", dirL.color);
+	shader->setUniform("dirL.direction", dirL.direction);
+
+	shader->setUniform("normalMapping", normalMapping);
+	//std::cout << "set normalMapping to: " << normalMapping << std::endl;
+
+	// iterate over all the pointlights	
+	if (game->getLevelString() == "level1") {
+		for (int i = 0; i < pointlightArrayLevel1.size(); i++) {
+			string number = std::to_string(i);
+			PointLight* pointLight = pointlightArrayLevel1[i];
+
+			shader->setUniformArr("pointLights", i, "color", pointLight->color);
+			shader->setUniformArr("pointLights", i, "position", pointLight->position);
+			shader->setUniformArr("pointLights", i, "attenuation", pointLight->attenuation);
+		}
+	}
+	else if (game->getLevelString() == "level2") {
+		for (GLuint i = 0; i < pointlightArrayLevel2.size(); i++) {
+			string number = std::to_string(i);
+			PointLight* pointLight = pointlightArrayLevel2[i];
+
+			shader->setUniformArr("pointLights", i, "color", pointLight->color);
+			shader->setUniformArr("pointLights", i, "position", pointLight->position);
+			shader->setUniformArr("pointLights", i, "attenuation", pointLight->attenuation);
+		}
+	}
+	else if (game->getLevelString() == "level3") {
+		for (GLuint i = 0; i < pointlightArrayLevel3.size(); i++) {
+			string number = std::to_string(i);
+			PointLight* pointLight = pointlightArrayLevel3[i];
+
+			shader->setUniformArr("pointLights", i, "color", pointLight->color);
+			shader->setUniformArr("pointLights", i, "position", pointLight->position);
+			shader->setUniformArr("pointLights", i, "attenuation", pointLight->attenuation);
+		}
 	}
 }
 

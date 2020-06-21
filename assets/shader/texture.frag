@@ -9,10 +9,9 @@ in VertexData {
 	vec3 position_world;
 	vec3 normal_world;
 	vec2 uv;
-
-	vec3 TangentLightPos;
-    vec3 TangentViewPos;
-    vec3 TangentFragPos;
+	//vec3 TangentLightPos;
+    //vec3 TangentViewPos;
+    //vec3 TangentFragPos;
 } vert;
 
 out vec4 color;
