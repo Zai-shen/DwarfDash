@@ -1,6 +1,6 @@
-# Blender v2.82 (sub 7) OBJ File: 'PlattformTorch.blend'
+# Blender v2.83.0 OBJ File: 'PlattformTorch.blend'
 # www.blender.org
-mtllib PlattformTorch.mtl
+mtllib Platform_Torch.mtl
 o platform_Cube.001
 v -1.859868 -0.142281 1.885486
 v -1.912179 0.195886 1.924665
