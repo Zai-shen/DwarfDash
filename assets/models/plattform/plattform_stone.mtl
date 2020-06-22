@@ -1,7 +1,7 @@
-# Blender MTL File: 'Plattform2.blend'
+# Blender MTL File: 'plattform_stone.blend'
 # Material Count: 1
 
-newmtl Material
+newmtl Material.002
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -13,3 +13,4 @@ illum 2
 map_Kd stone_color.jpg
 map_Ks stone_specular.jpg
 map_Bump stone_normal.jpg
+
