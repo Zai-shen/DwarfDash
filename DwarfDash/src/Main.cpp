@@ -59,6 +59,7 @@ void processInput(GLFWwindow* window, float deltaTime);
 //void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray);
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight*>& pointlightArrayLevel1, std::vector<PointLight*>& pointlightArrayLevel2, std::vector<PointLight*>& pointlightArrayLevel3);
 void fillPointlightArrays(std::vector<PointLight*>& pointlightArrayLevel1, std::vector<PointLight*>& pointlightArrayLevel2, std::vector<PointLight*>& pointlightArrayLevel3);
+void movePointlight(std::vector<PointLight*>& pointlightArrayLevel1, float &phi, float &dt, bool &reachedEnd);
 
 // Skybox
 unsigned int loadCubemap(vector<std::string> faces);
@@ -98,6 +99,10 @@ float lastX = config.width / 2.0f;
 float lastY = config.height / 2.0f;
 bool firstMouse = true;
 FPSCamera camera(config.fov, float(config.width) / float(config.height), config.nearZ, config.farZ); // new constructor
+
+// Pointlightmovement
+float phi = 0.0f;
+bool reachedEnd = true;
 
 /* --------------------------------------------- */
 // Main
@@ -368,6 +373,7 @@ int main(int argc, char** argv)
 
 			// Set per-frame uniforms
 			//setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointlightArray); // multiple pointlights
+			movePointlight(pointlightArrayLevel1, phi, dt, reachedEnd);
 			setPerFrameUniforms(game->primaryShader.get(), camera, dirL, pointlightArrayLevel1, pointlightArrayLevel2, pointlightArrayLevel3); // multiple pointlights
 
 			//PhysX
@@ -393,13 +399,18 @@ int main(int argc, char** argv)
 			game->update(dt);
 			game->draw();
 
-			/*
+			
 			// light visualization
 			// only needed for visual debugging
 			lightCubeShader.use();
 			lightCubeShader.setUniform("view", camera.getViewMatrix());
 			lightCubeShader.setUniform("projection", camera.getProjectionMatrix());
 			lightCubeShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
+
+			glm::vec3 boxpos1 = pointlightArrayLevel1[0]->position;
+			glm::vec3 boxpos2 = pointlightArrayLevel1[1]->position;
+			glm::vec3 boxpos3 = pointlightArrayLevel1[2]->position;
+			glm::vec3 boxpos4 = pointlightArrayLevel1[3]->position;
 
 			// multiple cubes
 			glm::vec3 cubePositions[] = {
@@ -418,9 +429,7 @@ int main(int argc, char** argv)
 				glBindVertexArray(lightCubeVAO);
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 			}
-			*/
-
-
+			
 
 			// render text
 			textRenderer.renderText("current points:   " + to_string(game->player->score), 25.0f, 25.0f, 1.0f, glm::vec3(0.6f, 1.0f, 0.5f));
@@ -575,13 +584,12 @@ void setWindowFPS(GLFWwindow *window, float& t_sum)
 	}
 }
 
-
 void fillPointlightArrays(std::vector<PointLight*>& pointlightArrayLevel1, std::vector<PointLight*>& pointlightArrayLevel2, std::vector<PointLight*>& pointlightArrayLevel3) {
 
 	PointLight* pointLightLevel1_1 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.61f, 2.8f, -19.8f), glm::vec3(1.0f, 0.1f, 0.01f));  // color, position, attenuation (constant, linear, quadratic)
 	PointLight* pointLightLevel1_2 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(12.27f, 2.8f, -19.8f), glm::vec3(1.0f, 0.1f, 0.01f));  // color, position, attenuation (constant, linear, quadratic)
-	PointLight* pointLightLevel1_3 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(12.5f, 6.8f, -50.0f), glm::vec3(1.0f, 0.1f, 0.01f));  // plattform in the middle
-	PointLight* pointLightLevel1_4 = new PointLight(glm::vec3(1.0f, 0.0f, 0.f), glm::vec3(11.47f, 6.8f, -88.0f), glm::vec3(1.0f, 0.4f, 0.1f));   // plattform right before the goal
+	PointLight* pointLightLevel1_3 = new PointLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(12.5f, 6.8f, -50.0f), glm::vec3(1.0f, 0.014f, 0.000001f));  // plattform in the middle
+	PointLight* pointLightLevel1_4 = new PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(11.47f, 5.8f, -88.0f), glm::vec3(1.0f, 0.1f, 0.01f));   // plattform right before the goal
 
 	PointLight* pointLightLevel2_1 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-0.064f, 2.8f, -3.9f), glm::vec3(1.0f, 0.1f, 0.01f));
 	PointLight* pointLightLevel2_2 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-9.8f, 5.3f, 0.2f), glm::vec3(1.0f, 0.1f, 0.01f));
@@ -607,6 +615,55 @@ void fillPointlightArrays(std::vector<PointLight*>& pointlightArrayLevel1, std::
 	pointlightArrayLevel3.push_back(pointLightLevel3_2);
 	pointlightArrayLevel3.push_back(pointLightLevel3_3);
 	pointlightArrayLevel3.push_back(pointLightLevel3_4);
+}
+
+void movePointlight(std::vector<PointLight*>& pointlightArrayLevel1, float &phi, float &dt, bool &reachedEnd) {
+
+	// cos(phi) - X axis movement
+	// sin(phi) - Z axis movement
+
+	PointLight* pointLightPlattform = pointlightArrayLevel1[2];
+	float xCoordinate = pointLightPlattform->position.x;
+	float yCoordinate = pointLightPlattform->position.y;
+	float zCoordinate = pointLightPlattform->position.z;
+	float k = 0.01f; // scalability factor for movementspeed
+
+	/*
+	// move in a circular motion (not really working)
+	if (phi < 360.0f) {
+		if (zCoordinate < -40.7f) {
+			//pointLightPlattform->position = glm::vec3(xCoordinate + k * sin(phi), yCoordinate, zCoordinate + k * sin(phi));
+			pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate - 1.0f);
+		}
+		else if (zCoordinate < -67.98f) {
+			pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate + 1.0f);
+		}
+		//phi = phi + (k * dt);
+		phi += 10;
+		//phi = phi + 1.0f;
+	}
+	else {
+		phi = 0.0f;
+	}
+	*/
+
+	if (reachedEnd) {
+		pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate - 1.0f * k);
+	}
+	else {
+		pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate + 1.0f * k);
+	}
+
+	if (zCoordinate <= -67.98f) {
+		reachedEnd = false;
+	}
+	else if (zCoordinate >= -40.7f) {
+		reachedEnd = true;
+	}
+
+	//std::cout << "xCoordinate: " << xCoordinate << std::endl;
+	//std::cout << "zCoordinate: " << zCoordinate << std::endl;
+	//std::cout << "phi: " << phi << std::endl;
 }
 
 void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight*>& pointlightArrayLevel1, std::vector<PointLight*>& pointlightArrayLevel2, std::vector<PointLight*>& pointlightArrayLevel3) {
@@ -650,31 +707,6 @@ void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dir
 			shader->setUniformArr("pointLights", i, "position", pointLight->position);
 			shader->setUniformArr("pointLights", i, "attenuation", pointLight->attenuation);
 		}
-	}
-}
-
-// for multiple pointlights
-void setPerFrameUniforms(Shader* shader, FPSCamera camera, DirectionalLight& dirL, std::vector<PointLight> pointlightArray)
-{
-	shader->use();
-	shader->setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
-	shader->setUniform("camera_world", camera.getPosition());
-
-	shader->setUniform("dirL.color", dirL.color);
-	shader->setUniform("dirL.direction", dirL.direction);
-
-	shader->setUniform("normalMapping", normalMapping);
-	//std::cout << "set normalMapping to: " << normalMapping << std::endl;
-
-	// TODO: check for level and add pointlights accordingly
-	// iterate over all the pointlights	
-	for (GLuint i = 0; i < pointlightArray.size(); i++) {
-		string number = std::to_string(i);
-		PointLight& pointLight = pointlightArray[i];
-
-		shader->setUniformArr("pointLights", i, "color", pointLight.color);
-		shader->setUniformArr("pointLights", i, "position", pointLight.position);
-		shader->setUniformArr("pointLights", i, "attenuation", pointLight.attenuation);
 	}
 }
 
