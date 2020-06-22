@@ -10,7 +10,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
+map_Bump stone_normal.jpg
 map_Kd stone_color.jpg
 map_Ks stone_specular.jpg
-map_Bump stone_normal.jpg
-

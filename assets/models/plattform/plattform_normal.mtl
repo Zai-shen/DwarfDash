@@ -1,4 +1,4 @@
-# Blender MTL File: 'Plattform2.blend'
+# Blender MTL File: 'plattform_normal.blend'
 # Material Count: 1
 
 newmtl Material.002
@@ -10,6 +10,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
+map_Bump ground1_normal.jpg
 map_Kd ground1_color.jpg
 map_Ks ground1_specular.jpg
-map_Bump ground1_normal.jpg

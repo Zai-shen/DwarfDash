@@ -1,4 +1,4 @@
-# Blender MTL File: 'PlattformTorch.blend'
+# Blender MTL File: 'Platform_Torch.blend'
 # Material Count: 2
 
 newmtl Material
@@ -10,12 +10,12 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
+map_Bump ground1_normal.jpg
 map_Kd ground1_color.jpg
 map_Ks ground1_specular.jpg
-map_Bump ground1_normal.jpg
 
 newmtl Material.001
-Ns 225.000000
+Ns 193.462789
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000
@@ -23,6 +23,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
+map_Bump metal1_normal.jpg
 map_Kd metal1_color.jpg
 map_Ks metal1_specular.jpg
-map_Bump metal1_normal.jpg

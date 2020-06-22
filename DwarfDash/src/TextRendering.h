@@ -26,8 +26,8 @@ public:
 
 private:
 	std::map<GLchar, Character> Characters;
-	unsigned int VAO;
-	unsigned int VBO;
+	GLuint VAO;
+	GLuint VBO;
 
 	glm::mat4 _projection;	
 	Shader _textShader;

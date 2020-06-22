@@ -648,10 +648,12 @@ void movePointlight(std::vector<PointLight*>& pointlightArrayLevel1, float &phi,
 	*/
 
 	if (reachedEnd) {
-		pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate - 1.0f * k);
+		pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate - 1.0f * k * dt);
+		//pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate - 1.0f * k * dt); // with delta time
 	}
 	else {
-		pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate + 1.0f * k);
+		pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate + 1.0f * k * dt);
+		//pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate + 1.0f * k * dt); // with delta time
 	}
 
 	if (zCoordinate <= -67.98f) {

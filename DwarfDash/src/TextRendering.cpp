@@ -1,7 +1,7 @@
 #include "TextRendering.h"
 
 TextRendering::TextRendering(Shader &textShader, float width, float height)  {
-	// : _textShader(textShader){
+	 //: _textShader(textShader), _projection(glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height))) {
 
 	_textShader = textShader;
 	_projection = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height));
@@ -27,7 +27,7 @@ TextRendering::TextRendering(Shader &textShader, float width, float height)  {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	// load first 128 characters of ASCII set
-	for (unsigned char c = 0; c < 128; c++)	{
+	for (GLubyte c = 0; c < 128; c++)	{
 		// Load character glyph 
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
 		{
@@ -35,7 +35,7 @@ TextRendering::TextRendering(Shader &textShader, float width, float height)  {
 			continue;
 		}
 		// generate texture
-		unsigned int texture;
+		GLuint texture;
 		glGenTextures(1, &texture);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexImage2D(
@@ -63,7 +63,7 @@ TextRendering::TextRendering(Shader &textShader, float width, float height)  {
 			glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
 			face->glyph->advance.x
 		};
-		Characters.insert(std::pair<char, Character>(c, character));
+		Characters.insert(std::pair<GLchar, Character>(c, character));
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -88,7 +88,7 @@ TextRendering::~TextRendering() {
 	glDeleteVertexArrays(1, &VAO);
 }
 
-void TextRendering::renderText(std::string text, float x, float y, float scale, glm::vec3 color) {
+void TextRendering::renderText(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color) {
 
 	_textShader.use();
 	_textShader.setUniform("projection", _projection);
@@ -97,20 +97,20 @@ void TextRendering::renderText(std::string text, float x, float y, float scale, 
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(VAO);
 
-	// iterate through all characters
+	// iterate through all available characters
 	std::string::const_iterator c;
 	for (c = text.begin(); c != text.end(); c++)
 	{
 		Character ch = Characters[*c];
 
-		float xpos = x + ch.Bearing.x * scale;
-		float ypos = y - (ch.Size.y - ch.Bearing.y) * scale; // "p" or "g" are rendered slighty below the baseline
+		GLfloat xpos = x + ch.Bearing.x * scale;
+		GLfloat ypos = y - (ch.Size.y - ch.Bearing.y) * scale; // "p" or "g" are rendered slighty below the baseline
 
-		float w = ch.Size.x * scale;
-		float h = ch.Size.y * scale;
+		GLfloat w = ch.Size.x * scale;
+		GLfloat h = ch.Size.y * scale;
 
 		// update VBO for each character
-		float vertices[6][4] = {
+		GLfloat vertices[6][4] = {
 			{ xpos,     ypos + h,   0.0f, 0.0f },
 			{ xpos,     ypos,       0.0f, 1.0f },
 			{ xpos + w, ypos,       1.0f, 1.0f },
