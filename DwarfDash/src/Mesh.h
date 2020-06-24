@@ -91,7 +91,7 @@ public:
 			else if (name == "texture_normal")
 				number = std::to_string(normalNr++); // actually Height texture according to tuwel
 			else if (name == "texture_height")
-				number = std::to_string(heightNr++); // actually Ambient  texture according to tuwel
+				number = std::to_string(heightNr++); // actually Ambient texture according to tuwel
 
 			// now set the sampler to the correct texture unit
 			glUniform1i(glGetUniformLocation(shader.getHandle(), (name + number).c_str()), i);
@@ -168,7 +168,6 @@ private:
 		// unbind
 		glBindVertexArray(0);
 
-		// TODO: set texture parameters (mag_filter, min_filter ...)
 	}
 };
 #endif

@@ -1,4 +1,4 @@
-# Blender v2.82 (sub 7) OBJ File: 'plattform_stone.blend'
+# Blender v2.82 (sub 7) OBJ File: 'plattform_normal.blend'
 # www.blender.org
 mtllib plattform_stone.mtl
 o platform_Cube.001
@@ -30,10 +30,10 @@ vt 0.678431 0.979923
 vt 0.513129 0.993513
 vt 0.513129 0.000000
 vt 0.678431 0.013590
-vt 0.000080 0.999920
-vt 0.000080 0.000080
-vt 0.645482 0.000080
-vt 0.645482 0.999920
+vt 0.000000 0.000000
+vt 0.678431 0.000000
+vt 0.678431 1.000000
+vt 0.000000 1.000000
 vt 0.682831 0.999917
 vt 0.000083 0.999917
 vt 0.000001 0.010178

@@ -46,7 +46,7 @@ static std::string FormatDebugOutput(GLenum source, GLenum type, GLuint id, GLen
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void setWindowFPS(GLFWwindow *window,float& t_sum);
+void setWindowFPS(GLFWwindow *window, float& t_sum);
 void initPhysX();
 void releasePhysX();
 void stepPhysics(float deltaTime);
@@ -78,6 +78,7 @@ static float _zoom = 10.0f;
 
 // normal mapping
 static int normalMapping = false;
+static int environmentMapping = false;
 
 // PhysX
 float mAccumulator = 0.0f;
@@ -118,7 +119,7 @@ int main(int argc, char** argv)
 	}
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // Request OpenGL version 4.3
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Request core profile
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);  // Create an OpenGL debug context 
 	glfwWindowHint(GLFW_REFRESH_RATE, config.refresh_rate); // Set refresh rate
@@ -197,7 +198,7 @@ int main(int argc, char** argv)
 	{
 		// Init PhysX
 		initPhysX();
-		 
+
 		// Init game
 		game->camPointer = &camera;
 		game->gPhysics = gPhysics;
@@ -212,9 +213,9 @@ int main(int argc, char** argv)
 		DirectionalLight dirL(glm::vec3(0.8f), glm::vec3(1.0f, 1.4f, 1.0f)); // color,  direction;
 
 		// pointlight arrays filled with pointlights for each level
-		std::vector<PointLight*> pointlightArrayLevel1 = std::vector<PointLight*>(); 
-		std::vector<PointLight*> pointlightArrayLevel2 = std::vector<PointLight*>(); 
-		std::vector<PointLight*> pointlightArrayLevel3 = std::vector<PointLight*>(); 
+		std::vector<PointLight*> pointlightArrayLevel1 = std::vector<PointLight*>();
+		std::vector<PointLight*> pointlightArrayLevel2 = std::vector<PointLight*>();
+		std::vector<PointLight*> pointlightArrayLevel3 = std::vector<PointLight*>();
 		fillPointlightArrays(pointlightArrayLevel1, pointlightArrayLevel2, pointlightArrayLevel3);
 
 		// visualization cube
@@ -354,8 +355,8 @@ int main(int argc, char** argv)
 		unsigned int cubemapTexture = loadCubemap(faces);
 
 		// set skybox
-		game->skyboxShader->use();
-		game->skyboxShader->setUniform("skybox", 0);
+		//game->skyboxShader->use();
+		//game->skyboxShader->setUniform("skybox", 0);
 
 		// Render loop
 		float t = float(glfwGetTime());
@@ -379,6 +380,13 @@ int main(int argc, char** argv)
 			//PhysX
 			stepPhysics(dt);
 
+			// set camera position for skybox reflection
+			//game->primaryShader->use();
+			//game->primaryShader->setUniform("cameraPos", camera.getPosition());
+			//glActiveTexture(GL_TEXTURE4);
+			//game->primaryShader->setUniform("skybox", 4); // 
+			//glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+
 			// draw skybox before opaque particle shader, to give information about background
 			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 			game->skyboxShader->use();
@@ -390,18 +398,28 @@ int main(int argc, char** argv)
 			// skybox cube
 			glBindVertexArray(skyboxVAO);
 			glActiveTexture(GL_TEXTURE0);
+			game->skyboxShader->use();
+			game->skyboxShader->setUniform("skybox", 0);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 			glBindVertexArray(0);
 			glDepthFunc(GL_LESS); // set depth function back to default
 
+			// set camera position for skybox reflection
+			game->primaryShader->use();
+			game->primaryShader->setUniform("cameraPos", camera.getPosition());
+			glActiveTexture(GL_TEXTURE4);
+			game->primaryShader->setUniform("skybox", 4); 
+			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+
 			// Render
 			game->update(dt);
 			game->draw();
 
-			
+
 			// light visualization
 			// only needed for visual debugging
+			/*******/
 			lightCubeShader.use();
 			lightCubeShader.setUniform("view", camera.getViewMatrix());
 			lightCubeShader.setUniform("projection", camera.getProjectionMatrix());
@@ -429,7 +447,7 @@ int main(int argc, char** argv)
 				glBindVertexArray(lightCubeVAO);
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 			}
-			
+			/*******/
 
 			// render text
 			textRenderer.renderText("current points:   " + to_string(game->player->score), 25.0f, 25.0f, 1.0f, glm::vec3(0.6f, 1.0f, 0.5f));
@@ -441,7 +459,7 @@ int main(int argc, char** argv)
 			t_sum += dt;
 			frames++;
 
-			setWindowFPS(window,t_sum);
+			setWindowFPS(window, t_sum);
 
 			// Swap buffers
 			glfwSwapBuffers(window);
@@ -648,11 +666,11 @@ void movePointlight(std::vector<PointLight*>& pointlightArrayLevel1, float &phi,
 	*/
 
 	if (reachedEnd) {
-		pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate - 1.0f * k * dt);
+		pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate - 1.0f * k);
 		//pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate - 1.0f * k * dt); // with delta time
 	}
 	else {
-		pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate + 1.0f * k * dt);
+		pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate + 1.0f * k);
 		//pointLightPlattform->position = glm::vec3(xCoordinate, yCoordinate, zCoordinate + 1.0f * k * dt); // with delta time
 	}
 
@@ -716,11 +734,14 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		_dragging = true;
-	} else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+	}
+	else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
 		_dragging = false;
-	} else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+	}
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
 		_strafing = true;
-	} else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+	}
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
 		_strafing = false;
 	}
 }
@@ -766,8 +787,8 @@ unsigned int loadCubemap(vector<std::string> faces) {
 }
 
 // FPS Camera & Player input processing
-void processInput(GLFWwindow* window, float deltaTime){
-	
+void processInput(GLFWwindow* window, float deltaTime) {
+
 	glm::vec3 displacement = glm::vec3(0.f);
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -796,7 +817,7 @@ void processInput(GLFWwindow* window, float deltaTime){
 	}
 
 	//Movespeed fix while afloat
-	if (displacement != glm::vec3(0.f,0.f,0.f))
+	if (displacement != glm::vec3(0.f, 0.f, 0.f))
 	{
 		displacement = glm::vec3(displacement.x, 0.f, displacement.z);
 	}
@@ -821,8 +842,8 @@ void processInput(GLFWwindow* window, float deltaTime){
 }
 
 // glfw: whenever the mouse moves, this callback is called
-void mouse_callback(GLFWwindow* window, double xpos, double ypos){
-	
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+
 	if (firstMouse)
 	{
 		lastX = xpos;
@@ -837,7 +858,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
 	lastY = ypos;
 
 	camera.ProcessMouseMovement(xoffset, yoffset);
-	
+
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -850,24 +871,28 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	switch (key)
 	{
-		case GLFW_KEY_ESCAPE:
-			glfwSetWindowShouldClose(window, true);
-			break;
-		case GLFW_KEY_F1:
-			config.wireframe = !config.wireframe;
-			glPolygonMode(GL_FRONT_AND_BACK, config.wireframe ? GL_LINE : GL_FILL);
-			break;
-		case GLFW_KEY_F2:
-			config.culling = !config.culling;
-			if (config.culling) glEnable(GL_CULL_FACE);
-			else glDisable(GL_CULL_FACE);
-			break;
-		case GLFW_KEY_F4:
-			normalMapping = !normalMapping;
-			//std::cout << "set normalMapping to: " << (normalMapping ? "true" : "false") << std::endl;
-			break;
+	case GLFW_KEY_ESCAPE:
+		glfwSetWindowShouldClose(window, true);
+		break;
+	case GLFW_KEY_F1:
+		config.wireframe = !config.wireframe;
+		glPolygonMode(GL_FRONT_AND_BACK, config.wireframe ? GL_LINE : GL_FILL);
+		break;
+	case GLFW_KEY_F2:
+		config.culling = !config.culling;
+		if (config.culling) glEnable(GL_CULL_FACE);
+		else glDisable(GL_CULL_FACE);
+		break;
+	case GLFW_KEY_F4:
+		normalMapping = !normalMapping;
+		//std::cout << "set normalMapping to: " << (normalMapping ? "true" : "false") << std::endl;
+		break;
+	case GLFW_KEY_F5:
+		//environmentMapping = !environmentMapping;
+		//std::cout << "set environmentMapping to: " << (environmentMapping ? "true" : "false") << std::endl;
+		break;
 	}
-	
+
 }
 
 static void APIENTRY DebugCallbackDefault(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
