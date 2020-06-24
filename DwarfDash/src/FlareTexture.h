@@ -5,6 +5,8 @@
 #include "Material.h"
 #include "FPSCamera.h"
 #include "Utils.h"
+#include "DDSLoader.h"
+#include <stb_image.h>
 
 using namespace std;
 
@@ -13,16 +15,11 @@ class FlareTexture
 public:
 
 	//position
-	glm::vec2 screenPosition;
-	//size
-	float scale;
-	//texture
-	//GLuint texture;
-	Texture texture;
+	glm::vec3 position;
 	
 	FlareTexture();
 
-	FlareTexture(std::shared_ptr<Shader> shader, string texture, FPSCamera* camera, float scale = 1.f, glm::vec2 screenPos = glm::vec2(0.0f,0.0f));
+	FlareTexture(std::shared_ptr<Shader> shader, string texture, FPSCamera* camera, glm::vec2 scaleTex = glm::vec2(1.f,1.f), glm::vec3 pos = glm::vec3(0.0f,1.0f,-1.0f));
 
 	~FlareTexture();
 
@@ -35,6 +32,11 @@ public:
 	FPSCamera* camera;
 
 private:
+	//size
+	glm::vec2 scaleTexture;
+
+	//texture
+	GLuint texId;
 
 	std::shared_ptr<Shader> shader;
 
@@ -43,5 +45,5 @@ private:
 	GLuint billboard_vertex_buffer;
 
 	// initializes buffer and vertex attributes
-	void init();
+	void init(string texture);
 };
