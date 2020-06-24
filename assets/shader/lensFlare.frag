@@ -1,15 +1,14 @@
-#version 330
+#version 330 core
 
-in vec2 pass_textureCoords;
+// Interpolated values from the vertex shaders
+in vec2 UV;
 
-out vec4 out_colour;
+// Ouput data
+out vec4 color;
 
-uniform sampler2D flareTexture;
-uniform float brightness;
+uniform sampler2D texSampler;
 
-void main(void){
-
-    out_colour = texture(flareTexture, pass_textureCoords);
-    out_colour.a *= brightness;
-
+void main(){
+	// Output color = color of the texture at the specified UV
+	color = texture( texSampler, UV );
 }

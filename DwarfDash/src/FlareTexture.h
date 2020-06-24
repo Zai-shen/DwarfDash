@@ -22,7 +22,7 @@ public:
 	
 	FlareTexture();
 
-	FlareTexture(std::shared_ptr<Shader> shader, string texture, float scale = 1.f, glm::vec2 screenPos = glm::vec2(0.0f,0.0f));
+	FlareTexture(std::shared_ptr<Shader> shader, string texture, FPSCamera* camera, float scale = 1.f, glm::vec2 screenPos = glm::vec2(0.0f,0.0f));
 
 	~FlareTexture();
 
@@ -40,6 +40,7 @@ private:
 
 	// render state
 	GLuint VAO;
+	GLuint billboard_vertex_buffer;
 
 	// initializes buffer and vertex attributes
 	void init();

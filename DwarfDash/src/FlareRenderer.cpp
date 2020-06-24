@@ -1,7 +1,8 @@
 #include "FlareRenderer.h"
 
 
-FlareRenderer::FlareRenderer(std::shared_ptr<Shader> shader) {
+FlareRenderer::FlareRenderer(std::shared_ptr<Shader> shader, FPSCamera* camera)
+	:camera(camera){
 	this->shader = shader;
 	this->init();
 }
@@ -23,7 +24,7 @@ void FlareRenderer::draw() {
 }
 
 void FlareRenderer::init() {
-	flares.push_back(new FlareTexture(this->shader, "assets/textures/particle.DDS", 1.f, glm::vec2(0.5f,0.5f)));
+	flares.push_back(new FlareTexture(this->shader, "assets/textures/particle.DDS", this->camera, 1.f, glm::vec2(0.5f,0.5f)));
 	//flares.push_back(new FlareTexture());
 	//flares.push_back(new FlareTexture());
 	//flares.push_back(new FlareTexture());

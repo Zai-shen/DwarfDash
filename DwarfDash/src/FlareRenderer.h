@@ -18,7 +18,7 @@ public:
 	//size
 	float scale;
 
-	FlareRenderer(std::shared_ptr<Shader> shader);
+	FlareRenderer(std::shared_ptr<Shader> shader, FPSCamera* camera);
 
 	~FlareRenderer();
 

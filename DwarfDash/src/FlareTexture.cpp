@@ -3,12 +3,12 @@
 #include "FlareTexture.h"
 
 FlareTexture::FlareTexture()
-	:texture(Texture("abc")){
-
+	:texture(Texture("assets/textures/particle.DDS")){
+	//standard texture
 }
 
-FlareTexture::FlareTexture(std::shared_ptr<Shader> shader, string texture, float scale, glm::vec2 screenPos)
-	:texture(Texture(texture)){
+FlareTexture::FlareTexture(std::shared_ptr<Shader> shader, string texture, FPSCamera* camera, float scale, glm::vec2 screenPos)
+	:texture(Texture(texture)), camera(camera){
 	this->shader = shader;
 	this->init();
 }
@@ -31,6 +31,9 @@ void FlareTexture::init() {
 		  0.5f,  0.5f, 0.0f,
 	};
 
+	glGenBuffers(1, &billboard_vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
 
 	//glBindVertexArray(0);
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -46,6 +49,9 @@ void FlareTexture::draw() {
 	//Bind VAO
 	glBindVertexArray(this->VAO);
 
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// Use our shader
 	shader->use();
 
@@ -56,18 +62,15 @@ void FlareTexture::draw() {
 
 	// Set our "myTextureSampler" sampler to use Texture Unit 0
 	///glUniform1i(TextureID, 0);
-	shader->setUniform("flareTexture", 0);
-
+	shader->setUniform("texSampler", 0);
 
 	glm::mat4 VM = camera->getViewMatrix();
 	// Same as the billboards tutorial
 	shader->setUniform("CameraRight_worldspace", glm::vec3(VM[0][0], VM[1][0], VM[2][0]));
 	shader->setUniform("CameraUp_worldspace", glm::vec3(VM[0][1], VM[1][1], VM[2][1]));
+	shader->setUniform("BillboardPos",glm::vec3(0.0f,2.f,-2.f));
+	shader->setUniform("BillboardSize", glm::vec2(1.f, 1.f));
 	shader->setUniform("VP", camera->getViewProjectionMatrix());
-
-	//glUniform3f(BillboardPosID, 0.0f, 0.5f, 0.0f); // The billboard will be just above the cube
-	//glUniform2f(BillboardSizeID, 1.0f, 0.125f);     // and 1m*12cm, because it matches its 256*32 resolution =)
-
 
 	// 1rst attribute buffer : vertices
 	glEnableVertexAttribArray(0);
@@ -81,8 +84,6 @@ void FlareTexture::draw() {
 		(void*)0            // array buffer offset
 	);
 
-
-	// Draw the billboard !
 	// This draws a triangle_strip which looks like a quad.
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
