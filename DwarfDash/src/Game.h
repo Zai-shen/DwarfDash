@@ -11,6 +11,7 @@
 #include "Player.h"
 #include "ParticleGenerator.h"
 #include "FPSCamera.h"
+#include "FlareRenderer.h"
 
 enum Direction {
 	F,
@@ -35,16 +36,19 @@ public:
 	shared_ptr<Shader> modelShader;
 	shared_ptr<Shader> skyboxShader;
 	shared_ptr<Shader> particleShader;
+	shared_ptr<Shader> flareShader;
+
 	shared_ptr<Material> woodTextureMaterial;
 	shared_ptr<Material> brickTextureMaterial;
 
 	PxPhysics* gPhysics;
 	PxScene* gScene;
 	PxRigidStatic* ground;
+
 	Player* player;
 	vector<ParticleGenerator*> particleSystem;
 	FPSCamera* camPointer;
-
+	FlareRenderer* flareRenderer;
 
 	Game();
 	~Game();

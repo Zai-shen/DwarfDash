@@ -5,10 +5,11 @@
 #include "Material.h"
 #include "FPSCamera.h"
 #include "Utils.h"
+#include "FlareTexture.h"
 
 using namespace std;
 
-class FlareTexture
+class FlareRenderer
 {
 public:
 
@@ -16,15 +17,10 @@ public:
 	glm::vec2 screenPosition;
 	//size
 	float scale;
-	//texture
-	//GLuint texture;
-	Texture texture;
-	
-	FlareTexture();
 
-	FlareTexture(std::shared_ptr<Shader> shader, string texture, float scale = 1.f, glm::vec2 screenPos = glm::vec2(0.0f,0.0f));
+	FlareRenderer(std::shared_ptr<Shader> shader);
 
-	~FlareTexture();
+	~FlareRenderer();
 
 	// update all particles
 	void update(float dt);
@@ -36,9 +32,10 @@ public:
 
 private:
 
+	std::vector<FlareTexture*> flares;
+	// render state
 	std::shared_ptr<Shader> shader;
 
-	// render state
 	GLuint VAO;
 
 	// initializes buffer and vertex attributes
