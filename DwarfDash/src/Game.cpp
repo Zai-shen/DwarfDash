@@ -80,6 +80,7 @@ void Game::initLevel1() {
 	Gameobject* goCoin = new Gameobject(new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader));
 	addGameobject(goCoin, true, PxVec3(0.f,1.8f,0.f) + 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingBack, *defaultPickUpGeometry, "coin");
 
+	// plattform plateau
 	addPlatformStairs(5, F, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront);
 	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft);
 	addPlatformLine(5, R, 5 * platSpacingFront + 3 * platSpacingRight + 1 * platSpacingFront + 5 * platSpacingFront + 2 * platSpacingLeft + 1 * platSpacingFront);
@@ -112,37 +113,90 @@ void Game::initLevel1() {
 
 void Game::initLevel2() {
 	createGroundPlane();
-	addPlatformLine(5, F, PxVec3(0.f, 0.f, 0.f));
-
-	// Dynamic coin example
-	Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
-	Gameobject* goCoin = new Gameobject(coin);
-	addGameobject(goCoin, true, PxVec3(0.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "coin");
-
-	// Dynamic heart example
-	Model* heart = new Model("assets/models/heart/Heart_low_poly_colored.obj", primaryShader);
-	Gameobject* goHeart = new Gameobject(heart);
-	addGameobject(goHeart, true, PxVec3(5.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "heart");
-
-	// Dynamic shield example
-	Model* shield = new Model("assets/models/shield/Shield_low_poly_colored.obj", primaryShader);
-	Gameobject* goShield = new Gameobject(shield);
-	addGameobject(goShield, true, PxVec3(-5.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "shield");
-
-	// Static actor example
-	Model* goal = new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader);
-	Gameobject* goGoal = new Gameobject(goal);
-	addGameobject(goGoal, false, PxVec3(0.0f, 5.f, -20.0f), PxBoxGeometry(PxVec3(7.5f, 5.f, .5f)), "goal");
-
-	// Static actor example
 	Model* platNorm = new Model("assets/models/plattform/plattform_normal.obj", primaryShader);
 	Gameobject* goPlatNorm = new Gameobject(platNorm);
-	addGameobject(goPlatNorm, false, PxVec3(-10.0f, 2.5f, .0f), *defaultPlatGeometry, "platformNormal");
+
+	addPlatformLine(1, F, PxVec3(0.f, 0.f, 0.f)); // start point
+
+	// moving platform
+	addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)),
+		true, 2 * platSpacingFront + 2 * platSpacingRight + platCurrentHeight, *defaultPlatGeometry, "platformMoving");
+
+	addPlatformLine(3, F, PxVec3(15.0f, 0.0f, -15.0f));
+
+	addGameobject(goPlatNorm, false, PxVec3(5.0f, 1.5f, -23.0f), *defaultPlatGeometry, "platformNormal");
+
+	addPlatformLine(4, L, PxVec3(0.f, 0.f, -23.0f)); 
+
+	addPlatformStairs(3, F, PxVec3(-12.0f, 1.8f, -23.0f) + 2 * platSpacingFront);
+
+	Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
+	Gameobject* goCoin = new Gameobject(coin);
+	addGameobject(goCoin, true, PxVec3(-12.0f, 3.6f, -27.0f), *defaultPickUpGeometry, "coin");
+
+	// moving platform2
+	addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)),
+		true, PxVec3(-11.0f, 4.8f, -38.0f) + 2 * platSpacingFront, *defaultPlatGeometry, "platformMoving");
+
+	// coin at the end of the moving plattform
+	Model* coin2 = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
+	goCoin = new Gameobject(coin2);
+	addGameobject(goCoin, true, PxVec3(13.0f, 7.0f, -45.0f), *defaultPickUpGeometry, "coin");
+
+	addPlatformLine(3, F, PxVec3(-1.2f, 7.0f, -55.0f));
+
+	Model* coin3 = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
+	goCoin = new Gameobject(coin3);
+	addGameobject(goCoin, true, PxVec3(-1.76f, 15.26f, -59.15f), *defaultPickUpGeometry, "coin");
+
+	addPlatformLine(9, L, platSpacingLeft + PxVec3(-10.f, 7.f, -63.0f));
+
+	Model* coin4 = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
+	goCoin = new Gameobject(coin4);
+	addGameobject(goCoin, true, PxVec3(-45.69f, 14.8f, -63.41f), *defaultPickUpGeometry, "coin");
+
+	addPlatformLine(3, B, platSpacingLeft + PxVec3(-31.2f, 10.86f, -73.0f));
+
+	goPlatNorm = new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader));
+	addGameobject(goPlatNorm, false, PxVec3(-24.3f, 10.5f, -79.0f), *defaultPlatGeometry, "platformNormal");
+
+	addPlatformLine(3, R, PxVec3(-11.82f, 2.0f, -87.0f)); 
+
+	// plattformline before goal
+	//addPlatformLine(3, R, PxVec3(-0.0f, 2.5f, -783.0f)); 
+
+	//Goal
+	addGameobject(new Gameobject(new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader)),
+		false, 24 * platSpacingFront + PxVec3(0.0f, 5.0f, 0.0f), PxBoxGeometry(PxVec3(7.5f, 5.0f, 0.5f)), "goal");
+
+	//Death cloud
+	addGameobject(new Gameobject(new Model("assets/models/cloud/cloud.obj", primaryShader)),
+		true, 5 * platSpacingBack + PxVec3(0, 6, 0), PxBoxGeometry(PxVec3(50.f, 5.f, 2.5f)), "cloud");
+
+	// Dynamic coin example
+	//Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
+	//Gameobject* goCoin = new Gameobject(coin);
+	//addGameobject(goCoin, true, PxVec3(0.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "coin");
+	//
+	//// Dynamic heart example
+	//Model* heart = new Model("assets/models/heart/Heart_low_poly_colored.obj", primaryShader);
+	//Gameobject* goHeart = new Gameobject(heart);
+	//addGameobject(goHeart, true, PxVec3(5.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "heart");
+	//
+	//// Dynamic shield example
+	//Model* shield = new Model("assets/models/shield/Shield_low_poly_colored.obj", primaryShader);
+	//Gameobject* goShield = new Gameobject(shield);
+	//addGameobject(goShield, true, PxVec3(-5.0f, 5.0f, -10.0f), *defaultPickUpGeometry, "shield");
 
 	// Static actor example
-	Model* platTorch = new Model("assets/models/plattform/Platform_Torch.obj", primaryShader);
-	Gameobject* goPlatTorch = new Gameobject(platTorch);
-	addGameobject(goPlatTorch, false, PxVec3(-10.0f, 2.5f, -10.0f), *defaultPlatGeometry, "platformTorch");
+	//Model* goal = new Model("assets/models/goal/Mine_escape_low_poly_colored.obj", primaryShader);
+	//Gameobject* goGoal = new Gameobject(goal);
+	//addGameobject(goGoal, false, PxVec3(0.0f, 5.f, -20.0f), PxBoxGeometry(PxVec3(7.5f, 5.f, .5f)), "goal");
+
+	//// Static actor example
+	//Model* platTorch = new Model("assets/models/plattform/Platform_Torch.obj", primaryShader);
+	//Gameobject* goPlatTorch = new Gameobject(platTorch);
+	//addGameobject(goPlatTorch, false, PxVec3(-10.0f, 2.5f, -10.0f), *defaultPlatGeometry, "platformTorch");
 }
 
 void Game::initLevel3() {
@@ -239,8 +293,8 @@ void Game::update(float dt) {
 	{
 		player->hasLost = false;
 
-		cout << "You lost!" << endl;
-		cout << "Score: " << player->score << endl;
+		//cout << "You lost!" << endl;
+		//cout << "Score: " << player->score << endl;
 
 		reset();
 	}
@@ -251,8 +305,8 @@ void Game::update(float dt) {
 		platCurrentHeight = PxVec3(0.0f);
 		player->setToStartPosition();
 
-		cout << "You win!" << endl;
-		cout << "Score: " << player->score << endl;
+		//cout << "You win!" << endl;
+		//cout << "Score: " << player->score << endl;
 
 		ground->release();
 		currentLevel->~Level();

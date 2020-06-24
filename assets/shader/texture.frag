@@ -85,6 +85,7 @@ void main() {
 	//}
 
     // Combine them
-    color = color + (reflect_color / 3);
+    //color = color + reflect_color;
+    color = color + (reflect_color / 2); // dividing makes the reflection a bit more smooth
 }
 

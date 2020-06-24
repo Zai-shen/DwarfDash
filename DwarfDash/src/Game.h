@@ -72,7 +72,6 @@ private:
 	Level* level2 = new Level();
 	Level* level3 = new Level();
 	Level* currentLevel = level1;
-	//Level* currentLevel = level2;
 
 	shared_ptr<Texture> woodTexture;
 	shared_ptr<Texture> brickTexture;
