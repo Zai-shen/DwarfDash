@@ -110,6 +110,10 @@ void Player::reset() {
 	setToStartPosition();
 }
 
+glm::vec3 Player::getPosition() {
+	return glm::vec3(gPlayerController->getPosition().x, gPlayerController->getPosition().y, gPlayerController->getPosition().z);
+}
+
 void Player::moveChar(glm::vec3 displacement, float deltaTime, PxControllerFilters filter) {
 	collFlags = gPlayerController->move(PxVec3(displacement.x, displacement.y, displacement.z ), 0.001f, deltaTime, filter, nullptr);
 }

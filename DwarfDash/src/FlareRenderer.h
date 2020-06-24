@@ -6,6 +6,7 @@
 #include "FPSCamera.h"
 #include "Utils.h"
 #include "FlareTexture.h"
+#include "Player.h"
 
 using namespace std;
 
@@ -18,7 +19,7 @@ public:
 	//size
 	float scale;
 
-	FlareRenderer(std::shared_ptr<Shader> shader, FPSCamera* camera);
+	FlareRenderer(std::shared_ptr<Shader> shader, FPSCamera* camera, Player* player);
 
 	~FlareRenderer();
 
@@ -29,6 +30,7 @@ public:
 	void draw();
 
 	FPSCamera* camera;
+	Player* player;
 
 private:
 

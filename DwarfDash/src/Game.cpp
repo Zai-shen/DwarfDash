@@ -34,7 +34,7 @@ void Game::init() {
 	player = new Player(gPhysics, gScene);
 
 	// Create & init Lens Flare
-	flareRenderer = new FlareRenderer(flareShader, camPointer);
+	flareRenderer = new FlareRenderer(flareShader, camPointer, player);
 
 	// Start game
 	currentGameState = GAME_STATE_ACTIVE;
