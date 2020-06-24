@@ -170,8 +170,8 @@ void Game::initLevel2() {
 		false, 24 * platSpacingFront + PxVec3(0.0f, 5.0f, 0.0f), PxBoxGeometry(PxVec3(7.5f, 5.0f, 0.5f)), "goal");
 
 	//Death cloud
-	addGameobject(new Gameobject(new Model("assets/models/cloud/cloud.obj", primaryShader)),
-		true, 5 * platSpacingBack + PxVec3(0, 6, 0), PxBoxGeometry(PxVec3(50.f, 5.f, 2.5f)), "cloud");
+	//addGameobject(new Gameobject(new Model("assets/models/cloud/cloud.obj", primaryShader)),
+	//	true, 5 * platSpacingBack + PxVec3(0, 6, 0), PxBoxGeometry(PxVec3(50.f, 5.f, 2.5f)), "cloud");
 
 	// Dynamic coin example
 	//Model* coin = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
@@ -293,8 +293,8 @@ void Game::update(float dt) {
 	{
 		player->hasLost = false;
 
-		//cout << "You lost!" << endl;
-		//cout << "Score: " << player->score << endl;
+		cout << "You lost!" << endl;
+		cout << "Score: " << player->score << endl;
 
 		reset();
 	}

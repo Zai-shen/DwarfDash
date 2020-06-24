@@ -419,16 +419,17 @@ int main(int argc, char** argv)
 
 			// light visualization
 			// only needed for visual debugging
-			/*******/
+			/*
+
 			lightCubeShader.use();
 			lightCubeShader.setUniform("view", camera.getViewMatrix());
 			lightCubeShader.setUniform("projection", camera.getProjectionMatrix());
 			lightCubeShader.setUniform("viewProjMatrix", camera.getViewProjectionMatrix());
 
-			glm::vec3 boxpos1 = pointlightArrayLevel1[0]->position;
-			glm::vec3 boxpos2 = pointlightArrayLevel1[1]->position;
-			glm::vec3 boxpos3 = pointlightArrayLevel1[2]->position;
-			glm::vec3 boxpos4 = pointlightArrayLevel1[3]->position;
+			glm::vec3 boxpos1 = pointlightArrayLevel2[0]->position;
+			glm::vec3 boxpos2 = pointlightArrayLevel2[1]->position;
+			glm::vec3 boxpos3 = pointlightArrayLevel2[2]->position;
+			glm::vec3 boxpos4 = pointlightArrayLevel2[3]->position;
 
 			// multiple cubes
 			glm::vec3 cubePositions[] = {
@@ -447,7 +448,7 @@ int main(int argc, char** argv)
 				glBindVertexArray(lightCubeVAO);
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 			}
-			/*******/
+			*/
 
 			// render text
 			textRenderer.renderText("current points:   " + to_string(game->player->score), 25.0f, 25.0f, 1.0f, glm::vec3(0.6f, 1.0f, 0.5f));
@@ -609,10 +610,10 @@ void fillPointlightArrays(std::vector<PointLight*>& pointlightArrayLevel1, std::
 	PointLight* pointLightLevel1_3 = new PointLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(12.5f, 6.8f, -50.0f), glm::vec3(1.0f, 0.014f, 0.000001f));  // plattform in the middle
 	PointLight* pointLightLevel1_4 = new PointLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(11.47f, 5.8f, -88.0f), glm::vec3(1.0f, 0.1f, 0.01f));   // plattform right before the goal
 
-	PointLight* pointLightLevel2_1 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-0.064f, 2.8f, -3.9f), glm::vec3(1.0f, 0.1f, 0.01f));
-	PointLight* pointLightLevel2_2 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-9.8f, 5.3f, 0.2f), glm::vec3(1.0f, 0.1f, 0.01f));
-	PointLight* pointLightLevel2_3 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-10.2f, 5.3f, -10.1f), glm::vec3(1.0f, 0.1f, 0.01f));
-	PointLight* pointLightLevel2_4 = new PointLight(glm::vec3(1.0f, 0.0f, 0.f), glm::vec3(-0.28f, 3.1f, -14.8f), glm::vec3(1.0f, 0.4f, 0.1f));
+	PointLight* pointLightLevel2_2 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(13.98f, 3.8f, -20.33f), glm::vec3(1.0f, 0.1f, 0.01f));
+	PointLight* pointLightLevel2_3 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-11.70f, 5.8f, -33.2f), glm::vec3(1.0f, 0.1f, 0.01f));
+	PointLight* pointLightLevel2_1 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-15.12f, 13.8f, -62.62f), glm::vec3(1.0f, 0.1f, 0.01f));
+	PointLight* pointLightLevel2_4 = new PointLight(glm::vec3(1.0f, 0.0f, 0.f),  glm::vec3(-7.21f, 7.8f, -87.34), glm::vec3(1.0f, 0.4f, 0.1f));
 
 	PointLight* pointLightLevel3_1 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.41f, 2.8f, -19.4f), glm::vec3(1.0f, 0.1f, 0.01f));
 	PointLight* pointLightLevel3_2 = new PointLight(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.3f, 2.8f, -50.0f), glm::vec3(1.0f, 0.1f, 0.01f));
