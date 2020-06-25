@@ -44,6 +44,8 @@ public:
 
 	void wantsToJump(float deltaTime);
 
+	glm::vec3 getPosition();
+
 private:
 	bool jumping = false;
 	bool jumpingUp = true;

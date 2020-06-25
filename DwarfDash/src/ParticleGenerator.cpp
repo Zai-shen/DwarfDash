@@ -21,7 +21,6 @@ ParticleGenerator::~ParticleGenerator()
 	glDeleteBuffers(1, &particles_color_buffer);
 	glDeleteBuffers(1, &particles_position_buffer);
 	glDeleteBuffers(1, &billboard_vertex_buffer);
-	glDeleteProgram(shader->getHandle());
 	glDeleteTextures(1, &Texture);
 	glDeleteVertexArrays(1, &VAO);
 }
@@ -97,6 +96,9 @@ void ParticleGenerator::init() {
 	glBindBuffer(GL_ARRAY_BUFFER, particles_color_buffer);
 	// Initialize with empty (NULL) buffer : it will be updated later, each frame.
 	glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void ParticleGenerator::update(float dt) {

@@ -9,6 +9,7 @@ Game::~Game() {
 	player->~Player();
 	currentLevel->~Level();
 	ground->release();
+	flareRenderer->~FlareRenderer();
 }
 
 void Game::init() {
@@ -33,6 +34,9 @@ void Game::init() {
 	// Create & init Player
 	player = new Player(gPhysics, gScene);
 
+	// Create & init Lens Flare
+	flareRenderer = new FlareRenderer(flareShader, camPointer, player);
+
 	// Start game
 	currentGameState = GAME_STATE_ACTIVE;
 }
@@ -42,6 +46,7 @@ void Game::initShaders() {
 	modelShader = make_shared<Shader>("modelloading.vert", "modelloading.frag");
 	skyboxShader = make_shared<Shader>("skybox.vert", "skybox.frag");
 	particleShader = make_shared<Shader>("particlesInstanced.vert", "particlesInstanced.frag");
+	flareShader = make_shared<Shader>("lensFlare.vert", "lensFlare.frag");
 }
 
 void Game::initTextures() {
@@ -288,6 +293,7 @@ void Game::update(float dt) {
 	for (std::size_t i = 0; i < particleSystem.size(); ++i) {
 		particleSystem[i]->update(dt);
 	}
+	flareRenderer->update(dt);
 
 	if (player->hasLost)
 	{
@@ -323,7 +329,7 @@ void Game::draw() {
 	for (std::size_t i = 0; i < particleSystem.size(); ++i) {
 		particleSystem[i]->draw();
 	}
-
+	flareRenderer->draw();
 }
 
 void Game::reset() {
