@@ -140,8 +140,10 @@ void Game::initLevel2() {
 	addGameobject(goCoin, true, PxVec3(-12.0f, 3.6f, -27.0f), *defaultPickUpGeometry, "coin");
 
 	// moving platform2
-	addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)),
-		true, PxVec3(-11.0f, 4.8f, -38.0f) + 2 * platSpacingFront, *defaultPlatGeometry, "platformMoving");
+	//addGameobject(new Gameobject(new Model("assets/models/plattform/plattform_normal.obj", primaryShader)),
+	//	true, PxVec3(-11.0f, 4.8f, -38.0f) + 2 * platSpacingFront, *defaultPlatGeometry, "platformMoving");
+
+	addPlatformStairs(3, F, PxVec3(-11.0f, 4.8f, -38.0f) + 2 * platSpacingFront);
 
 	// coin at the end of the moving plattform
 	Model* coin2 = new Model("assets/models/coin/Coin_low_poly_colored.obj", primaryShader);
