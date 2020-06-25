@@ -38,8 +38,6 @@ private:
 	// render state
 	std::shared_ptr<Shader> shader;
 
-	GLuint VAO;
-
 	// initializes buffer and vertex attributes
 	void init();
 };

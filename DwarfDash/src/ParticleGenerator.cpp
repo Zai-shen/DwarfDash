@@ -21,7 +21,6 @@ ParticleGenerator::~ParticleGenerator()
 	glDeleteBuffers(1, &particles_color_buffer);
 	glDeleteBuffers(1, &particles_position_buffer);
 	glDeleteBuffers(1, &billboard_vertex_buffer);
-	glDeleteProgram(shader->getHandle());
 	glDeleteTextures(1, &Texture);
 	glDeleteVertexArrays(1, &VAO);
 }

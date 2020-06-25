@@ -9,6 +9,7 @@ Game::~Game() {
 	player->~Player();
 	currentLevel->~Level();
 	ground->release();
+	flareRenderer->~FlareRenderer();
 }
 
 void Game::init() {

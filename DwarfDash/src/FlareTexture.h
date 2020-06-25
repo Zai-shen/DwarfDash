@@ -6,6 +6,7 @@
 #include "FPSCamera.h"
 #include "Utils.h"
 #include "DDSLoader.h"
+#include "Player.h"
 #include <stb_image.h>
 
 using namespace std;
@@ -19,7 +20,9 @@ public:
 	
 	FlareTexture();
 
-	FlareTexture(std::shared_ptr<Shader> shader, string texture, FPSCamera* camera, glm::vec2 scaleTex = glm::vec2(1.f,1.f), glm::vec3 pos = glm::vec3(0.0f,1.0f,-1.0f));
+	FlareTexture(std::shared_ptr<Shader> shader, string texture, FPSCamera* camera, Player* player,
+		glm::vec2 scaleTex = glm::vec2(1.f, 1.f), glm::vec3 sunOrigin = glm::vec3(12.f, 80.f, -60.f),
+		float distanceToSun = 0.1f, glm::vec3 pos = glm::vec3(0.0f, 1.0f, -1.0f));
 
 	~FlareTexture();
 
@@ -31,9 +34,15 @@ public:
 
 	FPSCamera* camera;
 
+	Player* player;
+
 private:
 	//size
 	glm::vec2 scaleTexture;
+
+	//pos calculations
+	float distanceToSun;
+	glm::vec3 sunOrigin;
 
 	//texture
 	GLuint texId;

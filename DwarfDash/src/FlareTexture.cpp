@@ -1,19 +1,25 @@
 //with help from: https://www.youtube.com/channel/UCUkRj4qoT1bsWpE_C8lZYoQ
 
 #include "FlareTexture.h"
+#include <glm/gtx/string_cast.hpp>
 
 FlareTexture::FlareTexture(){}
 
-FlareTexture::FlareTexture(std::shared_ptr<Shader> shader, string texture, FPSCamera* camera, glm::vec2 scaleTex, glm::vec3 pos)
-	:camera(camera){
+FlareTexture::FlareTexture(std::shared_ptr<Shader> shader, string texture, FPSCamera* camera,
+	Player* player, glm::vec2 scaleTex, glm::vec3 sunOrigin, float distanceToSun, glm::vec3 pos)
+	:camera(camera), player(player){
 	this->shader = shader;
 	this->position = pos;
 	this->scaleTexture = scaleTex;
+	this->distanceToSun = distanceToSun;
+	this->sunOrigin = sunOrigin;
 	this->init(texture);
 }
 
 FlareTexture::~FlareTexture() {
-
+	glDeleteBuffers(1, &billboard_vertex_buffer);
+	glDeleteTextures(1, &texId);
+	glDeleteVertexArrays(1, &VAO);
 }
 
 void FlareTexture::init(string texture) {
@@ -57,7 +63,9 @@ void FlareTexture::init(string texture) {
 
 // update all particles
 void FlareTexture::update(float dt) {
-
+	glm::vec3 sunToPlayer = player->getPosition() + glm::vec3(0,0,.3f) - sunOrigin;
+	position = sunOrigin + (sunToPlayer * distanceToSun);
+	//std::cout << distanceToSun << "<dToSun pos>" << glm::to_string(position) << std::endl;
 }
 
 // render all particles
