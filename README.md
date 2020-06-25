@@ -6,41 +6,43 @@ This game aims to be *fun and fast paced*, while at the same time _fullfilling t
 
 ## CG Grading
 ### Mandatory
-[x] 3D Geometry (6 Points)
+* [x] 3D Geometry (6 Points)
 	Objects loaded with ASSIMP
-[x] Playable (3 Points)
-[x] Advanced Gameplay (3 Points)
-[x] Min. 60 FPS and Framerate Independence (3 Points)
+* [x] Playable (3 Points)
+* [x] Advanced Gameplay (3 Points)
+* [x] Min. 60 FPS and Framerate Independence (3 Points)
 	Also insured by Nvidia PhysX
-[x] Win/Lose Condition (3 Points)
+* [x] Win/Lose Condition (3 Points)
 	Getting to the finish line / falling of platforms | getting caught by the cloud of death
-[x] Intuitive Controls (2 Points)
+* [x] Intuitive Controls (2 Points)
 	W/A/S/D /R for reset
-[x] Intuitive Camera (2 Points)
+* [x] Intuitive Camera (2 Points)
 	FPS Camera
-[x] Illumination Model (2 Points)
-[x] Textures (2 Points)
-[x] Moving Objects (2 Points)
+* [x] Illumination Model (2 Points)
+* [x] Textures (2 Points)
+* [x] Moving Objects (2 Points)
 	Also insured by Nvidia PhysX
-[x] Documentation (1 Point)
-[x] Adjustable Parameters (1 Point)
+* [x] Documentation (1 Point)
+* [x] Adjustable Parameters (1 Point)
 	Config class ensures parameters are loaded from the settings.ini
 
 ### Optional
-[x] Collision Detection (Basic Physics) (4 Points)
+* [x] Collision Detection (Basic Physics) (4 Points)
 	Nvidia PhysX ( Boxes, Spheres, Capsules )
-[x] Advanced Physics (6 Points)
+* [x] Advanced Physics (6 Points)
 	Nvidia PhysX
-[] Scripting Language Integration (6 Points)
-[] View-Frustum Culling (6 Points)
-[x] Heads-Up Display (4 Points)
+* [] Scripting Language Integration (6 Points)
+* [] View-Frustum Culling (6 Points)
+* [x] Heads-Up Display (4 Points)
 
 ### Effects
-[x] Environment Map (8 Points)
-[x] Simple Normal Mapping (4 Points) (turn on/off with F4)
+* [x] Environment Map (8 Points)
+* [x] Simple Normal Mapping (4 Points) (turn on/off with F4)
+* [x] CPU Particle System using Instancing (8 Points)
+* [x] Lens Flare (8 Points)
 
 ### Optional
-[x] Specular Map (4 Points)
+* [x] Specular Map (4 Points)
 
 
 ## Getting Started
